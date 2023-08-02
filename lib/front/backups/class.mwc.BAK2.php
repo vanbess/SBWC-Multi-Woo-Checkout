@@ -2122,7 +2122,7 @@ if (!class_exists('woocommerce')) :
                                         // loop
                                         foreach ($product->get_available_variations() as $key => $value) :
 
-                                            $current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_woocommerce_currency();
+                                            $current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_option('woocommerce_currency');
 
                                             array_push($var_arr, [
                                                 'id'         => $value['variation_id'],

@@ -36,7 +36,7 @@ if (!trait_exists('GetPackagePrice')) :
 
                 // get discount
                 if ($arr_discount['type'] == 'percentage') :
-                    $total_price -= ($total_price * $arr_discount['value']) / 100;
+                    $total_price -= $total_price * ($arr_discount['value'] / 100);
                 elseif ($arr_discount['type'] == 'free' && in_array($arr_discount['value'], $arr_product_ids)) :
                     $free_price = wc_get_product($arr_discount['value'])->get_regular_price();
                     $total_price -= $free_price;

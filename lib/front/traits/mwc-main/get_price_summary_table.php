@@ -20,7 +20,7 @@ if (!trait_exists('GetPriceSummaryTable')) :
             // file_put_contents(MWC_PLUGIN_DIR.'summ-pricelists.log', print_r($price_list, true));
 
             // current currency
-            $current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_woocommerce_currency();
+            $current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_option('woocommerce_currency');
 
             // uncomment to debug specific currency conversion
             // $current_curr = 'EUR';

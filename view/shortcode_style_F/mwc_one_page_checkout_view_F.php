@@ -83,12 +83,12 @@ if (!empty($package_product_ids)) {
                 }
 
                 //get product info
-                $product = wc_get_product($p_id);
-                $product_title = $prod['title_package'] ?: $product->get_title();
-                $product_price_html = $product->get_price_html();
-                $prod_price = $product->get_price();
+                $product               = wc_get_product($p_id);
+                $product_title         = $prod['title_package'] ?: $product->get_title();
+                $product_price_html    = $product->get_price_html();
+                $prod_price            = $product->get_price();
                 $product_regular_price = $product->get_regular_price();
-                $product_sale_price = $product->get_sale_price();
+                $product_sale_price    = $product->get_sale_price();
 
                 if ($prod['type'] == 'free') {
                     if ($prod['qty_free'] == 0) {
@@ -100,66 +100,61 @@ if (!empty($package_product_ids)) {
                     // get regular price
                     if ($product->is_type('variable')) {
                         $product_regular_price = $product->get_variation_regular_price('min');
-                        $product_sale_price = $product->get_variation_sale_price('min');
+                        $product_sale_price    = $product->get_variation_sale_price('min');
                     } else {
                         $product_regular_price = $product->get_regular_price();
-                        $product_sale_price = $product->get_sale_price();
+                        $product_sale_price    = $product->get_sale_price();
                     }
 
                     // get now price
-                    $now_price = ($prod_price * $prod['qty']) / ($prod['qty'] + $prod['qty_free']);
-
-                    $total_prod_qty= $prod['qty'] + $prod['qty_free'];
-                    $bundle_price = ($prod_price * $prod['qty']) / $total_prod_qty;
+                    $now_price          = ($prod_price * $prod['qty']) / ($prod['qty'] + $prod['qty_free']);
+                    $total_prod_qty     = $prod['qty'] + $prod['qty_free'];
+                    $bundle_price       = ($prod_price * $prod['qty']) / $total_prod_qty;
                     $bundle_price_total = $bundle_price * $total_prod_qty;
-                    $bundle_coupon= ((($prod_price * $total_prod_qty) - $bundle_price_total) / $bundle_price_total) * 100;
-                    $discount = ($total_prod_qty* $prod_price) - $bundle_price_total;
+                    $bundle_coupon      = ((($prod_price * $total_prod_qty) - $bundle_price_total) / $bundle_price_total) * 100;
+                    $discount           = ($total_prod_qty* $prod_price) - $bundle_price_total;
+
                 } else if ($prod['type'] == 'off') {
                     $bundle_title = sprintf(__('Buy %s + Get %d&#37;', 'woocommerce'), $prod['qty'], $prod['coupon']);
 
                     // get regular price
                     if ($product->is_type('variable')) {
                         $product_regular_price = $product->get_variation_regular_price('min');
-                        $product_sale_price = $product->get_variation_sale_price('min');
+                        $product_sale_price    = $product->get_variation_sale_price('min');
                     } else {
                         $product_regular_price = $product->get_regular_price();
-                        $product_sale_price = $product->get_sale_price();
+                        $product_sale_price    = $product->get_sale_price();
                     }
 
-                    $total_prod_qty= $prod['qty'];
-                    $i_total = $prod_price * $prod['qty'];
-                    $bundle_coupon= $prod['coupon'];
-                    // get now price
-                    $now_price = ($i_total - ($i_total * $bundle_coupon/ 100)) / $prod['qty'];
+                    $total_prod_qty     = $prod['qty'];
+                    $i_total            = $prod_price * $prod['qty'];
+                    $bundle_coupon      = $prod['coupon'];
+                    $now_price          = ($i_total - ($i_total * ($bundle_coupon/ 100))) / $prod['qty'];
                     $bundle_price_total = $now_price * $prod['qty'];
-                    $discount = $i_total - $bundle_price_total;
+                    $discount           = $i_total - $bundle_price_total;
                 } else {
-                    $bundle_title = $prod['title_header'] ?: __('Bundle option', 'woocommerce');
 
-                    // get regular price bun
+                    $bundle_title          = $prod['title_header'] ?: __('Bundle option', 'woocommerce');
                     $product_regular_price = 0;
-                    // get now price
-                    $now_price = 0;
+                    $now_price             = 0;
+                    $sum_price_regular     = 0;
 
-                    $sum_price_regular = 0;
-                    // $total_price_bun = 0;
                     foreach ($prod['prod'] as $i => $i_prod) {
+
                         $p_bun = wc_get_product($i_prod['id']);
+                        
                         if ($p_bun->is_type('variable')) {
                             $sum_price_regular += $p_bun->get_variation_regular_price('min');
-                            // $product_regular_price += $p_bun->get_variation_regular_price('min');
                         } else {
                             $sum_price_regular += $p_bun->get_regular_price();
-                            // $product_regular_price += $p_bun->get_regular_price();
                         }
                     }
 
-                    $bundle_coupon= $prod['coupon'];
-                    $bundle_price = $prod['price'];
+                    $bundle_coupon      = $prod['coupon'];
+                    $bundle_price       = $prod['price'];
                     $bundle_price_total = $prod['price'];
-
-                    $price_discount = $sum_price_regular - $bundle_price_total;
-                    $bundle_coupon= ($price_discount * 100) / $sum_price_regular;
+                    $price_discount     = $sum_price_regular - $bundle_price_total;
+                    $bundle_coupon      = ($price_discount * 100) / $sum_price_regular;
 
                     $discount = 0;
                 }

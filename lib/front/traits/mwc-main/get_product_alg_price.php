@@ -17,7 +17,7 @@ if (!trait_exists('MWC_Get_Product_ALG_Price')) :
         public static function mwc_get_product_ALG_Price($product_id, $current_currency, $default_currency) {
 
             // check if required ALG function exists before doing anything else to avoid errors; bail if false
-            if (!function_exists('alg_convert_price')) :
+            if (!function_exists('alg_wc_cs_get_currency_exchange_rate')) :
                 return false;
             endif;
 
@@ -35,15 +35,17 @@ if (!trait_exists('MWC_Get_Product_ALG_Price')) :
                 // get regular price
                 $reg_price = get_post_meta($product_id, '_regular_price', true);
 
-                // convert price using ALG
-                $conved_price = alg_convert_price([
-                    'price'         => $reg_price,
-                    'currency_from' => $default_currency,
-                    'currency'      => $current_currency,
-                    'format_price'  => false
-                ]);
+                // get exchange rate
+                $curr_rate =
+                                get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_currency}") ?
+                                get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_currency}") :
+                                1;
 
-                file_put_contents(MWC_PLUGIN_DIR.'conved_prices.log', print_r($conved_price, true), FILE_APPEND);
+                // convert price and return
+                $conved_price = $reg_price * $curr_rate;
+
+                // log to debug with product id, current currency, default currency, regular price, exchange rate, converted price
+                error_log("Product ID: {$product_id} | Current Currency: {$current_currency} | Default Currency: {$default_currency} | Regular Price: {$reg_price} | Exchange Rate: {$curr_rate} | Converted Price: {$conved_price}");
 
                 return $conved_price;
 

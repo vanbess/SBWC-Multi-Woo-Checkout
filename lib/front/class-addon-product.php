@@ -12,12 +12,14 @@ if (!class_exists('MWC_AddonProduct')) {
     /*
      * MWC_AddonProduct Class.
      */
-    class MWC_AddonProduct {
+    class MWC_AddonProduct
+    {
 
         /**
          * Constructor
          */
-        public function __construct() {
+        public function __construct()
+        {
 
             // cpt
             add_action('init', array(__CLASS__, 'create_post_type_addon_product'));
@@ -41,7 +43,8 @@ if (!class_exists('MWC_AddonProduct')) {
          *
          * @return void
          */
-        public static function create_post_type_addon_product() {
+        public static function create_post_type_addon_product()
+        {
             $args = array(
                 'labels' => array(
                     'name'               => __('Addon product', 'woocommerce'),
@@ -76,7 +79,8 @@ if (!class_exists('MWC_AddonProduct')) {
          *
          * @return void
          */
-        public static function add_product_id_meta_boxes() {
+        public static function add_product_id_meta_boxes()
+        {
             add_meta_box(
                 "addon_product_id_meta",
                 __('Product ID', 'woocommerce'),
@@ -92,7 +96,8 @@ if (!class_exists('MWC_AddonProduct')) {
          *
          * @return void
          */
-        public static function add_product_id_addon_product_meta_box() {
+        public static function add_product_id_addon_product_meta_box()
+        {
 
             global $post;
             $custom = get_post_custom($post->ID, true);
@@ -153,7 +158,8 @@ if (!class_exists('MWC_AddonProduct')) {
          * @param int $post_id
          * @return void
          */
-        public static function save_product_id_fields($post_id) {
+        public static function save_product_id_fields($post_id)
+        {
 
             global $post;
 
@@ -174,7 +180,8 @@ if (!class_exists('MWC_AddonProduct')) {
          * @param array $defaults
          * @return void
          */
-        public static function columns_head_only_addon_product($defaults) {
+        public static function columns_head_only_addon_product($defaults)
+        {
 
             $defaults['post_id'] = __('Post ID', 'woocommerce');
             $defaults['product_id'] = __('Product ID', 'woocommerce');
@@ -194,7 +201,8 @@ if (!class_exists('MWC_AddonProduct')) {
          * @param int $post_ID
          * @return void
          */
-        public static function columns_content_addon_product($column_name, $post_ID) {
+        public static function columns_content_addon_product($column_name, $post_ID)
+        {
 
             switch ($column_name) {
                 case 'post_id':
@@ -213,6 +221,7 @@ if (!class_exists('MWC_AddonProduct')) {
                     echo get_post_meta($post_ID, 'count_paid', true) ?: '-';
                     break;
                 case 'conversion_rate':
+                    
                     $paid_count      = (int)get_post_meta($post_ID, 'count_paid', true);
                     $view_count      = (int)get_post_meta($post_ID, 'count_view', true);
                     $click_count     = (int)get_post_meta($post_ID, 'count_click', true);
@@ -226,23 +235,36 @@ if (!class_exists('MWC_AddonProduct')) {
                     echo $conversion_rate > 0 ? number_format($conversion_rate, 2, '.', '') . '%' : '-';
                     break;
                 case 'revenue':
+
                     // revenue and order currency
-                    $revenue        = get_post_meta($post_ID, 'revenue', true);
-                    $order_currency = get_post_meta($post_ID, 'order_currency', true);
+                    $revenue = get_post_meta($post_ID, 'revenue', true);
+
+                    // get order currency
+                    $order_curr = get_post_meta($post_ID, 'order_currency', true);
+
+                    // get default currency
+                    $default_curr = get_option('woocommerce_currency');
 
                     // if ALG currency converter is installed
-                    if ($revenue && $order_currency && function_exists('alg_wc_cs_get_exchange_rate')) :
-                        if ($order_currency !== 'USD') :
-                            $ext_rate = alg_wc_cs_get_exchange_rate($order_currency, 'USD') ? alg_wc_cs_get_exchange_rate($order_currency, 'USD') : 1;
-                            $conv_revenue = $revenue * $ext_rate;
+                    if ($revenue && $order_curr && function_exists('alg_wc_cs_get_exchange_rate')) :
+
+                        if ($order_curr !== $default_curr) :
+                            // $ext_rate = alg_wc_cs_get_exchange_rate($order_currency, 'USD') ? alg_wc_cs_get_exchange_rate($order_currency, 'USD') : 1;
+
+                            $curr_rate =
+                                get_option("alg_currency_switcher_exchange_rate_{$default_curr}_{$order_curr}") ?
+                                get_option("alg_currency_switcher_exchange_rate_{$default_curr}_{$order_curr}") :
+                                1;
+
+                            $conv_revenue = $revenue * $curr_rate;
                             echo 'USD ' . number_format($conv_revenue, 2, '.', '');
                         else :
-                            echo $order_currency . ' ' . number_format($revenue, 2, '.', '');
+                            echo $order_curr . ' ' . number_format($revenue, 2, '.', '');
                         endif;
 
                     // if ALG currency converter is not installed
-                    elseif ($revenue && $order_currency && !function_exists('alg_wc_cs_get_exchange_rate')) :
-                        echo $order_currency . ' ' . number_format($revenue, 2, '.', '');
+                    elseif ($revenue && $order_curr && !function_exists('alg_wc_cs_get_exchange_rate')) :
+                        echo $order_curr . ' ' . number_format($revenue, 2, '.', '');
                     elseif (!$revenue) :
                         echo '-';
                     endif;
@@ -256,7 +278,8 @@ if (!class_exists('MWC_AddonProduct')) {
          * @param string $type
          * @return void
          */
-        public static function mwc_update_statistics_addon_product($addon_ids, $type) {
+        public static function mwc_update_statistics_addon_product($addon_ids, $type)
+        {
             //update or insert post meta
             foreach ($addon_ids as $addon_id) {
                 $exist_meta_view = get_post_meta($addon_id, $type, true);

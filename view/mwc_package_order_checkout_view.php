@@ -7,6 +7,18 @@ $currency              = get_woocommerce_currency_symbol();
 $package_product_ids   = self::$package_product_ids;
 $package_number_item_2 = self::$package_number_item_2;
 
+// setup exchange rate
+
+// current currency
+$current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_option('woocommerce_currency');
+
+// get default currency
+$default_currency = get_option('woocommerce_currency');
+
+// get alg exchange rate
+$ex_rate = get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") ?
+    get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") : 1;
+
 if (!empty($package_product_ids)) {
 
     // ********************************************
@@ -130,26 +142,31 @@ if (!empty($package_product_ids)) {
                             </div>
                         <?php
                         } else {
-                            $product_separate = 1;
-                            $product_title = $product->get_title();
-                            $product_price_html = $product->get_price_html();
-                            $prod_price = $product->get_price();
+                            $product_separate      = 1;
+                            $product_title         = $product->get_title();
+                            $product_price_html    = $product->get_price_html();
+                            $prod_price            = $product->get_price();
                             $product_regular_price = intval($product->get_regular_price());
-                            $product_sale_price = intval($product->get_sale_price());
+                            $product_sale_price    = intval($product->get_sale_price());
 
                             //calculation prices
                             if ($prod['type'] == 'free') {
-                                $bundle_price = ($prod_price * $prod['qty']) / ($prod['qty'] + $prod['qty_free']);
+
+                                $bundle_price       = ($prod_price * $prod['qty']) / ($prod['qty'] + $prod['qty_free']);
                                 $bundle_price_total = $bundle_price * ($prod['qty'] + $prod['qty_free']);
-                                $bundle_coupon= ((($prod_price * ($prod['qty'] + $prod['qty_free'])) - $bundle_price_total) / $bundle_price_total) * 100;
+                                $bundle_coupon      = ($prod_price * ($prod['qty'] + $prod['qty_free'])) - ($bundle_price_total / ($bundle_price_total * 100));
+
                             } else if ($prod['type'] == 'off') {
-                                $i_tt = $prod_price * $prod['qty'];
-                                $bundle_coupon= $prod['coupon'];
-                                $bundle_price = ($i_tt - ($i_tt * $bundle_coupon/ 100)) / $prod['qty'];
+
+                                $i_tt               = $prod_price * $prod['qty'];
+                                $bundle_coupon      = $prod['coupon'];
+                                $bundle_price       = $i_tt - ($i_tt * ($bundle_coupon / 100)) / $prod['qty'];
                                 $bundle_price_total = $bundle_price * $prod['qty'];
+
                             } else {
-                                $bundle_coupon= $prod['coupon'];
-                                $bundle_price = $prod['price'];
+
+                                $bundle_coupon      = $prod['coupon'];
+                                $bundle_price       = $prod['price'];
                                 $bundle_price_total = $prod['price'];
                             }
 
@@ -194,21 +211,19 @@ if (!empty($package_product_ids)) {
                                                 <div class="package-info">
                                                     <?php
 
+                                                    // calcualte discount percentage   
                                                     $percentage = 0;
-                                                    if ($product_regular_price > 0)
+
+                                                    if ($product_regular_price > 0) :
                                                         $percentage = round((($product_regular_price - $product_sale_price) / $product_regular_price) * 100);
+                                                    endif;
 
                                                     if ($p_i == 0 && isset($_GET['unit'])) {
                                                         $unit_price = (strlen($_GET['unit']) > 2) ? number_format(($_GET['unit'] / 100), 2) : $_GET['unit'];
-                                                        $atts = array(
-                                                            'price' => $unit_price,
-                                                            'currency_from' => "USD",
-                                                            'currency' => alg_get_current_currency_code(),
-                                                        );
                                                     ?>
 
                                                         <br>
-                                                        <span class="discount">( $ <?php echo (floatval(preg_replace('#[^\d.]#', '', alg_convert_price($atts)))) ?> / Unit )</span>
+                                                        <span class="discount">( $ <?php echo (floatval(preg_replace('#[^\d.]#', '', $unit_price * $ex_rate))) ?> / Unit )</span>
                                                     <?php
                                                     }
                                                     ?>

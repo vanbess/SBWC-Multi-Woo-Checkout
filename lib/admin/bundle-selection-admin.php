@@ -1560,7 +1560,7 @@ if (!class_exists('MWCBundleSectionAdmin')) :
                         <tr valign="top">
                             <th scope="row" class="titledesc">
                                 <?php
-                                $default_currency = get_woocommerce_currency();
+                                $default_currency = get_option('woocommerce_currency');
                                 ?>
                                 <label>Total price(<?= $default_currency ?>):</label>
                             </th>

@@ -83,61 +83,54 @@ if (!empty($package_product_ids)) {
                 }
 
                 //get product info
-                $product = wc_get_product($p_id);
-                $option_title = $prod['title_package'] ?: $product->get_title();
-                $product_price_html = $product->get_price_html();
-                $prod_price = $product->get_price();
+                $product               = wc_get_product($p_id);
+                $option_title          = $prod['title_package'] ?: $product->get_title();
+                $product_price_html    = $product->get_price_html();
+                $prod_price            = $product->get_price();
                 $product_regular_price = $product->get_regular_price();
-                $product_sale_price = $product->get_sale_price();
-                // get short description
-                $prod_short_desc = $product->get_short_description();
+                $product_sale_price    = $product->get_sale_price();
+                $prod_short_desc       = $product->get_short_description();
 
                 if ($prod['type'] == 'free') {
+
                   // package title
                   if ($prod['qty_free'] == 0) {
                     $bundle_title = sprintf(__('Buy %s', 'woocommerce'), $prod['qty']);
                   } else {
                     $bundle_title = sprintf(__('Buy %s + Get %d FREE', 'woocommerce'), $prod['qty'], $prod['qty_free']);
                   }
-                  // package bundle type
-                  $type_name = __('Free', 'woocommerce');
 
-                  $total_prod_qty= $prod['qty'] + $prod['qty_free'];
-                  $bundle_price = ($prod_price * $prod['qty']) / $total_prod_qty;
+                  $type_name          = __('Free', 'woocommerce');
+                  $total_prod_qty     = $prod['qty'] + $prod['qty_free'];
+                  $bundle_price       = ($prod_price * $prod['qty']) / $total_prod_qty;
                   $bundle_price_total = $bundle_price * $total_prod_qty;
-                  // get now price
-                  $now_price = ($prod_price * $prod['qty']) / ($prod['qty'] + $prod['qty_free']);
-                  // discount percentage 
-                  $bundle_coupon= ($prod['qty_free'] * 100) / ($prod['qty'] + $prod['qty_free']);
-                  $discount = ($total_prod_qty* $prod_price) - $bundle_price_total;
+                  $now_price          = ($prod_price * $prod['qty']) / ($prod['qty'] + $prod['qty_free']);
+                  $bundle_coupon      = ($prod['qty_free'] * 100) / ($prod['qty'] + $prod['qty_free']);
+                  $discount           = ($total_prod_qty* $prod_price) - $bundle_price_total;
+
                 } else if ($prod['type'] == 'off') {
-                  // package title
-                  $bundle_title = sprintf(__('Buy %s + Get %d&#37;', 'woocommerce'), $prod['qty'], $prod['coupon']);
-                  // package bundle type
-                  $type_name = __('Off', 'woocommerce');
 
-                  $total_prod_qty= $prod['qty'];
-                  $i_total = $prod_price * $prod['qty'];
-                  // discount percentage 
-                  $bundle_coupon= $prod['coupon'];
-                  // get now price
-                  $now_price = ($i_total - ($i_total * $bundle_coupon/ 100)) / $prod['qty'];
+                  $bundle_title       = sprintf(__('Buy %s + Get %d&#37;', 'woocommerce'), $prod['qty'], $prod['coupon']);
+                  $type_name          = __('Off', 'woocommerce');
+                  $total_prod_qty     = $prod['qty'];
+                  $i_total            = $prod_price * $prod['qty'];
+                  $bundle_coupon      = $prod['coupon'];
+                  $now_price          = ($i_total - ($i_total * ($bundle_coupon/ 100))) / $prod['qty'];
                   $bundle_price_total = $now_price * $prod['qty'];
-                  $discount = $i_total - $bundle_price_total;
+                  $discount           = $i_total - $bundle_price_total;
+
                 } else {
-                  // package title
-                  $bundle_title = $prod['title_header'] ?: __('Bundle option', 'woocommerce');
-                  // package bundle type
-                  $type_name = __('Bundle', 'woocommerce');
 
-                  // get now price
-                  $now_price = 0;
+                  $bundle_title       = $prod['title_header'] ?: __('Bundle option', 'woocommerce');
+                  $type_name          = __('Bundle', 'woocommerce');
+                  $now_price          = 0;
                   $bundle_price_total = $prod['price'];
+                  $sum_price_regular  = 0;
 
-                  $sum_price_regular = 0;
-                  // $total_price_bun = 0;
                   foreach ($prod['prod'] as $i => $i_prod) {
+
                     $p_bun = wc_get_product($i_prod['id']);
+
                     if ($p_bun->is_type('variable'))
                       $sum_price_regular += $p_bun->get_variation_regular_price('min');
                     else

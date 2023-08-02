@@ -66,25 +66,19 @@ if (!empty($package_product_ids)) {
 			<input type="hidden" id="mwc_package_is_empty" value="1">
 		<?php endif;
 
+		// get product count
 		$product_count = count($package_product_ids);
 
 		// current currency
-		$current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_woocommerce_currency();
-
-		// uncomment to debug specific currency conversion
-		// $current_curr = 'JPY';
-		// echo $current_curr;
+		$current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_option('woocommerce_currency');
 
 		// get default currency
-		$default_currency = get_woocommerce_currency();
-
-		// echo $default_currency;
+		$default_currency = get_option('woocommerce_currency');
 
 		// get alg exchange rate
-		$ex_rate     = get_option("alg_currency_switcher_exchange_rate_USD_$current_curr") ? get_option("alg_currency_switcher_exchange_rate_USD_$current_curr") : 1;
+		$ex_rate = get_option("alg_currency_switcher_exchange_rate_USD_$current_curr") ? get_option("alg_currency_switcher_exchange_rate_USD_$current_curr") : 1;
 
-		// echo 'JPY: '. $ex_rate;
-
+		// if product count is 1
 		if ($product_count == 1) : ?>
 			<div style="display:none">
 			<?php endif; ?>
@@ -120,6 +114,7 @@ if (!empty($package_product_ids)) {
 							$bundle_title           = '';
 							$cus_bundle_total_price = 0;
 
+							// free type bundle
 							if ($prod_data['type'] == 'free') :
 
 								$p_id = $prod_data['id'];
@@ -130,6 +125,7 @@ if (!empty($package_product_ids)) {
 									$bundle_title = sprintf(__('Buy %s + Get %d FREE', 'woocommerce'), $prod_data['qty'], $prod_data['qty_free']);
 								endif;
 
+							// off type bundle
 							elseif ($prod_data['type'] == 'off') :
 
 								$p_id = $prod_data['id'];
@@ -140,14 +136,18 @@ if (!empty($package_product_ids)) {
 									$bundle_title = sprintf(__('Buy %s + Get %d&#37;', 'woocommerce'), $prod_data['qty'], $prod_data['coupon']) . ' ' . __('Off', 'woocommerce');
 								endif;
 
+							// product type bundle
 							else :
-								$p_id = $prod_data['prod'][0]['id'];
+								$p_id         = $prod_data['prod'][0]['id'];
 								$bundle_title = $prod_data['title_header'] ?: __('Bundle option', 'woocommerce');
 							endif;
 
+							// get product object
 							$prod_obj = wc_get_product($p_id);
 
+							// if product count is 1
 							if ($product_count == 1) : ?>
+
 								<div class="mwc_package_radio_div">
 									<input type="radio" name="mwc_package_checkbox" data-product_id="<?php echo ($p_id) ?>" value="<?php echo ($p_id) ?>" <?php echo ($radio_checked) ?> class="mwc_package_checkbox">
 								</div>
@@ -155,12 +155,27 @@ if (!empty($package_product_ids)) {
 								<?php else :
 
 								$product_separate   = 1;
-								$product_title      = isset($prod_data['title_package']) ? $prod_data['title_package'] : $prod_obj->get_title();
-								$product_name       = isset($prod_data['product_name']) ? $prod_data['product_name'] : $prod_obj->get_title();
-								$prod_price         = get_post_meta($p_id, '_regular_price', true) ? (float)get_post_meta($p_id, '_regular_price', true) : (float)get_post_meta($p_id, '_price', true);
 
-								// setup pricing
-								$prod_price         = get_post_meta($p_id, '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) ? (float)get_post_meta($p_id, '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) : (float)$prod_price * (float)$ex_rate;
+								// package title
+								$package_title = isset($prod_data['title_package']) ?
+									$prod_data['title_package'] :
+									$prod_obj->get_title();
+
+								// product name
+								$product_name = isset($prod_data['product_name']) ?
+									$prod_data['product_name'] :
+									$prod_obj->get_title();
+
+								// product price
+								$prod_price = get_post_meta($p_id, '_regular_price', true) ?
+									get_post_meta($p_id, '_regular_price', true) :
+									get_post_meta($p_id, '_price', true);
+
+								// calculate pricing based on current currency as needed 
+								$prod_price =
+									get_post_meta($p_id, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) ?
+									get_post_meta($p_id, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) :
+									$prod_price * $ex_rate;
 
 								// mwc product option has custom price
 								if (key_exists('custom_price', $prod_data)) :
@@ -176,19 +191,32 @@ if (!empty($package_product_ids)) {
 								// get mwc price variation
 								if ($prod_obj->is_type('variable')) :
 
+									// variations loop
 									foreach ($prod_obj->get_available_variations() as $key => $value) :
 
 										$variation_price[trim($prod_data['bun_id'])][$value['variation_id']]['variation_id'] = $value['variation_id'];
 
+										// if custom price is set
 										if ($prod['custom_price'] && isset($prod['custom_price'][$var_data['variation_id']][$current_curr])) :
 											$variation_price[trim($prod['bun_id'])][$var_data['variation_id']]['price'] = $prod['custom_price'][$var_data['variation_id']][$current_curr];
+
+										// if custom price is not set
 										else :
 
-											$prod_price = get_post_meta($value['variation_id'], '_regular_price', true) ? get_post_meta($value['variation_id'], '_regular_price', true) : get_post_meta($value['variation_id'], '_price', true);
+											// get regular variation price
+											$prod_price = get_post_meta($value['variation_id'], '_regular_price', true) ?
+												get_post_meta($value['variation_id'], '_regular_price', true) :
+												get_post_meta($value['variation_id'], '_price', true);
 
+											// if current currency is not default currency, get alg price, else calculate price based on exchange rate
 											if ($current_curr !== $default_currency) :
-												$var_alg_price = get_post_meta($var_data['variation_id'], '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) ? get_post_meta($var_data['variation_id'], '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) : $product_price * $ex_rate;
-												$prod_price = $var_alg_price;
+
+												$prod_price =
+													get_post_meta($var_data['variation_id'], "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) ?
+													get_post_meta($var_data['variation_id'], "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) :
+													$product_price * $ex_rate;
+
+											// if current currency is default currency, get regular price
 											else :
 												$variation_price[trim($prod['bun_id'])][$var_data['variation_id']]['price'] = $var_data['display_regular_price'];
 											endif;
@@ -206,17 +234,37 @@ if (!empty($package_product_ids)) {
 									// get children
 									$children = $prod_obj->get_children();
 
+									// loop through children
 									foreach ($children as $vid) :
-										foreach ($children as $vid) :
-											$reg_price = get_post_meta($vid, '_regular_price', true) ? get_post_meta($vid, '_regular_price', true) : get_post_meta($vid, '_price', true);
-											$prod_price = get_post_meta($vid, '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) ? get_post_meta($vid, '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) : $reg_price * $ex_rate;
-										endforeach;
+
+										// get regular price
+										$reg_price =
+											get_post_meta($vid, '_regular_price', true) ?
+											get_post_meta($vid, '_regular_price', true) :
+											get_post_meta($vid, '_price', true);
+
+										// get alg price if defined, else calculate price based on exchange rate
+										$prod_price =
+											get_post_meta($vid, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) ?
+											get_post_meta($vid, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) :
+											$reg_price * $ex_rate;
+
 									endforeach;
 
+								// if is simple product
 								else :
 
-									$reg_price = get_post_meta($vid, '_regular_price', true) ? get_post_meta($vid, '_regular_price', true) : get_post_meta($vid, '_price', true);
-									$prod_price = get_post_meta($vid, '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) ? get_post_meta($vid, '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) : $reg_price * $ex_rate;
+									// get regular price
+									$reg_price =
+										get_post_meta($vid, '_regular_price', true) ?
+										get_post_meta($vid, '_regular_price', true) :
+										get_post_meta($vid, '_price', true);
+
+									// get alg price if defined, else calculate price based on exchange rate
+									$prod_price =
+										get_post_meta($vid, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) ?
+										get_post_meta($vid, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) :
+										$reg_price * $ex_rate;
 
 								endif;
 
@@ -227,12 +275,12 @@ if (!empty($package_product_ids)) {
 								// buy x get x free
 								if ($prod_data['type'] == 'free') :
 
-									$total_prod_qty     = (int)$prod_data['qty'] + (int)$prod_data['qty_free'];
-									$bundle_price       = ($prod_price * (int)$prod_data['qty']) / $total_prod_qty;
+									$total_prod_qty     = $prod_data['qty'] + $prod_data['qty_free'];
+									$bundle_price       = ($prod_price * $prod_data['qty']) / $total_prod_qty;
 									$sum_price_regular  = $prod_price * $total_prod_qty;
 									$bundle_price_total = $bundle_price * $total_prod_qty;
 									$price_discount     = ($prod_price * $total_prod_qty) - $bundle_price_total;
-									$bundle_coupon      = ((int)$prod_data['qty_free'] * 100) / $total_prod_qty;
+									$bundle_coupon      = ($prod_data['qty_free'] * 100) / $total_prod_qty;
 
 									// js input data package
 									$js_discount_type  = 'free';
@@ -242,12 +290,12 @@ if (!empty($package_product_ids)) {
 								// buy x get x off
 								elseif ($prod_data['type'] == 'off') :
 
-									$total_prod_qty     = (int)$prod_data['qty'];
-									$i_tt               = $prod_price * (int)$prod_data['qty'];
-									$bundle_coupon      = (int)$prod_data['coupon'];
-									$bundle_price       = ($prod_price - ($prod_price * $bundle_coupon / 100));
-									$sum_price_regular  = $prod_price * (int)$prod_data['qty'];
-									$bundle_price_total = $bundle_price * (int)$prod_data['qty'];
+									$total_prod_qty     = $prod_data['qty'];
+									$i_tt               = $prod_price * $prod_data['qty'];
+									$bundle_coupon      = $prod_data['coupon'];
+									$bundle_price       = $prod_price - ($prod_price * ($bundle_coupon / 100));
+									$sum_price_regular  = $prod_price * $prod_data['qty'];
+									$bundle_price_total = $bundle_price * $prod_data['qty'];
 									$price_discount     = $i_tt - $bundle_price_total;
 
 									// js input data package
@@ -258,31 +306,46 @@ if (!empty($package_product_ids)) {
 								// buy product bundle
 								else :
 
+									// total product qty
 									$total_prod_qty = count($prod_data['prod']);
-									$bundle_price   = (float)$prod_data['total_price'];
+
+									// bundle price
+									$bundle_price   = $prod_data['total_price'];
 
 									// js input data package
 									$js_discount_type  = 'percentage';
 									$js_discount_qty   = 1;
-									$js_discount_value = (int)$prod_data['discount_percentage'];
+									$js_discount_value = $prod_data['discount_percentage'];
 
+									// holds sum of regular prices
 									$sum_price_regular = 0;
 
+									// loop through products
 									foreach ($prod_data['prod'] as $i => $i_prod) :
 
-										// retrieve prod price
-										$prod_price = get_post_meta($i_prod['id'], '_regular_price', true) ? (float)get_post_meta($i_prod['id'], '_regular_price', true) : (float)get_post_meta($i_prod['id'], '_price', true) * (int)$i_prod['qty'];
+										// retrieve regular price
+										$prod_price =
+											get_post_meta($i_prod['id'], '_regular_price', true) ?
+											get_post_meta($i_prod['id'], '_regular_price', true) :
+											get_post_meta($i_prod['id'], '_price', true) * $i_prod['qty'];
 
 										// retrieve product object
 										$prod_obj = wc_get_product($i_prod['id']);
 
 										// if not default currency, retrieve converted price, or calculate converted price
 										if ($current_curr !== $default_currency) :
-											$prod_price         = get_post_meta($i_prod['id'], '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) ? (float)get_post_meta($i_prod['id'], '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) * (int)$i_prod['qty'] : ((float)$prod_price * (float)$ex_rate) * (int)$i_prod['qty'];
 
-											$sum_price_regular += $prod_price;
+											// if alg price is defined, use that, else calculate price based on exchange rate
+											$prod_price =
+												get_post_meta($i_prod['id'], "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) ?
+												get_post_meta($i_prod['id'], "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) * $i_prod['qty'] : ($prod_price * $ex_rate) * $i_prod['qty'];
+
+											// add price to total
+											$sum_price_regular = $sum_price_regular + $prod_price;
+
+										// if default currency, add price to total
 										else :
-											$sum_price_regular += $prod_price;
+											$sum_price_regular = $sum_price_regular + $prod_price;
 										endif;
 
 									endforeach;
@@ -296,13 +359,15 @@ if (!empty($package_product_ids)) {
 										$cus_bundle_total_price = $bundle_price;
 									endif;
 
+									// bundle price total
 									$subtotal_bundle = $sum_price_regular;
 
 									// apply discount percentage
 									if ($prod_data['discount_percentage'] > 0) :
-										$subtotal_bundle -= ($subtotal_bundle * $bundle_coupon / 100);
+										$subtotal_bundle = $subtotal_bundle - ($subtotal_bundle * ($bundle_coupon / 100));
 									endif;
 
+									// calculate discount
 									$price_discount = $sum_price_regular - $subtotal_bundle;
 								endif;
 
@@ -311,11 +376,14 @@ if (!empty($package_product_ids)) {
 									continue;
 								endif;
 
+								// if bundle type is free or off set
 								if ($prod_data['type'] == 'free' || $prod_data['type'] == 'off') : ?>
 
 									<div data-bundle-data="<?php echo base64_encode(json_encode($prod_data)) ?>" class="col-lg-4 col-md-4 col-xs-12 col-sm-12 item-selection item-selection-h col-hover-focus mwc_item_div template_h mwc_item_div_<?php echo (trim($prod_data['bun_id'])) ?> op_c_package_option <?= (self::$package_default_id == $prod_data['bun_id']) ? 'mwc_selected_default_opt' : '' ?>" data-type="<?php echo ($prod_data['type']) ?>" data-bundle_id="<?php echo (trim($prod_data['bun_id'])) ?>" data-coupon="<?= round($bundle_coupon, 0) ?>">
 
-									<?php else : ?>
+									<?php
+								// if bundle type is product bundle
+								else : ?>
 
 										<div data-bundle-data="<?php echo base64_encode(json_encode($prod_data)) ?>" class="col-lg-4 col-md-4 col-xs-12 col-sm-12 item-selection item-selection-h col-hover-focus mwc_item_div template_h mwc_item_div_<?php echo (trim($prod_data['bun_id'])) ?> op_c_package_option <?= (self::$package_default_id == $prod_data['bun_id']) ? 'mwc_selected_default_opt' : '' ?>" data-type="<?php echo ($prod_data['type']) ?>" data-bundle_id="<?php echo (trim($prod_data['bun_id'])) ?>" data-coupon="<?= round($bundle_coupon, 0) ?>">
 
@@ -359,7 +427,7 @@ if (!empty($package_product_ids)) {
 													</h3>
 												<?php endif; ?>
 
-												<h2 class="mwc-title mt-2 mb-0"><?php echo $product_title ?></h2>
+												<h2 class="mwc-title mt-2 mb-0"><?php echo $package_title ?></h2>
 
 												<!-- discount percent -->
 												<?php if (0 != $bundle_coupon) : ?>
@@ -588,6 +656,7 @@ if (!empty($package_product_ids)) {
 																							], $var_data, $prod_data);
 
 																							$prod_variations = $b_prod_obj->get_variation_attributes();
+
 																							foreach ($prod_variations as $attribute_name => $options) :
 																								$default_opt = '';
 																								try {
@@ -650,6 +719,7 @@ if (!empty($package_product_ids)) {
 																						], $var_data, $prod_data);
 
 																						$prod_variations = $prod_obj->get_variation_attributes();
+
 																						foreach ($prod_variations as $attribute_name => $options) :
 																							// $default_opt = $prod_obj->get_variation_default_attribute($attribute_name);
 																							$default_opt = '';

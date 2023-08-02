@@ -68,5 +68,5 @@ function mwc_get_formatted_cart_item_data($cart_item, $flat = false)
 // Format price after discount
 function mwc_price_discounted($price, $discount)
 {
-	return $price - ($price * $discount) / 100;
+	return $price - ($price * ($discount / 100));
 }

@@ -556,7 +556,7 @@ if (!class_exists('MWCBundleSectionAdmin')) {
                     $_POST['selValue_bundle'][$key] = $new_arr;
                 }
 
-                // $data_arr['selValue_bun'] = ['post' => $_POST['selValue_bundle'], 'price' => $_POST['bundle_price'], 'coupon' => round($coupon_discount, 2), 'default_currency' => get_woocommerce_currency()];
+                // $data_arr['selValue_bun'] = ['post' => $_POST['selValue_bundle'], 'price' => $_POST['bundle_price'], 'coupon' => round($coupon_discount, 2), 'default_currency' => get_option('woocommerce_currency')];
                 $data_arr['selValue_bun'] = ['post' => $_POST['selValue_bundle'], 'price_currency' => $_POST['bun_price_currency']];
                 $desc = array_filter($_POST['feature_bundle_desc']);
                 $data_arr['feature_description'] = $desc;
@@ -1107,7 +1107,7 @@ if (!class_exists('MWCBundleSectionAdmin')) {
                         <tr valign="top">
                             <th scope="row" class="titledesc">
                                 <?php
-                                $default_currency = get_woocommerce_currency();
+                                $default_currency = get_option('woocommerce_currency');
                                 ?>
                                 <label>Total price(<?= $default_currency ?>)</label>
                             </th>

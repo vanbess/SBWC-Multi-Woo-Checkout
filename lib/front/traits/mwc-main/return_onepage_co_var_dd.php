@@ -1,7 +1,8 @@
 <?php
 if (!trait_exists('ReturnOnePageCoVarDD')) :
 
-    trait ReturnOnePageCoVarDD {
+    trait ReturnOnePageCoVarDD
+    {
 
         /**
          * return_mwc_onepage_checkout_variation_dropdown HTML
@@ -9,7 +10,8 @@ if (!trait_exists('ReturnOnePageCoVarDD')) :
          * @param array $args
          * @return html
          */
-        public static function return_mwc_onepage_checkout_variation_dropdown($args = []) {
+        public static function return_mwc_onepage_checkout_variation_dropdown($args = [])
+        {
 
             $html = '';
 
@@ -21,8 +23,8 @@ if (!trait_exists('ReturnOnePageCoVarDD')) :
                 $default_option        = $args['default_option'];
                 $disable_woo_swatches  = !empty($args['disable_woo_swatches']) ? $args['disable_woo_swatches'] : 'no';
                 $var_data              = isset($args['var_data']) ? $args['var_data'] : null;
-                $name                  = isset($args['name']) ? $args['name'] : '';
-                $id                    = isset($args['id']) ? $args['id'] : '';
+                // $name                  = isset($args['name']) ? $args['name'] : '';
+                // $id                    = isset($args['id']) ? $args['id'] : '';
                 $class                 = isset($args['class']) ? $args['class'] : '';
                 $type                  = isset($args['type']) ? $args['type'] : 'dropdown';
 
@@ -32,24 +34,41 @@ if (!trait_exists('ReturnOnePageCoVarDD')) :
                 $product = wc_get_product($product_id);
 
                 // retrieve ALG pricing for current currency, for each variation/child and push to array for ref on dd select
-                $current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_woocommerce_currency();
-                $default_curr = get_woocommerce_currency();
+                $current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_option('woocommerce_currency');
 
-                // uncomment to debug
-                // $current_curr = 'USD';
+                // get default currency
+                $default_curr = get_option('woocommerce_currency');
 
-                $ex_rate              = get_option("alg_currency_switcher_exchange_rate_USD_$current_curr") ? get_option("alg_currency_switcher_exchange_rate_USD_$current_curr") : 1;
-                $children             = !empty($product->get_children()) ? $product->get_children() : false;
+                // get exchange rate
+                $ex_rate = get_option("alg_currency_switcher_exchange_rate_{$default_curr}_{$current_curr}") ?
+                    get_option("alg_currency_switcher_exchange_rate_{$default_curr}_{$current_curr}") :
+                    1;
+
+                // get product children
+                $children = !empty($product->get_children()) ?
+                    $product->get_children() :
+                    false;
+
+                // init array
                 $alg_currency_pricing = [];
 
+                // if children exist, get ALG pricing for each child
                 if ($children !== false) :
                     foreach ($children as $vid) :
+
+                        // get variation regular price for calculation if ALG price not defined
                         $product_price = get_post_meta($vid, '_regular_price', true) ? get_post_meta($vid, '_regular_price', true) : get_post_meta($vid, '_price', true);
-                        $alg_currency_pricing[$vid] = get_post_meta($vid, '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) ? get_post_meta($vid, '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) : $product_price * $ex_rate;
+
+                        // get ALG price if defined, else calculate based on exchange rate and push to array
+                        $alg_currency_pricing[$vid] =
+                            get_post_meta($vid, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) ?
+                            get_post_meta($vid, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) :
+                            $product_price * $ex_rate;
                     endforeach;
                 endif;
 
-                file_put_contents(MWC_PLUGIN_DIR . 'alg_pricing.txt', print_r($alg_currency_pricing, true));
+                // log to debug
+                error_log("Var DD ALG pricing:" . PHP_EOL . print_r($alg_currency_pricing, true));
 
                 // load label woothumb(Wooswatch)
                 $woothumb_products = get_post_meta($product_id, '_coloredvariables', true);
@@ -62,11 +81,15 @@ if (!trait_exists('ReturnOnePageCoVarDD')) :
                     // get woothumb attribute name
                     $woothumb = $woothumb_products[$attribute_name];
 
+                    // get woothumb attribute name
                     $taxonomies = array($attribute_name);
+
+                    // args
                     $args = array(
                         'hide_empty' => 0
                     );
 
+                    // get all terms
                     $newvalues = get_terms($taxonomies, $args);
 
                     // woothumb type color of image
@@ -146,7 +169,7 @@ if (!trait_exists('ReturnOnePageCoVarDD')) :
                 // load select option
                 if ('dropdown' === $type) :
 
-                    $html .= '<select data-def-currency="' . get_woocommerce_currency() . '" data-curr-symbol="' . get_woocommerce_currency_symbol($current_curr) . '" data-currency="' . $current_curr . '" data-ex-rate="' . $ex_rate . '" data-alg-pricing="' . base64_encode(json_encode($alg_currency_pricing)) . '" class="' . $class . '" name="" data-variations="' . base64_encode(json_encode($product->get_available_variations())) . '" data-attribute_name="attribute_' . $attribute_name . '" ' . (($_hidden) ? 'style="display:none"' : '') . '>';
+                    $html .= '<select data-def-currency="' . get_option('woocommerce_currency') . '" data-curr-symbol="' . get_woocommerce_currency_symbol($current_curr) . '" data-currency="' . $current_curr . '" data-ex-rate="' . $ex_rate . '" data-alg-pricing="' . base64_encode(json_encode($alg_currency_pricing)) . '" class="' . $class . '" name="" data-variations="' . base64_encode(json_encode($product->get_available_variations())) . '" data-attribute_name="attribute_' . $attribute_name . '" ' . (($_hidden) ? 'style="display:none"' : '') . '>';
 
                     $options = wc_get_product_terms($product_id, $attribute_name);
 

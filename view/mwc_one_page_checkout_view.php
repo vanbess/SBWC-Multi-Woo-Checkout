@@ -70,19 +70,14 @@ if (!empty($package_product_ids)) :
 		<?php endif;
 
 		// current currency
-		$current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_woocommerce_currency();
-
-		// uncomment to debug specific currency conversion
-		// $current_curr = 'JPY';
-		// echo $current_curr;
+		$current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_option('woocommerce_currency');
 
 		// get default currency
-		$default_currency = get_woocommerce_currency();
-
-		// echo $default_currency;
+		$default_currency = get_option('woocommerce_currency');
 
 		// get alg exchange rate
-		$ex_rate     = get_option("alg_currency_switcher_exchange_rate_USD_$current_curr") ? get_option("alg_currency_switcher_exchange_rate_USD_$current_curr") : 1;
+		$ex_rate = get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") ?
+			get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") : 1;
 
 		?>
 
@@ -147,7 +142,7 @@ if (!empty($package_product_ids)) :
 						endif;
 
 						// retrieve product object
-						$prod_obj = wc_get_product((int)$p_id);
+						$prod_obj = wc_get_product($p_id);
 
 						// if no product object returned, continue
 						if (!is_object($prod_obj)) :
@@ -177,15 +172,19 @@ if (!empty($package_product_ids)) :
 							$product_separate   = 1;
 							$product_title      = isset($prod_data['title_package']) ? $prod_data['title_package'] : $prod_obj->get_title();
 							$product_name       = isset($prod_data['product_name']) && $prod_data['product_name'] !== '' ? $prod_data['product_name'] : $prod_obj->get_title();
-							$prod_price         = get_post_meta($p_id, '_regular_price', true) ? (float)get_post_meta($p_id, '_regular_price', true) : (float)get_post_meta($p_id, '_price', true);
+							$prod_price         = get_post_meta($p_id, '_regular_price', true) ?
+								get_post_meta($p_id, '_regular_price', true) :
+								get_post_meta($p_id, '_price', true);
 
 							// setup pricing
-							$prod_price         = get_post_meta($p_id, '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) ? (float)get_post_meta($p_id, '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) : (float)$prod_price * (float)$ex_rate;
+							$prod_price = get_post_meta($p_id, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) ?
+								get_post_meta($p_id, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) :
+								$prod_price * $ex_rate;
 
 							// mwc product option has custom price
 							if (isset($prod_data['custom_price']) && !empty($prod_data['custom_price'])) :
 								if (current($prod_data['custom_price'])[$current_curr]) :
-									$prod_price      = current($prod_data['custom_price'])[$current_curr];
+									$prod_price = current($prod_data['custom_price'])[$current_curr];
 								endif;
 							endif;
 
@@ -196,15 +195,23 @@ if (!empty($package_product_ids)) :
 
 									$variation_price[trim($prod_data['bun_id'])][$value['variation_id']]['variation_id'] = $value['variation_id'];
 
+									// custom price if set
 									if ($prod['custom_price'] && isset($prod['custom_price'][$var_data['variation_id']][$current_curr])) :
 										$variation_price[trim($prod['bun_id'])][$var_data['variation_id']]['price'] = $prod['custom_price'][$var_data['variation_id']][$current_curr];
 									else :
 
-										$prod_price = get_post_meta($value['variation_id'], '_regular_price', true) ? get_post_meta($value['variation_id'], '_regular_price', true) : get_post_meta($value['variation_id'], '_price', true);
+										// get variation price
+										$prod_price = get_post_meta($value['variation_id'], '_regular_price', true) ?
+											get_post_meta($value['variation_id'], '_regular_price', true) :
+											get_post_meta($value['variation_id'], '_price', true);
 
+										// if currency is not default, update pricing according to currency
 										if ($current_curr !== $default_currency) :
-											$var_alg_price = get_post_meta($var_data['variation_id'], '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) ? get_post_meta($var_data['variation_id'], '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) : $product_price * $ex_rate;
-											$prod_price = $var_alg_price;
+
+											// setup pricing
+											$prod_price = get_post_meta($var_data['variation_id'], "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) ?
+												get_post_meta($var_data['variation_id'], "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) :
+												$product_price * $ex_rate;
 										else :
 											$variation_price[trim($prod['bun_id'])][$var_data['variation_id']]['price'] = $var_data['display_regular_price'];
 										endif;
@@ -224,15 +231,31 @@ if (!empty($package_product_ids)) :
 
 								foreach ($children as $vid) :
 									foreach ($children as $vid) :
-										$reg_price = get_post_meta($vid, '_regular_price', true) ? get_post_meta($vid, '_regular_price', true) : get_post_meta($vid, '_price', true);
-										$prod_price = get_post_meta($vid, '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) ? get_post_meta($vid, '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) : $reg_price * $ex_rate;
+
+										// retrieve regular price
+										$reg_price = get_post_meta($vid, '_regular_price', true) ?
+											get_post_meta($vid, '_regular_price', true) :
+											get_post_meta($vid, '_price', true);
+
+										// if currency is not default, update pricing according to currency
+										$prod_price = get_post_meta($vid, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) ?
+											get_post_meta($vid, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) :
+											$reg_price * $ex_rate;
+
 									endforeach;
 								endforeach;
 
 							else :
 
-								$reg_price = get_post_meta($vid, '_regular_price', true) ? get_post_meta($vid, '_regular_price', true) : get_post_meta($vid, '_price', true);
-								$prod_price = get_post_meta($vid, '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) ? get_post_meta($vid, '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) : $reg_price * $ex_rate;
+								// retrieve regular price
+								$reg_price = get_post_meta($vid, '_regular_price', true) ?
+									get_post_meta($vid, '_regular_price', true) :
+									get_post_meta($vid, '_price', true);
+
+								// if currency is not default, update pricing according to currency
+								$prod_price = get_post_meta($vid, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) ?
+									get_post_meta($vid, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) :
+									$reg_price * $ex_rate;
 
 							endif;
 
@@ -262,7 +285,7 @@ if (!empty($package_product_ids)) :
 								$total_prod_qty     = $prod_data['qty'];
 								$i_tt               = $prod_price * $prod_data['qty'];
 								$bundle_coupon      = $prod_data['coupon'];
-								$bundle_price       = ($prod_price - ($prod_price * $bundle_coupon / 100));
+								$bundle_price       = $prod_price - ($prod_price * ($bundle_coupon / 100));
 								$bundle_price_total = $bundle_price * $prod_data['qty'];
 								$price_discount     = $i_tt - $bundle_price_total;
 
@@ -283,22 +306,23 @@ if (!empty($package_product_ids)) :
 								$js_discount_type  = 'percentage';
 								$js_discount_qty   = 1;
 								$js_discount_value = $prod_data['discount_percentage'];
-								$js_disc_mp        = (100 - (int)$js_discount_value) / 100;
-
 								$sum_price_regular = 0;
 
 								foreach ($prod_data['prod'] as $i => $i_prod) :
 
 									// retrieve prod price
-									$prod_price = get_post_meta($i_prod['id'], '_regular_price', true) ? (float)get_post_meta($i_prod['id'], '_regular_price', true) : (float)get_post_meta($i_prod['id'], '_price', true) * (int)$i_prod['qty'];
+									$prod_price = get_post_meta($i_prod['id'], '_regular_price', true) ? get_post_meta($i_prod['id'], '_regular_price', true) : get_post_meta($i_prod['id'], '_price', true) * $i_prod['qty'];
 
 									// retrieve product object
 									$prod_obj = wc_get_product($i_prod['id']);
 
 									// if not default currency, retrieve converted price, or calculate converted price
 									if ($current_curr !== $default_currency) :
-										$prod_price         = get_post_meta($i_prod['id'], '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) ? (float)get_post_meta($i_prod['id'], '_alg_currency_switcher_per_product_regular_price_' . $current_curr, true) * (int)$i_prod['qty'] : ((float)$prod_price * (float)$ex_rate) * (int)$i_prod['qty'];
+
+										$prod_price         = get_post_meta($i_prod['id'], "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) ? get_post_meta($i_prod['id'], "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) * $i_prod['qty'] : ($prod_price * $ex_rate) * $i_prod['qty'];
+
 										$sum_price_regular += $prod_price;
+
 									else :
 										$sum_price_regular += $prod_price;
 									endif;
@@ -318,7 +342,7 @@ if (!empty($package_product_ids)) :
 
 								// apply discount percentage
 								if ($prod_data['discount_percentage'] > 0) :
-									$subtotal_bundle -= ($subtotal_bundle * $bundle_coupon / 100);
+									$subtotal_bundle -= ($subtotal_bundle * ($bundle_coupon / 100));
 								endif;
 
 								$price_discount = $sum_price_regular - $subtotal_bundle;
@@ -356,16 +380,13 @@ if (!empty($package_product_ids)) :
 
 												<?php
 												if ($p_i == 0 && isset($_GET['unit'])) :
-													$unit_price = (strlen($_GET['unit']) > 2) ? number_format(($_GET['unit'] / 100), 2) : $_GET['unit'];
-													$atts = array(
-														'price' => $unit_price,
-														'currency_from' => "USD",
-														'currency' => alg_get_current_currency_code(),
-													);
-												?>
 
+													// get unit price
+													$unit_price = (strlen($_GET['unit']) > 2) ? number_format(($_GET['unit'] / 100), 2) : $_GET['unit'];
+
+												?>
 													<br>
-													<span class="discount">( <?php echo (floatval(preg_replace('#[^\d.]#', '', alg_convert_price($atts)))) ?> / Unit )</span>
+													<span class="discount">( <?php echo (floatval(preg_replace('#[^\d.]#', '', $unit_price * $ex_rate))) ?> / Unit )</span>
 												<?php endif; ?>
 
 											</div>

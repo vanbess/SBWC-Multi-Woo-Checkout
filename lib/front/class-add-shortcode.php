@@ -11,7 +11,8 @@ if (!class_exists('MWCShortCode')) {
      *
      * @since 1.1
      */
-    function is_mwc_checkout($post_id = null) {
+    function is_mwc_checkout($post_id = null)
+    {
 
         // If no post_id specified try getting the post_id
         if (empty($post_id)) {
@@ -51,7 +52,8 @@ if (!class_exists('MWCShortCode')) {
     /**
      * Shortcodes class
      */
-    class MWCShortCode {
+    class MWCShortCode
+    {
 
         // properties
         private static $initiated              = false;
@@ -76,7 +78,8 @@ if (!class_exists('MWCShortCode')) {
          *
          * @return void
          */
-        public static function init() {
+        public static function init()
+        {
             if (!self::$initiated) {
                 self::init_hooks();
             }
@@ -85,7 +88,8 @@ if (!class_exists('MWCShortCode')) {
         /**
          * Initializes WordPress hooks
          */
-        private static function init_hooks() {
+        private static function init_hooks()
+        {
             self::$initiated = true;
 
             self::$plugin_path    = untrailingslashit(MWC_PLUGIN_DIR);
@@ -117,7 +121,8 @@ if (!class_exists('MWCShortCode')) {
          * @param object $post_to_check
          * @return void
          */
-        public static function check_for_shortcode($post_to_check) {
+        public static function check_for_shortcode($post_to_check)
+        {
 
             if (false !== stripos($post_to_check->post_content, '[mwc_one_page_checkout')) {
                 self::$add_scripts = true;
@@ -127,7 +132,6 @@ if (!class_exists('MWCShortCode')) {
                 // flag
                 global $is_mwc_checkout;
                 $is_mwc_checkout = true;
-                
             } else {
                 $contains_shortcode = false;
                 $is_mwc_checkout = true;
@@ -142,7 +146,8 @@ if (!class_exists('MWCShortCode')) {
          * @param  boolean  $return
          * @return boolean
          */
-        public static function is_checkout_filter($return = false) {
+        public static function is_checkout_filter($return = false)
+        {
 
             if (is_mwc_checkout()) {
                 $return = true;
@@ -156,7 +161,8 @@ if (!class_exists('MWCShortCode')) {
          *
          * @since 1.2.4
          */
-        public static function is_woocommerce_pre($version) {
+        public static function is_woocommerce_pre($version)
+        {
 
             if (!defined('WC_VERSION') || version_compare(WC_VERSION, $version, '<')) {
                 $woocommerce_is_pre = true;
@@ -173,7 +179,8 @@ if (!class_exists('MWCShortCode')) {
          *
          * @since 1.0
          */
-        public static function short_circuit_ajax_update_order_review() {
+        public static function short_circuit_ajax_update_order_review()
+        {
 
             if (self::is_woocommerce_pre('2.3') && sizeof(WC()->cart->get_cart()) == 0) {
                 if (version_compare(WC_VERSION, '2.2.9', '>=')) {
@@ -221,7 +228,8 @@ if (!class_exists('MWCShortCode')) {
          * @return array
          * @since 1.1.1
          */
-        public static function mwc_update_order_review_fragments($fragments) {
+        public static function mwc_update_order_review_fragments($fragments)
+        {
 
             // If the cart is empty
             if (self::is_any_form_of_opc_page() && 0 == sizeof(WC()->cart->get_cart())) {
@@ -267,7 +275,8 @@ if (!class_exists('MWCShortCode')) {
          *
          * @return bool
          */
-        public static function is_any_form_of_opc_page() {
+        public static function is_any_form_of_opc_page()
+        {
 
             $is_opc = false;
 
@@ -294,14 +303,15 @@ if (!class_exists('MWCShortCode')) {
             return $is_opc;
         }
 
-      
+
         /**
          * Hook to wc_get_template() and override the checkout template used on OPC pages and when updating the order review fields
          * via WC_Ajax::update_order_review()
          *
          * @return string
          */
-        public static function override_checkout_template($located, $template_name, $args, $template_path, $default_path) {
+        public static function override_checkout_template($located, $template_name, $args, $template_path, $default_path)
+        {
             if ($default_path !== self::$template_path && !self::is_woocommerce_pre('2.3') && self::is_any_form_of_opc_page()) {
 
                 if ('checkout/form-checkout.php' == $template_name) {
@@ -318,7 +328,8 @@ if (!class_exists('MWCShortCode')) {
         /**
          * Make sure a session is set whenever loading an OPC page.
          */
-        public static function maybe_set_session() {
+        public static function maybe_set_session()
+        {
             if (is_mwc_checkout() && !WC()->session->has_session()) {
                 WC()->session->set_customer_session_cookie(true);
             }
@@ -332,7 +343,8 @@ if (!class_exists('MWCShortCode')) {
         */
 
         // function shortcode package order checkout
-        public static function package_order_checkout_shortcode() {
+        public static function package_order_checkout_shortcode()
+        {
 
             $suffix      = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
             $assets_path = str_replace(array('http:', 'https:'), '', WC()->plugin_url()) . '/assets/';
@@ -362,7 +374,8 @@ if (!class_exists('MWCShortCode')) {
         // Shortcode onepage checkout------------------------------------------------>
 
         // fuction action shortcode one page checkout
-        public static function mwc_one_page_checkout_shortcode($atts) {
+        public static function mwc_one_page_checkout_shortcode($atts)
+        {
 
             $options = shortcode_atts(array(
                 'style'             => 'A',
@@ -479,15 +492,20 @@ if (!class_exists('MWCShortCode')) {
                         $prod_ids[$key]['custom_price'] = isset($meta['custom_price']) ? $meta['custom_price'] : '';
                     } elseif ($meta['selValue'] == 'bun') {
 
-                        $curr      = get_woocommerce_currency();
-                        $curr_rate = 1;
+                        $default_curr = get_option('woocommerce_currency');
+                        $curr_curr    = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : $default_curr;
+                        $curr_rate    = 1;
 
-                        if (function_exists('alg_wc_cs_get_currency_exchange_rate')) {
-                            $curr_rate = alg_wc_cs_get_currency_exchange_rate($curr);
+                        if (function_exists('alg_wc_cs_get_currency_exchange_rate') && $default_curr != $curr_curr) {
+                            // $curr_rate = alg_wc_cs_get_currency_exchange_rate($default_curr);
+                            $curr_rate =
+                                get_option("alg_currency_switcher_exchange_rate_{$default_curr}_{$curr_curr}") ?
+                                get_option("alg_currency_switcher_exchange_rate_{$default_curr}_{$curr_curr}") :
+                                1;
                         }
 
                         $prod_ids[$key]['title_header'] = isset($meta['title_header']) ? $meta['title_header'] : "";
-                        $prod_ids[$key]['total_price']  = is_numeric($meta['selValue_bun']['price_currency'][$curr]) ? $meta['selValue_bun']['price_currency'][$curr] : (current($meta['selValue_bun']['price_currency']) > 0 ? current($meta['selValue_bun']['price_currency']) * $curr_rate : false);
+                        $prod_ids[$key]['total_price']  = is_numeric($meta['selValue_bun']['price_currency'][$default_curr]) ? $meta['selValue_bun']['price_currency'][$default_curr] : (current($meta['selValue_bun']['price_currency']) > 0 ? current($meta['selValue_bun']['price_currency']) * $curr_rate : false);
 
                         foreach ($meta['selValue_bun']['post'] as $i => $bun) {
                             $prod_ids[$key]['prod'][$i]['id']  = $bun['id'];
@@ -544,7 +562,8 @@ if (!class_exists('MWCShortCode')) {
         }
 
         // function shortcode one page checkout
-        public static function one_page_checkout_shortcode_style_A() {
+        public static function one_page_checkout_shortcode_style_A()
+        {
             $suffix      = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
             $assets_path = str_replace(array('http:', 'https:'), '', WC()->plugin_url()) . '/assets/';
 
@@ -560,7 +579,8 @@ if (!class_exists('MWCShortCode')) {
 
 
         // function shortcode one page checkout style B
-        public static function one_page_checkout_shortcode_style_B() {
+        public static function one_page_checkout_shortcode_style_B()
+        {
             $suffix      = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
             $assets_path = str_replace(array('http:', 'https:'), '', WC()->plugin_url()) . '/assets/';
 
@@ -577,7 +597,8 @@ if (!class_exists('MWCShortCode')) {
         }
 
         // function shortcode one page checkout style C
-        public static function one_page_checkout_shortcode_style_C() {
+        public static function one_page_checkout_shortcode_style_C()
+        {
             $suffix      = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
             $assets_path = str_replace(array('http:', 'https:'), '', WC()->plugin_url()) . '/assets/';
 
@@ -593,7 +614,8 @@ if (!class_exists('MWCShortCode')) {
         }
 
         // function shortcode one page checkout style D
-        public static function one_page_checkout_shortcode_style_D() {
+        public static function one_page_checkout_shortcode_style_D()
+        {
             $suffix      = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
             $assets_path = str_replace(array('http:', 'https:'), '', WC()->plugin_url()) . '/assets/';
 
@@ -610,7 +632,8 @@ if (!class_exists('MWCShortCode')) {
         }
 
         // function shortcode one page checkout style B
-        public static function one_page_checkout_shortcode_style_E() {
+        public static function one_page_checkout_shortcode_style_E()
+        {
             $suffix      = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
             $assets_path = str_replace(array('http:', 'https:'), '', WC()->plugin_url()) . '/assets/';
 
@@ -627,7 +650,8 @@ if (!class_exists('MWCShortCode')) {
         }
 
         // function shortcode one page checkout style F
-        public static function one_page_checkout_shortcode_style_F() {
+        public static function one_page_checkout_shortcode_style_F()
+        {
             $suffix      = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
             $assets_path = str_replace(array('http:', 'https:'), '', WC()->plugin_url()) . '/assets/';
 
@@ -645,7 +669,8 @@ if (!class_exists('MWCShortCode')) {
 
 
         // function shortcode one page checkout style G
-        public static function one_page_checkout_shortcode_style_G() {
+        public static function one_page_checkout_shortcode_style_G()
+        {
 
             $suffix      = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
             $assets_path = str_replace(array('http:', 'https:'), '', WC()->plugin_url()) . '/assets/';
@@ -663,7 +688,8 @@ if (!class_exists('MWCShortCode')) {
         }
 
         // function shortcode one page checkout style H
-        public static function one_page_checkout_shortcode_style_H() {
+        public static function one_page_checkout_shortcode_style_H()
+        {
 
             $suffix      = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
             $assets_path = str_replace(array('http:', 'https:'), '', WC()->plugin_url()) . '/assets/';

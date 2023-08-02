@@ -93,40 +93,38 @@ if (!empty($package_product_ids)) {
                 }
 
                 //get product info
-                $product = wc_get_product($p_id);
-                $option_title = $prod['title_package'] ?: $product->get_title();
-                $product_price_html = $product->get_price_html();
-                $prod_price = $product->get_price();
+                $product               = wc_get_product($p_id);
+                $option_title          = $prod['title_package'] ?: $product->get_title();
+                $product_price_html    = $product->get_price_html();
+                $prod_price            = $product->get_price();
                 $product_regular_price = $product->get_regular_price();
-                $product_sale_price = $product->get_sale_price();
+                $product_sale_price    = $product->get_sale_price();
 
                 if ($prod['type'] == 'free') {
                   // $type_title = sprintf(__('Buy %s + Get %d FREE', 'woocommerce'), $prod['qty'], $prod['qty_free']);
-                  $type_name = __('Free', 'woocommerce');
-
-                  $total_prod_qty= $prod['qty'] + $prod['qty_free'];
-                  $bundle_price = ($prod_price * $prod['qty']) / $total_prod_qty;
+                  $type_name          = __('Free', 'woocommerce');
+                  $total_prod_qty     = $prod['qty'] + $prod['qty_free'];
+                  $bundle_price       = ($prod_price * $prod['qty']) / $total_prod_qty;
                   $bundle_price_total = $bundle_price * $total_prod_qty;
-                  $bundle_coupon= ((($prod_price * $total_prod_qty) - $bundle_price_total) / $bundle_price_total) * 100;
-                  $discount = ($total_prod_qty* $prod_price) - $bundle_price_total;
+                  $bundle_coupon      = ((($prod_price * $total_prod_qty) - $bundle_price_total) / $bundle_price_total) * 100;
+                  $discount           = ($total_prod_qty* $prod_price) - $bundle_price_total;
+
                 } else if ($prod['type'] == 'off') {
                   // $type_title = sprintf(__('Buy %s + Get %d &#37;', 'woocommerce'), $prod['qty'], $prod['coupon']);
-                  $type_name = __('Off', 'woocommerce');
-
-                  $total_prod_qty= $prod['qty'];
-                  $i_total = $prod_price * $prod['qty'];
-                  $bundle_coupon= $prod['coupon'];
-                  $bundle_price = ($i_total - ($i_total * $bundle_coupon/ 100)) / $prod['qty'];
+                  $type_name          = __('Off', 'woocommerce');
+                  $total_prod_qty     = $prod['qty'];
+                  $i_total            = $prod_price * $prod['qty'];
+                  $bundle_coupon      = $prod['coupon'];
+                  $bundle_price       = ($i_total - ($i_total * ($bundle_coupon/ 100))) / $prod['qty'];
                   $bundle_price_total = $bundle_price * $prod['qty'];
-                  $discount = $i_total - $bundle_price_total;
+                  $discount           = $i_total - $bundle_price_total;
                 } else {
                   // $type_title = __('Bundle option');
-                  $type_name = __('Bundle', 'woocommerce');
-
-                  $bundle_coupon= $prod['coupon'];
-                  $bundle_price = $prod['price'];
+                  $type_name          = __('Bundle', 'woocommerce');
+                  $bundle_coupon      = $prod['coupon'];
+                  $bundle_price       = $prod['price'];
                   $bundle_price_total = $prod['price'];
-                  $discount = 0;
+                  $discount           = 0;
                 }
 
               ?>
