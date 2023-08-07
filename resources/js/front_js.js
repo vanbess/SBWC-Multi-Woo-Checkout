@@ -452,8 +452,7 @@ jQuery(document).ready(function ($) {
             // var result = JSON.parse(response);
             var result = response;
 
-            console.log(response);
-
+            // console.log(response);
 
             if (result.status !== false) {
                 var img = $('.mwc_item_div.mwc_active_product').find('.op_c_package_image img').attr('src');
