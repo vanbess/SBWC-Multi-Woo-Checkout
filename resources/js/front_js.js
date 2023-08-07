@@ -1,5 +1,10 @@
 jQuery(document).ready(function ($) {
 
+    // check if class .mwc_items_div exists and bail if not
+    if (!$('.mwc_items_div').length) {
+        return;
+    }
+
     /**
      * Progress bar animation
      */
