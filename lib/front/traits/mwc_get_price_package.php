@@ -27,10 +27,10 @@ if (!trait_exists('GetPackagePrice')) :
 
                 foreach ($arr_product_ids as $key => $prod_id) :
 
-                    $product = wc_get_product($prod_id);
-                    $loop_prod[$prod_id] = $product;
-                    $total_price += $product->get_regular_price();
-                    $old_price += $product->get_regular_price();
+                    $product              = wc_get_product($prod_id);
+                    $loop_prod[$prod_id]  = $product;
+                    $total_price         += $product->get_regular_price();
+                    $old_price           += $product->get_regular_price();
 
                 endforeach;
 

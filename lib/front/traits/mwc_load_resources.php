@@ -8,7 +8,7 @@ if (!trait_exists('LoadResources')) :
          *
          * @return void
          */
-        public static function load_resources() {
+        public static function mwc_load_resources() {
 
             global $woocommerce;
 

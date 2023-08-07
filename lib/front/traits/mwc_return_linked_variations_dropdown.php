@@ -4,13 +4,13 @@ if (!trait_exists('ReturnLinkedProdVarDD')) :
     trait ReturnLinkedProdVarDD {
 
         /**
-         * return_mwc_linked_variations_dropdown HTML
+         * mwc_return_linked_variations_dropdown HTML
          *
          * @param array $args
          * @param array $var_data
          * @return html
          */
-        public static function return_mwc_linked_variations_dropdown($args, $var_data, $prod_data) {
+        public static function mwc_return_linked_variations_dropdown($args, $var_data, $prod_data) {
 
             $html = '';
 

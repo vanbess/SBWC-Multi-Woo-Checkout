@@ -3,19 +3,22 @@
 if (!class_exists('woocommerce')) :
 
     // include traits
-    include MWC_PLUGIN_DIR . 'lib/front/traits/mwc-main/add_to_cart_basic_aj_action.php';
-    include MWC_PLUGIN_DIR . 'lib/front/traits/mwc-main/add_to_cart_basic_js.php';
-    include MWC_PLUGIN_DIR . 'lib/front/traits/mwc-main/add_to_cart_linked_aj_action.php';
-    include MWC_PLUGIN_DIR . 'lib/front/traits/mwc-main/add_to_cart_linked_js.php';
-    include MWC_PLUGIN_DIR . 'lib/front/traits/mwc-main/apply_cart_discounts.php';
-    include MWC_PLUGIN_DIR . 'lib/front/traits/mwc-main/apply_reg_price_cart.php';
-    include MWC_PLUGIN_DIR . 'lib/front/traits/mwc-main/get_package_price.php';
-    include MWC_PLUGIN_DIR . 'lib/front/traits/mwc-main/get_price_summary_table.php';
-    include MWC_PLUGIN_DIR . 'lib/front/traits/mwc-main/load_resources.php';
-    include MWC_PLUGIN_DIR . 'lib/front/traits/mwc-main/return_linked_prod_var_dd.php';
-    include MWC_PLUGIN_DIR . 'lib/front/traits/mwc-main/return_onepage_co_var_dd.php';
-    include MWC_PLUGIN_DIR . 'lib/front/traits/mwc-main/remove-other-coupons.php';
-    include MWC_PLUGIN_DIR . 'lib/front/traits/mwc-main/pll_register_strings.php';
+    require_once __DIR__ . '/traits/mwc_add_to_cart_multiple.php';
+    require_once __DIR__ . '/traits/mwc_apply_cart_discounts.php';
+    require_once __DIR__ . '/traits/mwc_atc_js_linked_prods.php';
+    require_once __DIR__ . '/traits/mwc_atc_js.php';
+    require_once __DIR__ . '/traits/mwc_atc_linked_products.php';
+    require_once __DIR__ . '/traits/mwc_cart_apply_regular_prices.php';
+    require_once __DIR__ . '/traits/mwc_get_price_package.php';
+    require_once __DIR__ . '/traits/mwc_get_price_summary_table.php';
+    require_once __DIR__ . '/traits/mwc_load_resources.php';
+    require_once __DIR__ . '/traits/mwc_pll_reg_strings_add_translations.php';
+    require_once __DIR__ . '/traits/mwc_pll_register_strings.php';
+    require_once __DIR__ . '/traits/mwc_remove_other_coupons.php';
+    require_once __DIR__ . '/traits/mwc_return_linked_variations_dropdown.php';
+    require_once __DIR__ . '/traits/mwc_return_onepage_checkout_variation_dropdown.php';
+    require_once __DIR__ . '/traits/mwc_update_minicart_prices.php';
+
 
     class MWC
     {
@@ -33,7 +36,8 @@ if (!class_exists('woocommerce')) :
             ReturnLinkedProdVarDD,
             ReturnOnePageCoVarDD,
             MWC_Remove_Other_Coupons,
-            MWC_PLL_Register_Strings;
+            MWC_PLL_Register_Strings,
+            MWC_Update_MiniCart;
 
         // vars
         private static $initiated = false;
@@ -66,7 +70,7 @@ if (!class_exists('woocommerce')) :
             add_filter('woocommerce_coupons_enabled', '__return_false');
 
             // script
-            add_action('wp_footer', array(__CLASS__, 'load_resources'));
+            add_action('wp_footer', array(__CLASS__, 'mwc_load_resources'));
 
             // action ajax add products to cart
             add_action('wp_ajax_mwc_add_to_cart_multiple', array(__CLASS__, 'mwc_add_to_cart_multiple'));
@@ -93,30 +97,20 @@ if (!class_exists('woocommerce')) :
             // action to set item prices to regular
             add_action('woocommerce_before_calculate_totals', array(__CLASS__, 'mwc_cart_apply_regular_prices'));
 
+            // apply regular pricing to mini cart
+            add_filter('woocommerce_cart_item_price', [__CLASS__, 'mwc_apply_regular_price_mini_cart'], 30, 3);
+
+            // update mini cart prices
+            add_action('wp_footer', array(__CLASS__, 'mwc_update_minicart_prices'));
+
             // action to apply cart discount
             add_action('woocommerce_cart_calculate_fees', array(__CLASS__, 'mwc_apply_cart_discounts'));
 
-            // add_action('woocommerce_before_calculate_totals', array(__CLASS__, 'mwc_apply_cart_discounts'));
-
             // action add referer to order note
-            add_action('woocommerce_order_status_processing', array(__CLASS__, 'add_referer_url_order_note'), 10, 1);
+            add_action('woocommerce_order_status_processing', array(__CLASS__, 'mwc_add_referer_url_order_note'), 10, 1);
 
             // register PLL strings
             self::mwc_pll_register_strings();
-
-            // remove all product price filters if mwc flag is set to true
-            global $is_mwc_checkout;
-
-            // add_action('plugins_loaded', function () use ($is_mwc_checkout) {
-
-            //     if ($is_mwc_checkout) {
-            //         remove_all_filters('woocommerce_product_get_price');
-            //         remove_all_filters('woocommerce_product_get_regular_price');
-            //         remove_all_filters('woocommerce_product_variation_get_regular_price');
-            //         remove_all_filters('woocommerce_product_variation_get_price');
-            //     }
-            // }, PHP_INT_MAX);
-
         }
 
         /**
@@ -125,7 +119,7 @@ if (!class_exists('woocommerce')) :
          * @param int $order_id
          * @return void
          */
-        public static function add_referer_url_order_note($order_id)
+        public static function mwc_add_referer_url_order_note($order_id)
         {
             $order = wc_get_order($order_id);
             $order->add_order_note('Checkout url: ' . $_SERVER['HTTP_REFERER']);

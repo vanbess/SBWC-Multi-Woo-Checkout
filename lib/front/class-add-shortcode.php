@@ -129,6 +129,9 @@ if (!class_exists('MWCShortCode')) {
                 self::$shortcode_page_id = $post_to_check->ID;
                 $contains_shortcode = true;
 
+                // empty cart
+                wc()->cart->empty_cart();
+
                 // flag
                 global $is_mwc_checkout;
                 $is_mwc_checkout = true;

@@ -571,7 +571,7 @@ if (!empty($package_product_ids)) {
 																						<?php
 
 																						// show variations linked by variations
-																						echo MWC::return_mwc_linked_variations_dropdown([
+																						echo MWC::mwc_return_linked_variations_dropdown([
 																							'product_id'		=> $prod_data['id'],
 																							'class' 			=> 'var_prod_attr checkou_prod_attr select-variation-' . $prod_data['type'],
 																						], $var_data, $prod_data);
@@ -592,7 +592,7 @@ if (!empty($package_product_ids)) {
 
 																								<!-- load dropdown variations -->
 																								<?php
-																								echo MWC::return_mwc_onepage_checkout_variation_dropdown([
+																								echo MWC::mwc_return_onepage_checkout_variation_dropdown([
 																									'product_id'		=> $prod_data['id'],
 																									'options' 			=> $options,
 																									'attribute_name'	=> $attribute_name,
@@ -650,7 +650,7 @@ if (!empty($package_product_ids)) {
 																							<?php
 
 																							// show variations linked by variations
-																							echo MWC::return_mwc_linked_variations_dropdown([
+																							echo MWC::mwc_return_linked_variations_dropdown([
 																								'product_id'		=> $i_prod['id'],
 																								'class' 			=> 'var_prod_attr checkou_prod_attr select-variation-' . $prod_data['type'],
 																							], $var_data, $prod_data);
@@ -670,7 +670,7 @@ if (!empty($package_product_ids)) {
 
 																									<!-- load dropdown variations -->
 																									<?php
-																									echo MWC::return_mwc_onepage_checkout_variation_dropdown([
+																									echo MWC::mwc_return_onepage_checkout_variation_dropdown([
 																										'product_id'		=> $i_prod['id'],
 																										'options' 			=> $options,
 																										'attribute_name'	=> $attribute_name,
@@ -713,7 +713,7 @@ if (!empty($package_product_ids)) {
 																						<?php
 
 																						// show variations linked by variations
-																						echo MWC::return_mwc_linked_variations_dropdown([
+																						echo MWC::mwc_return_linked_variations_dropdown([
 																							'product_id'		=> $prod_data['id'],
 																							'class' 			=> 'var_prod_attr checkou_prod_attr select-variation-' . $prod_data['type'],
 																						], $var_data, $prod_data);
@@ -734,7 +734,7 @@ if (!empty($package_product_ids)) {
 
 																								<!-- load dropdown variations -->
 																								<?php
-																								echo MWC::return_mwc_onepage_checkout_variation_dropdown([
+																								echo MWC::mwc_return_onepage_checkout_variation_dropdown([
 																									'product_id'		=> $prod_data['id'],
 																									'options' 			=> $options,
 																									'attribute_name'	=> $attribute_name,

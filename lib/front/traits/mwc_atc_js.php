@@ -1185,22 +1185,13 @@ if (!trait_exists('AddToCartBasic')) :
 
                                 setTimeout(() => {
                                     $.post(ajaxurl, data, function(response) {
-                                        // console.log(response);
-                                        $(document.body).trigger('update_checkout');
-                                        // $( document.body ).trigger( 'wc_fragment_refresh' );
-                                        
 
-                                        // $.ajax({
-                                        //     url: wc_cart_fragments_params.wc_ajax_url.toString().replace('%%endpoint%%', 'get_refreshed_fragments'),
-                                        //     type: 'POST',
-                                        //     success: function(data) {
-                                        //         if (data && data.fragments) {
-                                        //             $.each(data.fragments, function(key, value) {
-                                        //                 $(key).replaceWith(value);
-                                        //             });
-                                        //         }
-                                        //     }
-                                        // });
+                                        // debug
+                                        // console.log(response);
+
+                                        // update cart
+                                        // $(document.body).trigger('update_checkout');
+                                        // $( document.body ).trigger( 'wc_fragment_refresh' );
 
                                     });
                                 }, 250);
@@ -1225,6 +1216,16 @@ if (!trait_exists('AddToCartBasic')) :
                         }
 
                     }
+
+                    // if class mwc_active_product is found in document after load, trigger mwc_atc_linked after 2 seconds
+                    if ($('.mwc_active_product').length) {
+                            setTimeout(() => {
+
+                                console.log('mwc_active_product found');
+
+                                mwc_atc();
+                            }, 2000);
+                        }
 
                 });
             </script>

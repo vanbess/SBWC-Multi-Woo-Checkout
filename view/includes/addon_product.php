@@ -271,7 +271,7 @@ class viewAddonProduct {
                                                                 <label for="<?php echo sanitize_title($attribute_name); ?>"><?php echo wc_attribute_label($attribute_name); ?></label>
                                                                 <!-- load dropdown variations -->
                                                                 <?php
-                                                                echo MWC::return_mwc_onepage_checkout_variation_dropdown([
+                                                                echo MWC::mwc_return_onepage_checkout_variation_dropdown([
                                                                     'product_id'            => $p_id,
                                                                     'options'               => $options,
                                                                     'attribute_name'        => $attribute_name,

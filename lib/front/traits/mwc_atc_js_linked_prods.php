@@ -1044,26 +1044,28 @@ if (!trait_exists('AddToCartLinkedJS')) :
 
                                     // debug
                                     // console.log(response);
-                                    $(document.body).trigger('update_checkout');
 
-                                    // $( document.body ).trigger( 'wc_fragment_refresh' );
-
-                                    // $.ajax({
-                                    //     url: wc_cart_fragments_params.wc_ajax_url.toString().replace('%%endpoint%%', 'get_refreshed_fragments'),
-                                    //     type: 'POST',
-                                    //     success: function(data) {
-                                    //         if (data && data.fragments) {
-                                    //             $.each(data.fragments, function(key, value) {
-                                    //                 $(key).replaceWith(value);
-                                    //             });
-                                    //         }
-                                    //     }
-                                    // });
+                                    // update cart
+                                    // $(document.body).trigger('update_checkout');
+                                    // $(document.body).trigger('wc_fragment_refresh');
                                 });
                             }, 1000);
 
                         }
+
+                        
+
                     }
+
+                    // if class mwc_active_product is found in document after load, trigger mwc_atc_linked after 2 seconds
+                    if ($('.mwc_active_product').length) {
+                            setTimeout(() => {
+
+                                console.log('mwc_active_product found');
+
+                                mwc_atc_linked();
+                            }, 2000);
+                        }
 
                 });
             </script>

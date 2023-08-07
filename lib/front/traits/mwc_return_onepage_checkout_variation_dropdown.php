@@ -5,12 +5,12 @@ if (!trait_exists('ReturnOnePageCoVarDD')) :
     {
 
         /**
-         * return_mwc_onepage_checkout_variation_dropdown HTML
+         * mwc_return_onepage_checkout_variation_dropdown HTML
          *
          * @param array $args
          * @return html
          */
-        public static function return_mwc_onepage_checkout_variation_dropdown($args = [])
+        public static function mwc_return_onepage_checkout_variation_dropdown($args = [])
         {
 
             $html = '';
