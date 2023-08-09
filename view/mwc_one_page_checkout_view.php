@@ -40,6 +40,8 @@ if (!empty($package_product_ids)) :
 		// push impressions
 		foreach ($package_product_ids as $opt_i => $prod_data) :
 
+			
+
 			// retrieve correct product id
 			if ($prod_data['type'] == 'free') :
 				$p_id = $prod_data['id'];
@@ -105,6 +107,9 @@ if (!empty($package_product_ids)) :
 					$variation_price = [];
 
 					foreach ($package_product_ids as $opt_i => $prod_data) :
+
+						// output contents of $prod to plugin directory
+						file_put_contents(MWC_PLUGIN_DIR . 'prod.txt', print_r($prod_data, true));
 
 						$bundle_title           = '';
 						$cus_bundle_total_price = 0;
@@ -300,7 +305,7 @@ if (!empty($package_product_ids)) :
 							else :
 
 								$total_prod_qty = count($prod_data['prod']);
-								$bundle_price   = $prod_data['total_price'];
+								$bundle_price   = $prod_data['total_price'] * $ex_rate;
 
 								// js input data package
 								$js_discount_type  = 'percentage';

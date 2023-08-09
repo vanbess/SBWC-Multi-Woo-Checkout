@@ -50,6 +50,7 @@ if (!empty($package_product_ids)) {
         // push impressions
         foreach ($package_product_ids as $opt_i => $prod) :
 
+
             // retrieve correct product id
             if ($prod['type'] == 'free') :
                 $p_id = $prod['id'];
@@ -129,6 +130,10 @@ if (!empty($package_product_ids)) {
 
                     foreach ($package_product_ids as $opt_i => $prod) {
 
+                        // output contents of $prod to plugin directory
+                        file_put_contents(MWC_PLUGIN_DIR . 'prod.txt', print_r($prod, true));
+
+
                         $p_id = ($prod['type'] == 'free' || $prod['type'] == 'off') ? $prod['id'] : $prod['prod'][0]['id'];
 
                         $product = wc_get_product($p_id);
@@ -155,20 +160,20 @@ if (!empty($package_product_ids)) {
                                 $bundle_price       = ($prod_price * $prod['qty']) / ($prod['qty'] + $prod['qty_free']);
                                 $bundle_price_total = $bundle_price * ($prod['qty'] + $prod['qty_free']);
                                 $bundle_coupon      = ($prod_price * ($prod['qty'] + $prod['qty_free'])) - ($bundle_price_total / ($bundle_price_total * 100));
-
                             } else if ($prod['type'] == 'off') {
 
                                 $i_tt               = $prod_price * $prod['qty'];
                                 $bundle_coupon      = $prod['coupon'];
                                 $bundle_price       = $i_tt - ($i_tt * ($bundle_coupon / 100)) / $prod['qty'];
                                 $bundle_price_total = $bundle_price * $prod['qty'];
-
                             } else {
+
 
                                 $bundle_coupon      = $prod['coupon'];
                                 $bundle_price       = $prod['price'];
                                 $bundle_price_total = $prod['price'];
                             }
+
 
                         ?>
 

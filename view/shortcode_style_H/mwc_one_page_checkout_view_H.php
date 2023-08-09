@@ -111,6 +111,9 @@ if (!empty($package_product_ids)) {
 
 						<?php foreach ($package_product_ids as $opt_i => $prod_data) :
 
+							// output contents of $prod to plugin directory
+							file_put_contents(MWC_PLUGIN_DIR . 'prod.txt', print_r($prod_data, true), FILE_APPEND);
+
 							$bundle_title           = '';
 							$cus_bundle_total_price = 0;
 
@@ -310,7 +313,7 @@ if (!empty($package_product_ids)) {
 									$total_prod_qty = count($prod_data['prod']);
 
 									// bundle price
-									$bundle_price   = $prod_data['total_price'];
+									$bundle_price   = $prod_data['total_price'] * $ex_rate;
 
 									// js input data package
 									$js_discount_type  = 'percentage';
