@@ -73736,3 +73736,1355 @@ Array
         )
 
 )
+Array
+(
+    [selValue] => free
+    [title_package] => <p>Buy 3 Get 1 Free, and Free Shipping</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/2-3.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/2-3.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-8.jpg
+    [product_name] => InvisiChic Seamless Bra
+    [selValue_free] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27427
+                    [title] => SANVAH InvisiChic Seamless Bra - Black
+                )
+
+            [quantity] => 3
+        )
+
+    [selValue_free_prod] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27427
+                    [title] => SANVAH InvisiChic Seamless Bra - Black
+                )
+
+            [quantity] => 1
+        )
+
+    [feature_description] => Array
+        (
+        )
+
+    [show_discount_label] => 
+    [sell_out_risk] => medium
+    [popularity] => popular
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+            [1] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+        )
+
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => bun
+    [title_header] => InvisiChic Seamless Bra + Elessa Seamless Underwear
+    [title_package] => <p>InvisiChic Seamless Bra + Elessa Seamless Underwear</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/3-4.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/3-4.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-6.jpg
+    [selValue_bun] => Array
+        (
+            [post] => Array
+                (
+                    [0] => Array
+                        (
+                            [id] => 27417
+                            [title] => SANVAH InvisiChic Seamless Bra - Pink
+                            [quantity] => 3
+                        )
+
+                    [1] => Array
+                        (
+                            [id] => 23278
+                            [title] => Elessa Seamless Underwear - Pink
+                            [quantity] => 3
+                        )
+
+                )
+
+            [price_currency] => Array
+                (
+                    [USD] => 99
+                    [AUD] => 
+                    [CAD] => 
+                    [NZD] => 
+                    [HKD] => 
+                    [SGD] => 
+                    [EUR] => 
+                    [JPY] => 
+                    [NOK] => 
+                    [DKK] => 
+                    [MYR] => 
+                    [SEK] => 
+                    [CHF] => 
+                    [TWD] => 
+                    [GBP] => 
+                )
+
+        )
+
+    [feature_description] => 
+    [discount_percentage] => 
+    [show_discount_label] => 1
+    [sell_out_risk] => medium
+    [popularity] => popular
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 5 Get 35% Off</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/5-4.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/5-4.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-7.jpg
+    [product_name] => InvisiChic Seamless Bra
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27422
+                    [title] => SANVAH InvisiChic Seamless Bra - Green
+                )
+
+            [quantity] => 5
+            [coupon] => 35
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 1
+    [show_original_price] => 
+    [sell_out_risk] => high
+    [popularity] => best-seller
+    [free_shipping] => 
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 3 Get 25% Off and Free Shipping</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/3-4.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/3-4.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-6.jpg
+    [product_name] => InvisiChic Seamless Bra
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27417
+                    [title] => SANVAH InvisiChic Seamless Bra - Pink
+                )
+
+            [quantity] => 3
+            [coupon] => 25
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 1
+    [show_original_price] => 
+    [sell_out_risk] => medium
+    [popularity] => popular
+    [free_shipping] => 1
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 1</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/1-4.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/1-4.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-5.jpg
+    [product_name] => InvisiChic Seamless Bra
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27413
+                    [title] => SANVAH InvisiChic Seamless Bra - Nude
+                )
+
+            [quantity] => 1
+            [coupon] => 
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 
+    [show_original_price] => 
+    [sell_out_risk] => low
+    [popularity] => moderate
+    [free_shipping] => 
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 3 Get 46% Off</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_03.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_03.jpg
+    [product_name] => Layla Sage 2-In-1 All Movement Dress
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 11290
+                    [title] => Layla Sage 2-In-1 4 Way Stretch All Movement Dress - Sale
+                )
+
+            [quantity] => 3
+            [cupon] => 46
+        )
+
+    [feature_description] => Array
+        (
+        )
+
+    [show_discount_label] => 1
+    [sell_out_risk] => none
+    [popularity] => popular
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+        )
+
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 2 Get 37% Off</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_02.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_02.jpg
+    [product_name] => Layla Sage 2-In-1 All Movement Dress
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 11290
+                    [title] => Layla Sage 2-In-1 4 Way Stretch All Movement Dress - Sale
+                )
+
+            [quantity] => 2
+            [cupon] => 37
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 1
+    [sell_out_risk] => none
+    [popularity] => best-seller
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] =>  #bada55
+                )
+
+        )
+
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 1 Get 24% Off</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_01.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_01.jpg
+    [product_name] => Layla Sage 2-In-1 All Movement Dress
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 11290
+                    [title] => Layla Sage 2-In-1 4 Way Stretch All Movement Dress - Sale
+                )
+
+            [quantity] => 1
+            [cupon] => 24
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 1
+    [sell_out_risk] => none
+    [popularity] => none
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] =>  #bada55
+                )
+
+        )
+
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => free
+    [title_package] => <p>Buy 3 Get 1 Free, and Free Shipping</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/2-3.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/2-3.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-8.jpg
+    [product_name] => InvisiChic Seamless Bra
+    [selValue_free] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27427
+                    [title] => SANVAH InvisiChic Seamless Bra - Black
+                )
+
+            [quantity] => 3
+        )
+
+    [selValue_free_prod] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27427
+                    [title] => SANVAH InvisiChic Seamless Bra - Black
+                )
+
+            [quantity] => 1
+        )
+
+    [feature_description] => Array
+        (
+        )
+
+    [show_discount_label] => 
+    [sell_out_risk] => medium
+    [popularity] => popular
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+            [1] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+        )
+
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => bun
+    [title_header] => InvisiChic Seamless Bra + Elessa Seamless Underwear
+    [title_package] => <p>InvisiChic Seamless Bra + Elessa Seamless Underwear</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/3-4.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/3-4.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-6.jpg
+    [selValue_bun] => Array
+        (
+            [post] => Array
+                (
+                    [0] => Array
+                        (
+                            [id] => 27417
+                            [title] => SANVAH InvisiChic Seamless Bra - Pink
+                            [quantity] => 3
+                        )
+
+                    [1] => Array
+                        (
+                            [id] => 23278
+                            [title] => Elessa Seamless Underwear - Pink
+                            [quantity] => 3
+                        )
+
+                )
+
+            [price_currency] => Array
+                (
+                    [USD] => 99
+                    [AUD] => 
+                    [CAD] => 
+                    [NZD] => 
+                    [HKD] => 
+                    [SGD] => 
+                    [EUR] => 
+                    [JPY] => 
+                    [NOK] => 
+                    [DKK] => 
+                    [MYR] => 
+                    [SEK] => 
+                    [CHF] => 
+                    [TWD] => 
+                    [GBP] => 
+                )
+
+        )
+
+    [feature_description] => 
+    [discount_percentage] => 
+    [show_discount_label] => 1
+    [sell_out_risk] => medium
+    [popularity] => popular
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 5 Get 35% Off</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/5-4.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/5-4.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-7.jpg
+    [product_name] => InvisiChic Seamless Bra
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27422
+                    [title] => SANVAH InvisiChic Seamless Bra - Green
+                )
+
+            [quantity] => 5
+            [coupon] => 35
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 1
+    [show_original_price] => 
+    [sell_out_risk] => high
+    [popularity] => best-seller
+    [free_shipping] => 
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 3 Get 25% Off and Free Shipping</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/3-4.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/3-4.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-6.jpg
+    [product_name] => InvisiChic Seamless Bra
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27417
+                    [title] => SANVAH InvisiChic Seamless Bra - Pink
+                )
+
+            [quantity] => 3
+            [coupon] => 25
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 1
+    [show_original_price] => 
+    [sell_out_risk] => medium
+    [popularity] => popular
+    [free_shipping] => 1
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 1</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/1-4.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/1-4.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-5.jpg
+    [product_name] => InvisiChic Seamless Bra
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27413
+                    [title] => SANVAH InvisiChic Seamless Bra - Nude
+                )
+
+            [quantity] => 1
+            [coupon] => 
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 
+    [show_original_price] => 
+    [sell_out_risk] => low
+    [popularity] => moderate
+    [free_shipping] => 
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 3 Get 46% Off</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_03.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_03.jpg
+    [product_name] => Layla Sage 2-In-1 All Movement Dress
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 11290
+                    [title] => Layla Sage 2-In-1 4 Way Stretch All Movement Dress - Sale
+                )
+
+            [quantity] => 3
+            [cupon] => 46
+        )
+
+    [feature_description] => Array
+        (
+        )
+
+    [show_discount_label] => 1
+    [sell_out_risk] => none
+    [popularity] => popular
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+        )
+
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 2 Get 37% Off</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_02.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_02.jpg
+    [product_name] => Layla Sage 2-In-1 All Movement Dress
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 11290
+                    [title] => Layla Sage 2-In-1 4 Way Stretch All Movement Dress - Sale
+                )
+
+            [quantity] => 2
+            [cupon] => 37
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 1
+    [sell_out_risk] => none
+    [popularity] => best-seller
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] =>  #bada55
+                )
+
+        )
+
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 1 Get 24% Off</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_01.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_01.jpg
+    [product_name] => Layla Sage 2-In-1 All Movement Dress
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 11290
+                    [title] => Layla Sage 2-In-1 4 Way Stretch All Movement Dress - Sale
+                )
+
+            [quantity] => 1
+            [cupon] => 24
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 1
+    [sell_out_risk] => none
+    [popularity] => none
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] =>  #bada55
+                )
+
+        )
+
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => free
+    [title_package] => <p>Buy 3 Get 1 Free, and Free Shipping</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/2-3.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/2-3.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-8.jpg
+    [product_name] => InvisiChic Seamless Bra
+    [selValue_free] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27427
+                    [title] => SANVAH InvisiChic Seamless Bra - Black
+                )
+
+            [quantity] => 3
+        )
+
+    [selValue_free_prod] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27427
+                    [title] => SANVAH InvisiChic Seamless Bra - Black
+                )
+
+            [quantity] => 1
+        )
+
+    [feature_description] => Array
+        (
+        )
+
+    [show_discount_label] => 
+    [sell_out_risk] => medium
+    [popularity] => popular
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+            [1] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+        )
+
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => bun
+    [title_header] => InvisiChic Seamless Bra + Elessa Seamless Underwear
+    [title_package] => <p>InvisiChic Seamless Bra + Elessa Seamless Underwear</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/3-4.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/3-4.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-6.jpg
+    [selValue_bun] => Array
+        (
+            [post] => Array
+                (
+                    [0] => Array
+                        (
+                            [id] => 27417
+                            [title] => SANVAH InvisiChic Seamless Bra - Pink
+                            [quantity] => 3
+                        )
+
+                    [1] => Array
+                        (
+                            [id] => 23278
+                            [title] => Elessa Seamless Underwear - Pink
+                            [quantity] => 3
+                        )
+
+                )
+
+            [price_currency] => Array
+                (
+                    [USD] => 99
+                    [AUD] => 
+                    [CAD] => 
+                    [NZD] => 
+                    [HKD] => 
+                    [SGD] => 
+                    [EUR] => 
+                    [JPY] => 
+                    [NOK] => 
+                    [DKK] => 
+                    [MYR] => 
+                    [SEK] => 
+                    [CHF] => 
+                    [TWD] => 
+                    [GBP] => 
+                )
+
+        )
+
+    [feature_description] => 
+    [discount_percentage] => 
+    [show_discount_label] => 1
+    [sell_out_risk] => medium
+    [popularity] => popular
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 5 Get 35% Off</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/5-4.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/5-4.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-7.jpg
+    [product_name] => InvisiChic Seamless Bra
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27422
+                    [title] => SANVAH InvisiChic Seamless Bra - Green
+                )
+
+            [quantity] => 5
+            [coupon] => 35
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 1
+    [show_original_price] => 
+    [sell_out_risk] => high
+    [popularity] => best-seller
+    [free_shipping] => 
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 3 Get 25% Off and Free Shipping</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/3-4.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/3-4.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-6.jpg
+    [product_name] => InvisiChic Seamless Bra
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27417
+                    [title] => SANVAH InvisiChic Seamless Bra - Pink
+                )
+
+            [quantity] => 3
+            [coupon] => 25
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 1
+    [show_original_price] => 
+    [sell_out_risk] => medium
+    [popularity] => popular
+    [free_shipping] => 1
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 1</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/1-4.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/1-4.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-5.jpg
+    [product_name] => InvisiChic Seamless Bra
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27413
+                    [title] => SANVAH InvisiChic Seamless Bra - Nude
+                )
+
+            [quantity] => 1
+            [coupon] => 
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 
+    [show_original_price] => 
+    [sell_out_risk] => low
+    [popularity] => moderate
+    [free_shipping] => 
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 3 Get 46% Off</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_03.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_03.jpg
+    [product_name] => Layla Sage 2-In-1 All Movement Dress
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 11290
+                    [title] => Layla Sage 2-In-1 4 Way Stretch All Movement Dress - Sale
+                )
+
+            [quantity] => 3
+            [cupon] => 46
+        )
+
+    [feature_description] => Array
+        (
+        )
+
+    [show_discount_label] => 1
+    [sell_out_risk] => none
+    [popularity] => popular
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+        )
+
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 2 Get 37% Off</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_02.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_02.jpg
+    [product_name] => Layla Sage 2-In-1 All Movement Dress
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 11290
+                    [title] => Layla Sage 2-In-1 4 Way Stretch All Movement Dress - Sale
+                )
+
+            [quantity] => 2
+            [cupon] => 37
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 1
+    [sell_out_risk] => none
+    [popularity] => best-seller
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] =>  #bada55
+                )
+
+        )
+
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 1 Get 24% Off</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_01.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_01.jpg
+    [product_name] => Layla Sage 2-In-1 All Movement Dress
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 11290
+                    [title] => Layla Sage 2-In-1 4 Way Stretch All Movement Dress - Sale
+                )
+
+            [quantity] => 1
+            [cupon] => 24
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 1
+    [sell_out_risk] => none
+    [popularity] => none
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] =>  #bada55
+                )
+
+        )
+
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => free
+    [title_package] => <p>Buy 3 Get 1 Free, and Free Shipping</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/2-3.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/2-3.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-8.jpg
+    [product_name] => InvisiChic Seamless Bra
+    [selValue_free] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27427
+                    [title] => SANVAH InvisiChic Seamless Bra - Black
+                )
+
+            [quantity] => 3
+        )
+
+    [selValue_free_prod] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27427
+                    [title] => SANVAH InvisiChic Seamless Bra - Black
+                )
+
+            [quantity] => 1
+        )
+
+    [feature_description] => Array
+        (
+        )
+
+    [show_discount_label] => 
+    [sell_out_risk] => medium
+    [popularity] => popular
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+            [1] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+        )
+
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => bun
+    [title_header] => InvisiChic Seamless Bra + Elessa Seamless Underwear
+    [title_package] => <p>InvisiChic Seamless Bra + Elessa Seamless Underwear</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/3-4.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/3-4.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-6.jpg
+    [selValue_bun] => Array
+        (
+            [post] => Array
+                (
+                    [0] => Array
+                        (
+                            [id] => 27417
+                            [title] => SANVAH InvisiChic Seamless Bra - Pink
+                            [quantity] => 3
+                        )
+
+                    [1] => Array
+                        (
+                            [id] => 23278
+                            [title] => Elessa Seamless Underwear - Pink
+                            [quantity] => 3
+                        )
+
+                )
+
+            [price_currency] => Array
+                (
+                    [USD] => 99
+                    [AUD] => 
+                    [CAD] => 
+                    [NZD] => 
+                    [HKD] => 
+                    [SGD] => 
+                    [EUR] => 
+                    [JPY] => 
+                    [NOK] => 
+                    [DKK] => 
+                    [MYR] => 
+                    [SEK] => 
+                    [CHF] => 
+                    [TWD] => 
+                    [GBP] => 
+                )
+
+        )
+
+    [feature_description] => 
+    [discount_percentage] => 
+    [show_discount_label] => 1
+    [sell_out_risk] => medium
+    [popularity] => popular
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 5 Get 35% Off</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/5-4.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/5-4.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-7.jpg
+    [product_name] => InvisiChic Seamless Bra
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27422
+                    [title] => SANVAH InvisiChic Seamless Bra - Green
+                )
+
+            [quantity] => 5
+            [coupon] => 35
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 1
+    [show_original_price] => 
+    [sell_out_risk] => high
+    [popularity] => best-seller
+    [free_shipping] => 
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 3 Get 25% Off and Free Shipping</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/3-4.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/3-4.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-6.jpg
+    [product_name] => InvisiChic Seamless Bra
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27417
+                    [title] => SANVAH InvisiChic Seamless Bra - Pink
+                )
+
+            [quantity] => 3
+            [coupon] => 25
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 1
+    [show_original_price] => 
+    [sell_out_risk] => medium
+    [popularity] => popular
+    [free_shipping] => 1
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 1</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2023/06/1-4.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2023/06/1-4.jpg
+    [image_package_hover] => http://localhost/sanvah/wp-content/uploads/2023/06/5-5.jpg
+    [product_name] => InvisiChic Seamless Bra
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 27413
+                    [title] => SANVAH InvisiChic Seamless Bra - Nude
+                )
+
+            [quantity] => 1
+            [coupon] => 
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 
+    [show_original_price] => 
+    [sell_out_risk] => low
+    [popularity] => moderate
+    [free_shipping] => 
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 3 Get 46% Off</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_03.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_03.jpg
+    [product_name] => Layla Sage 2-In-1 All Movement Dress
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 11290
+                    [title] => Layla Sage 2-In-1 4 Way Stretch All Movement Dress - Sale
+                )
+
+            [quantity] => 3
+            [cupon] => 46
+        )
+
+    [feature_description] => Array
+        (
+        )
+
+    [show_discount_label] => 1
+    [sell_out_risk] => none
+    [popularity] => popular
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+        )
+
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 2 Get 37% Off</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_02.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_02.jpg
+    [product_name] => Layla Sage 2-In-1 All Movement Dress
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 11290
+                    [title] => Layla Sage 2-In-1 4 Way Stretch All Movement Dress - Sale
+                )
+
+            [quantity] => 2
+            [cupon] => 37
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 1
+    [sell_out_risk] => none
+    [popularity] => best-seller
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] =>  #bada55
+                )
+
+        )
+
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [selValue] => off
+    [title_package] => <p>Buy 1 Get 24% Off</p>
+    [image_package_desktop] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_01.jpg
+    [image_package_mobile] => http://localhost/sanvah/wp-content/uploads/2022/10/600x300_01.jpg
+    [product_name] => Layla Sage 2-In-1 All Movement Dress
+    [selValue_off] => Array
+        (
+            [post] => Array
+                (
+                    [id] => 11290
+                    [title] => Layla Sage 2-In-1 4 Way Stretch All Movement Dress - Sale
+                )
+
+            [quantity] => 1
+            [cupon] => 24
+        )
+
+    [feature_description] => 
+    [show_discount_label] => 1
+    [sell_out_risk] => none
+    [popularity] => none
+    [free_shipping] => 1
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] =>  #bada55
+                )
+
+        )
+
+    [custom_price] => Array
+        (
+        )
+
+)

@@ -113,6 +113,30 @@ if (!class_exists('MWCShortCode')) {
 
             // Ensure we have a session when loading OPC pages
             add_action('template_redirect', array(__CLASS__, 'maybe_set_session'), 1);
+
+            add_action('wp_footer', array(__CLASS__, 'mwc_trigger_update_checkout'), 9999);
+        }
+
+        /**
+         * Make sure checkout form is refreshed on window load complete
+         * 
+         * @return void
+         */
+        public function mwc_trigger_update_checkout()
+        {
+
+            global $is_mwc_checkout;
+
+            if ($is_mwc_checkout) : ?>
+
+                <script>
+                    window.onload = function() {
+                        // Trigger WooCommerce order review update action
+                        jQuery(document.body).trigger('update_checkout');
+                    };
+                </script>
+
+<?php endif;
         }
 
         /**

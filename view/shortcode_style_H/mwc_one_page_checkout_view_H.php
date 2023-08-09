@@ -280,7 +280,7 @@ if (!empty($package_product_ids)) {
 							// buy x get x free
 							if ($prod_data['type'] == 'free') :
 
-								$total_prod_qty     = $prod_data['qty'] + $prod_data['qty_free'];
+								$total_prod_qty     = (int)$prod_data['qty'] + (int)$prod_data['qty_free'];
 								$bundle_price       = ($prod_price * $prod_data['qty']) / $total_prod_qty;
 								$sum_price_regular  = $prod_price * $total_prod_qty;
 								$bundle_price_total = $bundle_price * $total_prod_qty;
@@ -295,9 +295,9 @@ if (!empty($package_product_ids)) {
 							// buy x get x off
 							elseif ($prod_data['type'] == 'off') :
 
-								$total_prod_qty     = $prod_data['qty'];
+								$total_prod_qty     = (int)$prod_data['qty'];
 								$i_tt               = $prod_price * $prod_data['qty'];
-								$bundle_coupon      = $prod_data['coupon'];
+								$bundle_coupon      = (int)$prod_data['coupon'];
 								$bundle_price       = $prod_price - ($prod_price * ($bundle_coupon / 100));
 								$sum_price_regular  = $prod_price * $prod_data['qty'];
 								$bundle_price_total = $bundle_price * $prod_data['qty'];
@@ -801,7 +801,7 @@ if (!empty($package_product_ids)) {
 								</div> <!-- end col order summary -->
 
 				</div>
-				
+
 				<!-- checkout cont -->
 				<div id="mwc-checkout-cont" class="col-lg-5 col-md-6 col-sm-12 col-xs-12">
 
