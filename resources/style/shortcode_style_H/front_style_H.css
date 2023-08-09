@@ -231,6 +231,11 @@ button#mwc_template_h_see_more {
 
 @media (max-width: 576px) {
 
+    .op_c_package_option{
+        width: 33%;
+        padding: 3px;
+    }
+
     button#mwc_template_h_see_more {
         width: 100%;
     }
@@ -241,29 +246,30 @@ button#mwc_template_h_see_more {
     }
 
     .op_c_package_option .col-inner {
-        padding: 15px;
+        padding: 5px;
     }
 
     .op_c_package_content .mwc-popularity-text {
-        font-size: 18px;
+        font-size: 14px;
     }
 
     .mwc-title p {
-        font-size: 18px;
-        min-height: 30px;
+        font-size: 14px;
+        min-height: 65px;
+        line-height: 1.5;
     }
 
     .op_c_package_content .mwc-discount-text {
-        font-size: 18px;
+        font-size: 14px;
         min-height: 40px;
     }
 
     .op_c_package_content .mwc-sub-price {
-        font-size: 18px;
+        font-size: 14px;
     }
 
     .op_c_package_content .mwc-total-price {
-        font-size: 18px;
+        font-size: 14px;
     }
 
 }

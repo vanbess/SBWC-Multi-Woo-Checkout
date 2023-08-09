@@ -97,7 +97,7 @@ if (!empty($package_product_ids)) :
 					<h3 class="mwc_checkout_title" style="font-size: calc(1.8rem * var(--rio-typo-ratio,1));"><?php pll_e('Select Package:', 'woocommerce') ?></h3>
 				</div>
 
-				<div class="col large-7 small-12">
+				<div class="col-lg-7 col-md-7 col-sm-4 col-xs-4">
 
 					<?php
 					// create array variations data
