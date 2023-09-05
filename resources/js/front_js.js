@@ -148,6 +148,9 @@ jQuery(document).ready(function ($) {
      */
     $('.var_prod_attr').change(function () {
 
+        // debug
+        console.log('var_prod_attr change');
+
         // vars
         var reg_price_total = 0, disc_perc = 0, disc_mp = 0, bundle_id, currency_sym, old_price_html;
 
@@ -194,7 +197,7 @@ jQuery(document).ready(function ($) {
         old_price_html = '<span class="woocommerce-Price-amount amount"><bdi><span class="woocommerce-Price-currencySymbol">' + currency_sym + '</span>' + reg_price_total.toFixed(2) + '</bdi></span>'
 
         // set hidden bundle price to new discount price
-        $('.mwc_item_div_' + bundle_id).find('.mwc_bundle_price_hidden').val(reg_price_total * ($disc_perc / 100));
+        $('.mwc_item_div_' + bundle_id).find('.mwc_bundle_price_hidden').val(reg_price_total - (reg_price_total * (disc_perc / 100)));
 
         // trigger bundle summary prices update
         mwc_set_summary_prices();

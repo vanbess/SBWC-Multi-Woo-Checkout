@@ -12,6 +12,8 @@ jQuery(document).ready(function ($) {
     $('.op_c_checkout_form').show();
     $('#op_c_loading').hide();
 
+    $('.mwc_active_product').trigger('click');
+
     var attrs = $('.var_prod_attr');
 
     $.each(attrs, function () {

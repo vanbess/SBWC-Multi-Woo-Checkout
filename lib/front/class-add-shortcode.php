@@ -40,9 +40,6 @@ if (!class_exists('MWCShortCode')) {
             if (!self::$initiated) {
                 self::init_hooks();
             }
-            // Payment gateways
-            add_action('wp_ajax_mwc_fetch_pmt_gateways', [__CLASS__ , 'mwc_fetch_pmt_gateways']);
-            add_action('wp_ajax_nopriv_mwc_fetch_pmt_gateways',  [__CLASS__ , 'mwc_fetch_pmt_gateways']);
 
         }
 
@@ -63,11 +60,11 @@ if (!class_exists('MWCShortCode')) {
             add_filter('woocommerce_is_checkout', array(__CLASS__, 'is_checkout_filter'));
 
             // Display order review template even when cart is empty in WC < 2.3
-            add_action('wp_ajax_woocommerce_update_order_review', array(__CLASS__, 'short_circuit_ajax_update_order_review'), 9);
-            add_action('wp_ajax_nopriv_woocommerce_update_order_review', array(__CLASS__, 'short_circuit_ajax_update_order_review'), 9);
+            add_action('wp_ajax_woocommerce_update_order_review', array(__CLASS__, 'short_circuit_ajax_update_order_review'), 1);
+            add_action('wp_ajax_nopriv_woocommerce_update_order_review', array(__CLASS__, 'short_circuit_ajax_update_order_review'), 1);
 
             // Display order review template even when cart is empty in WC 2.3+
-            add_action('woocommerce_update_order_review_fragments', array(__CLASS__, 'mwc_update_order_review_fragments'), PHP_INT_MAX);
+            add_action('woocommerce_update_order_review_fragments', array(__CLASS__, 'mwc_update_order_review_fragments'));
 
             // Override the checkout template on OPC pages and Ajax requests to update checkout on OPC pages
             add_filter('wc_get_template', array(__CLASS__, 'override_checkout_template'), 10, 5);
@@ -79,11 +76,8 @@ if (!class_exists('MWCShortCode')) {
             add_action('wp_ajax_mwc_fetch_pmt_gateways', [__CLASS__ , 'mwc_fetch_pmt_gateways']);
             add_action('wp_ajax_nopriv_mwc_fetch_pmt_gateways',  [__CLASS__ , 'mwc_fetch_pmt_gateways']);
 
-            // Payment gateways script to footer
-            add_action('wp_footer', array(__CLASS__, 'mwc_gateway_js'), 999);
-
             // if any item in the cart has a price of 0.00, remove said item
-            add_action('woocommerce_before_calculate_totals', array(__CLASS__, 'remove_free_products_from_cart'), 10, 1);
+            // add_action('woocommerce_before_calculate_totals', array(__CLASS__, 'remove_free_products_from_cart'), 10, 1);
         }
 
         /**
@@ -123,63 +117,6 @@ if (!class_exists('MWCShortCode')) {
                 return false;
             endif;
         }
-
-        /**
-         * AJAX function to fetch and return available payment gateways
-         */
-        public function mwc_fetch_pmt_gateways()
-        {
-
-            wp_send_json($_POST);
-
-            // check nonce
-            // check_ajax_referer('mwc_fetch_pmt_gateways');
-
-            // // get available payment gateways
-            // $available_gateways = WC()->payment_gateways->get_available_payment_gateways();
-
-            // // render HTML and return
-            // ob_start();
-
-            // foreach ($available_gateways as $gateway) {
-            //     $gateway->payment_fields();
-            // }
-
-            // $html = ob_get_clean();
-
-            // wp_send_json_success($html);
-        }
-
-        /**
-         * Gateway fetch script
-         *
-         * @return void
-         */
-        public static function mwc_gateway_js()
-        { ?>
-            <?php if (self::is_mwc_page()) : ?>
-
-                <script>
-                    $ = jQuery;
-
-                    $(document).ready(function() {
-                        console.log('hola');
-                        data = {
-                            '_ajax_nonce': '<?php echo wp_create_nonce('mwc_fetch_pmt_gateways') ?>',
-                            'action': 'mwc_fetch_pmt_gateways',
-                        }
-
-                        $.post('<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) {
-                            console.log(response)
-                        })
-
-
-                    });
-                </script>
-
-            <?php endif; ?>
-<?php }
-
 
         /**
          * Filter the result of `is_checkout()` for OPC posts/pages

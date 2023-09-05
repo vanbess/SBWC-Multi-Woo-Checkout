@@ -46,8 +46,8 @@ if (!trait_exists('AddToCartLinkedAjAction')) :
             $discount    = isset($_POST['discount']) ? $_POST['discount'] : false;
 
             // UNCOMMENT TO DEBUG SESSION
-            // print_r($_SESSION);
-            // wp_die();
+            print_r($_SESSION);
+            wp_die();
 
             // empty cart
             wc()->cart->empty_cart();

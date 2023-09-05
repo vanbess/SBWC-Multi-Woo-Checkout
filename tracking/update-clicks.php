@@ -47,7 +47,7 @@ add_action('wp_footer', function () {
                     'addon_id': addon_id
                 }
 
-                $.post('<?php echo $ajax_url ?>', data, function(response){
+                $.post('<?php echo $ajax_url ?>', data, function(response) {
                     // console.log(response);
                 });
 
@@ -80,10 +80,24 @@ add_action('wp_footer', function () {
 
             // add/remove bundle products to tracking session if checked
             $('.mwc_item_div').on('change', function() {
-                
+
+                // debug
+                console.log('bundle clicked/changed');
+
                 var bundle_prod_ids = [];
 
-                bundle_prod_ids.push($(this).find('.c_prod_item').data('id'));
+                let bundle_id = $(this).attr('data-bundle_id').trim();
+
+                // console.log(bundle_id);
+
+                let mwc_variations = $(document).find('.mwc_product_variations_' + bundle_id);
+
+                mwc_variations.find('.c_prod_item').each(function() {
+                    bundle_prod_ids.push($(this).attr('data-id'));
+                });
+
+                // debug
+                console.log(bundle_prod_ids);
 
                 var data = {
                     '_ajax_nonce': '<?= $session_nonce ?>',
@@ -95,7 +109,6 @@ add_action('wp_footer', function () {
                 $.post('<?= $ajax_url ?>', data, function(response) {
                     // console.log(response);
                 });
-
             });
         });
     </script>
@@ -213,7 +226,7 @@ function mwc_add_products_to_session()
         if (isset($_POST['addon_prods'])) :
             $_SESSION['mwc_addon_prod_ids'] = $_POST['addon_prods'];
         else :
-            $_SESSION['mwc_addon_prod_ids'] = null;
+            unset($_SESSION['mwc_addon_prod_ids']);
         endif;
 
         wp_send_json($_SESSION);
@@ -230,7 +243,7 @@ function mwc_add_products_to_session()
         if (isset($_POST['bundle_prod'])) :
             $_SESSION['mwc_bundle_prod_ids'] = $_POST['bundle_prod'];
         else :
-            $_SESSION['mwc_bundle_prod_ids'] = null;
+            unset($_SESSION['mwc_bundle_prod_ids']);
         endif;
 
         wp_send_json($_SESSION);

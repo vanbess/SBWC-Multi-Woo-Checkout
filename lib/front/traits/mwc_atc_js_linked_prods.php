@@ -18,6 +18,9 @@ if (!trait_exists('AddToCartLinkedJS')) :
                     // only execute if linked products present in document
                     if ($(document).find('.linked_product').length) {
 
+                        // debug
+                        console.log('linked products present');
+
                         /*********************************************
                          * Setup json data array for atc ajax request
                          *********************************************/
@@ -72,6 +75,10 @@ if (!trait_exists('AddToCartLinkedJS')) :
                                 if ($(this).hasClass('mwc_selected_default_opt')) {
 
                                     $(this).find('.mwc_package_checkbox').click();
+
+                                    // debug: check if mwc_package_checkbox is clicked on page load
+                                    // console.log('checking if mwc_package_checkbox is clicked on page load...');
+                                    // console.log($(this).find('.mwc_package_checkbox').click());
 
                                     // setup basic vars
                                     bundle_id = $(this).attr('data-bundle_id');
@@ -227,6 +234,9 @@ if (!trait_exists('AddToCartLinkedJS')) :
                             // -----------
                             if ($(this).hasClass('template_h')) {
 
+                                // debug
+                                console.log('is template H');
+
                                 // set template and main target for use in functions
                                 var template = 'H';
                                 var target_main = $('.mwc_product_variations_' + bundle_id);
@@ -236,7 +246,15 @@ if (!trait_exists('AddToCartLinkedJS')) :
                                 // ------------------------
                                 if ($(this).hasClass('mwc_selected_default_opt')) {
 
+                                    // debug
+                                    console.log('default option present');
+
                                     $(this).find('.mwc_package_checkbox').click();
+
+                                    // debug
+                                    // debug: check if mwc_package_checkbox is clicked on page load
+                                    // console.log('checking if mwc_package_checkbox is clicked on page load...');
+                                    // console.log($(this).find('.mwc_package_checkbox').click());
 
                                     // setup basic vars
                                     bundle_id = $(this).attr('data-bundle_id');
@@ -262,6 +280,9 @@ if (!trait_exists('AddToCartLinkedJS')) :
                                     if (type === 'free') {
                                         linked_data.linked_free_prods = build_free_prod_dataset(target_main, v_dd, template);
                                     }
+
+                                    // debug
+                                    // console.log(linked_data);
 
                                 }
 
@@ -270,14 +291,23 @@ if (!trait_exists('AddToCartLinkedJS')) :
                                 // -----------------------
                                 $(this).on('mousedown', function(e) {
 
+                                    // debug
+                                    // console.log('container mousedown');
+                                    // console.log(e.which);
+
                                     if (e.which === 3) {
                                         return;
                                     }
 
                                     // don't execute if target/child is linked_product or var_prod_attr dropdown, else multiple atc events will be triggered
                                     if ($(e.target).hasClass('linked_product') || $(e.target).hasClass('var_prod_attr') || $(e.target).hasClass('c_prod_item')) {
+
+                                        // debug
+                                        // console.log('target is linked_product or var_prod_attr or c_prod_item');
                                         return;
                                     }
+
+
                                     // setup basic vars
                                     bundle_id = $(this).attr('data-bundle_id');
                                     linked_data.bundle_id = $(this).attr('data-bundle_id');
@@ -302,6 +332,9 @@ if (!trait_exists('AddToCartLinkedJS')) :
                                     if (type === 'free') {
                                         linked_data.linked_free_prods = build_free_prod_dataset(target_main, v_dd, template);
                                     }
+
+                                    // debug
+                                    // console.log(linked_data);
 
                                     mwc_atc_linked();
 
@@ -1031,41 +1064,48 @@ if (!trait_exists('AddToCartLinkedJS')) :
                             return prods;
                         }
 
-                        // 5. Add linked products to cart
-                        function mwc_atc_linked() {
-
-                            var ajaxurl = '<?php echo admin_url('admin-ajax.php') ?>';
-
-                            // debug
-                            // console.log(linked_data);
-
-                            setTimeout(() => {
-                                $.post(ajaxurl, linked_data, function(response) {
-
-                                    // debug
-                                    // console.log(response);
-
-                                    // update cart
-                                    // $(document.body).trigger('update_checkout');
-                                    // $(document.body).trigger('wc_fragment_refresh');
-                                });
-                            }, 1000);
-
-                        }
-
                         
+                        
+                        
+                    }
+
+
+                    // 5. Add linked products to cart
+                    function mwc_atc_linked() {
+
+                        var ajaxurl = '<?php echo admin_url('admin-ajax.php') ?>';
+
+                        // debug
+                        console.log('triggering mwc_atc_linked...');
+                        console.log(linked_data);
+
+                        setTimeout(() => {
+
+// debug
+console.log('triggering mwc_atc_linked after 1 second...');
+
+                            $.post(ajaxurl, linked_data, function(response) {
+
+                                // debug
+                                console.log(response);
+
+                                // update cart
+                                // $(document.body).trigger('update_checkout');
+                                // $(document.body).trigger('wc_fragment_refresh');
+                            });
+                        }, 1000);
 
                     }
 
                     // if class mwc_active_product is found in document after load, trigger mwc_atc_linked after 2 seconds
                     if ($('.mwc_active_product').length) {
-                            setTimeout(() => {
+                        setTimeout(() => {
 
-                                console.log('mwc_active_product found');
+                            console.log('mwc_active_product found');
 
-                                mwc_atc_linked();
-                            }, 2000);
-                        }
+                            mwc_atc_linked();
+                        }, 2000);
+                    }
 
                 });
             </script>
