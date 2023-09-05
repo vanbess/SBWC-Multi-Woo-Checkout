@@ -7,49 +7,6 @@ if (!defined('ABSPATH')) {
 if (!class_exists('MWCShortCode')) {
 
     /**
-     * Function that devs can use to check if a page includes the OPC shortcode
-     *
-     * @since 1.1
-     */
-    function is_mwc_checkout($post_id = null)
-    {
-
-        // If no post_id specified try getting the post_id
-        if (empty($post_id)) {
-            global $post;
-
-            if (is_object($post)) {
-                $post_id = $post->ID;
-            } else {
-                // Try to get the post ID from the URL in case this function is called before init
-                $schema = is_ssl() ? 'https://' : 'http://';
-                $url = explode('?', $schema . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
-                $post_id = url_to_postid($url[0]);
-            }
-        }
-
-        // If still no post_id return straight away
-        if (empty($post_id) || is_admin()) {
-            $is_opc = false;
-        } else {
-
-            if (0 == MWCShortCode::$shortcode_page_id) {
-                $post_to_check = !empty($post) ? $post : get_post($post_id);
-                MWCShortCode::check_for_shortcode($post_to_check);
-            }
-
-            // Compare IDs
-            if ($post_id == MWCShortCode::$shortcode_page_id || ('yes' == get_post_meta($post_id, '_wcopc', true))) {
-                $is_opc = true;
-            } else {
-                $is_opc = false;
-            }
-        }
-
-        return apply_filters('is_mwc_checkout', $is_opc);
-    }
-
-    /**
      * Shortcodes class
      */
     class MWCShortCode
@@ -83,6 +40,10 @@ if (!class_exists('MWCShortCode')) {
             if (!self::$initiated) {
                 self::init_hooks();
             }
+            // Payment gateways
+            add_action('wp_ajax_mwc_fetch_pmt_gateways', [__CLASS__ , 'mwc_fetch_pmt_gateways']);
+            add_action('wp_ajax_nopriv_mwc_fetch_pmt_gateways',  [__CLASS__ , 'mwc_fetch_pmt_gateways']);
+
         }
 
         /**
@@ -95,7 +56,7 @@ if (!class_exists('MWCShortCode')) {
             self::$plugin_path    = untrailingslashit(MWC_PLUGIN_DIR);
             self::$template_path  = self::$plugin_path . '/templates/';
 
-            add_shortcode('package_order_checkout', array(__CLASS__, 'package_order_checkout_shortcode'));
+            // add_shortcode('package_order_checkout', array(__CLASS__, 'package_order_checkout_shortcode'));
             add_shortcode('mwc_one_page_checkout', array(__CLASS__, 'mwc_one_page_checkout_shortcode'));
 
             // Filter is_checkout() on OPC posts/pages
@@ -105,7 +66,7 @@ if (!class_exists('MWCShortCode')) {
             add_action('wp_ajax_woocommerce_update_order_review', array(__CLASS__, 'short_circuit_ajax_update_order_review'), 9);
             add_action('wp_ajax_nopriv_woocommerce_update_order_review', array(__CLASS__, 'short_circuit_ajax_update_order_review'), 9);
 
-                     // Display order review template even when cart is empty in WC 2.3+
+            // Display order review template even when cart is empty in WC 2.3+
             add_action('woocommerce_update_order_review_fragments', array(__CLASS__, 'mwc_update_order_review_fragments'), PHP_INT_MAX);
 
             // Override the checkout template on OPC pages and Ajax requests to update checkout on OPC pages
@@ -114,58 +75,111 @@ if (!class_exists('MWCShortCode')) {
             // Ensure we have a session when loading OPC pages
             add_action('template_redirect', array(__CLASS__, 'maybe_set_session'), 1);
 
-            add_action('wp_footer', array(__CLASS__, 'mwc_trigger_update_checkout'), 9999);
+            // Payment gateways
+            add_action('wp_ajax_mwc_fetch_pmt_gateways', [__CLASS__ , 'mwc_fetch_pmt_gateways']);
+            add_action('wp_ajax_nopriv_mwc_fetch_pmt_gateways',  [__CLASS__ , 'mwc_fetch_pmt_gateways']);
+
+            // Payment gateways script to footer
+            add_action('wp_footer', array(__CLASS__, 'mwc_gateway_js'), 999);
+
+            // if any item in the cart has a price of 0.00, remove said item
+            add_action('woocommerce_before_calculate_totals', array(__CLASS__, 'remove_free_products_from_cart'), 10, 1);
         }
 
         /**
-         * Make sure checkout form is refreshed on window load complete
-         * 
-         * @return void
-         */
-        public function mwc_trigger_update_checkout()
-        {
-
-            global $is_mwc_checkout;
-
-            if ($is_mwc_checkout) : ?>
-
-                <script>
-                    window.onload = function() {
-                        // Trigger WooCommerce order review update action
-                        jQuery(document.body).trigger('update_checkout');
-                    };
-                </script>
-
-<?php endif;
-        }
-
-        /**
-         * Function to check for presence of shortcode
+         * Remove free products from cart
          *
-         * @param object $post_to_check
+         * @param  object $cart_object
          * @return void
          */
-        public static function check_for_shortcode($post_to_check)
-        {
+        public static function remove_free_products_from_cart($cart_object){
 
-            if (false !== stripos($post_to_check->post_content, '[mwc_one_page_checkout')) {
-                self::$add_scripts = true;
-                self::$shortcode_page_id = $post_to_check->ID;
-                $contains_shortcode = true;
-
-                // empty cart
-                wc()->cart->empty_cart();
-
-                // flag
-                global $is_mwc_checkout;
-                $is_mwc_checkout = true;
-            } else {
-                $contains_shortcode = false;
-                $is_mwc_checkout = true;
+            if (is_admin() && !defined('DOING_AJAX')) {
+                return;
             }
 
-            return $contains_shortcode;
+            if (did_action('woocommerce_before_calculate_totals') >= 2) {
+                return;
+            }
+
+            foreach ($cart_object->get_cart() as $cart_item_key => $cart_item) {
+                if ($cart_item['data']->get_price() == 0) {
+                    $cart_object->remove_cart_item($cart_item_key);
+                }
+            }
         }
+
+        /**
+         * Check if page contains shortcode and return either true or false
+         */
+        public static function is_mwc_page()
+        {
+
+            global $post;
+
+            if (is_object($post) && has_shortcode($post->post_content, 'mwc_one_page_checkout')) :
+                return true;
+            else :
+                return false;
+            endif;
+        }
+
+        /**
+         * AJAX function to fetch and return available payment gateways
+         */
+        public function mwc_fetch_pmt_gateways()
+        {
+
+            wp_send_json($_POST);
+
+            // check nonce
+            // check_ajax_referer('mwc_fetch_pmt_gateways');
+
+            // // get available payment gateways
+            // $available_gateways = WC()->payment_gateways->get_available_payment_gateways();
+
+            // // render HTML and return
+            // ob_start();
+
+            // foreach ($available_gateways as $gateway) {
+            //     $gateway->payment_fields();
+            // }
+
+            // $html = ob_get_clean();
+
+            // wp_send_json_success($html);
+        }
+
+        /**
+         * Gateway fetch script
+         *
+         * @return void
+         */
+        public static function mwc_gateway_js()
+        { ?>
+            <?php if (self::is_mwc_page()) : ?>
+
+                <script>
+                    $ = jQuery;
+
+                    $(document).ready(function() {
+                        console.log('hola');
+                        data = {
+                            '_ajax_nonce': '<?php echo wp_create_nonce('mwc_fetch_pmt_gateways') ?>',
+                            'action': 'mwc_fetch_pmt_gateways',
+                        }
+
+                        $.post('<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) {
+                            console.log(response)
+                        })
+
+
+                    });
+                </script>
+
+            <?php endif; ?>
+<?php }
+
 
         /**
          * Filter the result of `is_checkout()` for OPC posts/pages
@@ -176,7 +190,7 @@ if (!class_exists('MWCShortCode')) {
         public static function is_checkout_filter($return = false)
         {
 
-            if (is_mwc_checkout()) {
+            if (self::is_mwc_page()) {
                 $return = true;
             }
 
@@ -308,7 +322,7 @@ if (!class_exists('MWCShortCode')) {
             $is_opc = false;
 
             // Modify template if the page being loaded (non-ajax) is an OPC page
-            if (is_mwc_checkout()) {
+            if (self::is_mwc_page()) {
 
                 $is_opc = true;
 
@@ -357,7 +371,7 @@ if (!class_exists('MWCShortCode')) {
          */
         public static function maybe_set_session()
         {
-            if (is_mwc_checkout() && !WC()->session->has_session()) {
+            if (self::is_mwc_page() && !WC()->session->has_session()) {
                 WC()->session->set_customer_session_cookie(true);
             }
         }

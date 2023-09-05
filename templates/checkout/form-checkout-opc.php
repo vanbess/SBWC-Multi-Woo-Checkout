@@ -50,7 +50,6 @@ if (function_exists('flatsome_option') && flatsome_option('facebook_login_checko
 ?>
 
 <form name="checkout" method="post" class="mwc_checkout checkout woocommerce-checkout <?php echo esc_attr($wrapper_classes); ?>" action="<?php echo esc_url(wc_get_checkout_url()); ?>" enctype="multipart/form-data">
-
 	<div class="row pt-0 <?php echo esc_attr($row_classes); ?>">
 		<div class="col customer_info <?php echo esc_attr($main_classes); ?> large-7">
 			<?php if ($checkout->get_checkout_fields()) : ?>
@@ -143,7 +142,7 @@ if (function_exists('flatsome_option') && flatsome_option('facebook_login_checko
 					<div class="col-inner <?php echo esc_attr($sidebar_classes); ?>">
 						<div class="checkout-sidebar sm-touch-scroll">
 							<h3 id="order_review_heading" class="mwc_checkout_title"><?php esc_html_e('Payment Option', 'woocommerce'); ?></h3>
-
+help...
 							<?php do_action('woocommerce_checkout_before_order_review'); ?>
 
 							<div id="order_review" class="woocommerce-checkout-review-order">

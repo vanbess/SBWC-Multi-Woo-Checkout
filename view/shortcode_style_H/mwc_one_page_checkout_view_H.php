@@ -588,7 +588,7 @@ if (!empty($package_product_ids)) {
 																						$default_opt = '';
 																						try {
 																							$default_opt =  key_exists($attribute_name, $prod_obj->get_default_attributes()) ? $prod_obj->get_default_attributes()[$attribute_name] : '';
-																						} catch (\Thable $th) {
+																						} catch (Error $th) {
 																						}
 																					?>
 
@@ -666,7 +666,7 @@ if (!empty($package_product_ids)) {
 																							$default_opt = '';
 																							try {
 																								$default_opt =  key_exists($attribute_name, $prod_obj->get_default_attributes()) ? $prod_obj->get_default_attributes()[$attribute_name] : '';
-																							} catch (\Thable $th) {
+																							} catch (Error $th) {
 																								$default_opt = '';
 																							}
 																						?>
@@ -730,7 +730,7 @@ if (!empty($package_product_ids)) {
 																						$default_opt = '';
 																						try {
 																							$default_opt =  key_exists($attribute_name, $prod_obj->get_default_attributes()) ? $prod_obj->get_default_attributes()[$attribute_name] : '';
-																						} catch (\Thable $th) {
+																						} catch (Error $th) {
 																							$default_opt = '';
 																						}
 																					?>
@@ -809,13 +809,15 @@ if (!empty($package_product_ids)) {
 					<div id="op_c_loading" class="" style="text-align:center;">
 						<img src="<?php echo (MWC_PLUGIN_URL . 'images/loading.gif') ?>" id="i_loading_img">
 					</div>
-					<div class="op_c_checkout_form" hidden>
+					<div class="op_c_checkout_form">
 
 						<?php
 						// Get checkout object for WC 2.0+
 						$checkout = WC()->checkout();
-						wc_get_template('checkout/form-checkout.php', array('checkout' => $checkout));
-						?>
+
+						wc_get_template('checkout/form-checkout.php', array('checkout' => $checkout)); ?>
+
+						
 					</div>
 				</div>
 			</div>
