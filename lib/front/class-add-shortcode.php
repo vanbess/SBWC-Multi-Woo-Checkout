@@ -105,7 +105,7 @@ if (!class_exists('MWCShortCode')) {
             add_action('wp_ajax_woocommerce_update_order_review', array(__CLASS__, 'short_circuit_ajax_update_order_review'), 9);
             add_action('wp_ajax_nopriv_woocommerce_update_order_review', array(__CLASS__, 'short_circuit_ajax_update_order_review'), 9);
 
-            // Display order review template even when cart is empty in WC 2.3+
+                     // Display order review template even when cart is empty in WC 2.3+
             add_action('woocommerce_update_order_review_fragments', array(__CLASS__, 'mwc_update_order_review_fragments'), PHP_INT_MAX);
 
             // Override the checkout template on OPC pages and Ajax requests to update checkout on OPC pages
