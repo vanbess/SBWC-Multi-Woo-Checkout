@@ -61,6 +61,9 @@ if (!trait_exists('GetPriceSummaryTable')) :
             // current currency
             $current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_option('woocommerce_currency');
 
+            // get woocommerce default currency
+            $default_curr = get_option('woocommerce_currency');
+
             // calculate total
             $b_total_full = round(array_sum($b_total_arr), 2);
 
@@ -143,7 +146,7 @@ if (!trait_exists('GetPriceSummaryTable')) :
                     'html'     => $html,
                     'old_total' => '<del>' . wc_price($b_total_full, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</del>',
                     'mc_total' => wc_price($b_discounted_total, ['ex_tax_label' => false, 'currency' => $current_curr]),
-                    'p_price'  => '<b>'.wc_price($p_price, ['ex_tax_label' => false, 'currency' => $current_curr]) . __('</b> / Each', 'woocommerce')
+                    'p_price'  => '<b>' . wc_price($p_price, ['ex_tax_label' => false, 'currency' => $current_curr]) . __('</b> / Each', 'woocommerce')
                 ];
 
             endif;

@@ -828,3 +828,135 @@ Array
         )
 
 )
+Array
+(
+    [type] => free
+    [bun_id] => 16804
+    [title_package] => <p>Buy 6 Get 5 Free</p>
+    [image_package_desktop] => https://canles.com/wp-content/uploads/2023/05/1400x1400_01-12.jpg
+    [image_package_mobile] => https://canles.com/wp-content/uploads/2023/05/1400x1400_01-12.jpg
+    [image_package_hover] => https://canles.com/wp-content/uploads/2023/05/1400x1400_04-12.jpg
+    [feature_description] => Array
+        (
+        )
+
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+            [1] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+        )
+
+    [discount_percentage] => 0
+    [sell_out_risk] => none
+    [popularity] => popular
+    [free_shipping] => 1
+    [show_discount_label] => 
+    [show_original_price] => 
+    [product_name] => Bowman - Buy 6 Get 5 Free
+    [id] => 1568
+    [qty] => 6
+    [id_free] => 1568
+    [qty_free] => 5
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [type] => free
+    [bun_id] => 16803
+    [title_package] => <p>Buy 4 Get 3 Free</p>
+    [image_package_desktop] => https://canles.com/wp-content/uploads/2023/05/1400x1400_01-12.jpg
+    [image_package_mobile] => https://canles.com/wp-content/uploads/2023/05/1400x1400_01-12.jpg
+    [image_package_hover] => https://canles.com/wp-content/uploads/2023/05/1400x1400_03-12.jpg
+    [feature_description] => Array
+        (
+        )
+
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+            [1] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+            [2] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+        )
+
+    [discount_percentage] => 0
+    [sell_out_risk] => none
+    [popularity] => popular
+    [free_shipping] => 1
+    [show_discount_label] => 
+    [show_original_price] => 
+    [product_name] => Bowman -  Buy 4 Get 3 Free
+    [id] => 1568
+    [qty] => 4
+    [id_free] => 1568
+    [qty_free] => 3
+    [custom_price] => Array
+        (
+        )
+
+)
+Array
+(
+    [type] => free
+    [bun_id] => 16796
+    [title_package] => <p>Buy 2 Get 1 Free</p>
+    [image_package_desktop] => https://canles.com/wp-content/uploads/2023/05/1400x1400_01-12.jpg
+    [image_package_mobile] => https://canles.com/wp-content/uploads/2023/05/1400x1400_01-12.jpg
+    [image_package_hover] => https://canles.com/wp-content/uploads/2023/05/1400x1400_02-12.jpg
+    [feature_description] => Array
+        (
+        )
+
+    [label_item] => Array
+        (
+            [0] => Array
+                (
+                    [name] => 
+                    [color] => #bada55
+                )
+
+        )
+
+    [discount_percentage] => 0
+    [sell_out_risk] => none
+    [popularity] => best-seller
+    [free_shipping] => 1
+    [show_discount_label] => 
+    [show_original_price] => 
+    [product_name] => Bowman - Buy 2 Get 1 Free
+    [id] => 1568
+    [qty] => 2
+    [id_free] => 1568
+    [qty_free] => 1
+    [custom_price] => Array
+        (
+        )
+
+)

@@ -136,9 +136,6 @@ if (!class_exists('MWC')) :
 
                     // retrieve bundle data from session
                     $disc_p_price  = $_SESSION['mwc_product_price'];
-                    $disc_p_total  = $_SESSION['mwc_bundle_discounted_total'];
-                    $disc_perc     = $_SESSION['mwc_bundle_discount_perc'];
-                    $curr_currency = $_SESSION['mwc_current_curr'];
 
                     $price = sprintf(
                         __('<del>%s</del><br><b>%s</b>', 'woocommerce'),

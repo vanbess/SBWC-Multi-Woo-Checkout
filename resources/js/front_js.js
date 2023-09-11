@@ -648,8 +648,6 @@ jQuery(document).ready(function ($) {
         }
 
     });
-    
-    
 
 
     /**
