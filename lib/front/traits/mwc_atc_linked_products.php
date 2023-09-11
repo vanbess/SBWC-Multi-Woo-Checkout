@@ -9,36 +9,34 @@ if (!trait_exists('AddToCartLinkedAjAction')) :
          *
          * @return void
          */
-        public static function mwc_atc_linked_products()
+        public function mwc_atc_linked_products()
         {
 
             check_ajax_referer('add linked products to cart');
 
-            if (!session_id()) :
-                session_start();
-            endif;
-
-        
+            // init session
+            WC()->session->init();
+            WC()->session->set_customer_session_cookie(true);
 
             // UNCOMMENT TO DEBUG PAYLOAD
-            // print_r($_POST);
-            // wp_die();
+            // wp_send_json($_POST);
+
+            // force init cart
+            WC()->cart;
 
             // holds total mwc product count
             global $mwc_prod_count;
 
             // count linked_bun_prods OR linked_off_prods OR linked_free_prods and addon_variable_prods and addon_simple_prods
-            $linked_prods_count = isset($_POST['linked_bun_prods']) ? count($_POST['linked_bun_prods']) : (isset($_POST['linked_off_prods']) ? count($_POST['linked_off_prods']) : (isset($_POST['linked_free_prods']) ? count($_POST['linked_free_prods']) : 0));
+            $linked_prods_count         = isset($_POST['linked_bun_prods']) ? count($_POST['linked_bun_prods']) : (isset($_POST['linked_off_prods']) ? count($_POST['linked_off_prods']) : (isset($_POST['linked_free_prods']) ? count($_POST['linked_free_prods']) : 0));
             $addon_simple_prods_count   = isset($_POST['addon_simple_prods']) ? count($_POST['addon_simple_prods']) : 0;
             $addon_variable_prods_count = isset($_POST['addon_variable_prods']) ? count($_POST['addon_variable_prods']) : 0;
 
             // set mwc_prod_count
             $mwc_prod_count = $linked_prods_count + $addon_simple_prods_count + $addon_variable_prods_count;
 
-            // empty cart if cart total is 0
-            if (wc()->cart->get_cart_contents_total() == 0) :
-                wc()->cart->empty_cart();
-            endif;
+            // debug cart object
+            // wp_send_json(WC()->cart);
 
             // retrieve subbed vars
             $bundle_type = isset($_POST['type']) ? $_POST['type'] : false;
@@ -46,19 +44,28 @@ if (!trait_exists('AddToCartLinkedAjAction')) :
             $discount    = isset($_POST['discount']) ? $_POST['discount'] : false;
 
             // UNCOMMENT TO DEBUG SESSION
-            print_r($_SESSION);
-            wp_die();
+            // wp_send_json($_SESSION);
 
             // empty cart
             wc()->cart->empty_cart();
+
+            // $cart_keys[] = wc()->cart->add_to_cart(14190, 1, 14195, [], ['mwc_off_discount' => $discount]);
+
+            // wp_send_json($cart_keys);
 
             // holds cart keys
             $cart_keys = [];
 
             if ($bundle_id) :
 
+                // debug
+                // wp_send_json('bundle ID: ' . $bundle_id);
+
                 // bundle discount data
                 $disc_data = get_post_meta($bundle_id, 'product_discount', true);
+
+                // debug
+                // wp_send_json($disc_data);
 
                 // check if shipping is free or not
                 $is_free_shipping = isset($disc_data['free_shipping']) ? true : false;
@@ -74,6 +81,7 @@ if (!trait_exists('AddToCartLinkedAjAction')) :
                     // loop through linked prods and add to cart
                     foreach ($linked_off_prods as $prod_data) :
 
+                        // retrieve product
                         $prod = wc_get_product($prod_data['prod_id']);
 
                         // if variable product
@@ -96,13 +104,13 @@ if (!trait_exists('AddToCartLinkedAjAction')) :
                             endforeach;
 
                             // add to cart
-                            $cart_keys[] = wc()->cart->add_to_cart($prod_data['prod_id'], 1, $var_id, [], ['mwc_bun_discount' => $discount]);
+                            $cart_keys[] = wc()->cart->add_to_cart($prod->get_id(), 1, $var_id, [], ['mwc_bun_discount' => $discount]);
 
                         // if simple prod
                         else :
 
                             // add to cart
-                            $cart_keys[] = wc()->cart->add_to_cart($prod_data['prod_id'], 1, 0, [], ['mwc_bun_discount' => $discount]);
+                            $cart_keys[] = wc()->cart->add_to_cart($prod->get_id(), 1, 0, [], ['mwc_bun_discount' => $discount]);
 
                         endif;
 
@@ -126,7 +134,10 @@ if (!trait_exists('AddToCartLinkedAjAction')) :
                     // loop through linked prods and add to cart
                     foreach ($linked_off_prods as $prod_data) :
 
+
+                        // retrieve product
                         $prod = wc_get_product($prod_data['prod_id']);
+
 
                         // if variable product
                         if ($prod->get_type() === 'variable') :
@@ -140,21 +151,22 @@ if (!trait_exists('AddToCartLinkedAjAction')) :
                                 // retrieve attribute string
                                 $attrib_string = implode('', $var_data['attributes']);
 
+
                                 // if string matches submitted string, retrieve variation id
-                                if ($attrib_string === $prod_data['attribute']) :
+                                if ($attrib_string == $prod_data['attribute']) :
                                     $var_id = $var_data['variation_id'];
                                 endif;
 
                             endforeach;
 
                             // add to cart
-                            $cart_keys[] = wc()->cart->add_to_cart($prod_data['prod_id'], 1, $var_id, [], ['mwc_off_discount' => $discount]);
+                            $cart_keys[] = WC()->cart->add_to_cart($prod->get_id(), 1, $var_id, [], ['mwc_off_discount' => $discount]);
 
                         // if simple prod
                         else :
 
                             // add to cart
-                            $cart_keys[] = wc()->cart->add_to_cart($prod_data['prod_id'], 1, 0, [], ['mwc_off_discount' => $discount]);
+                            $cart_keys[] = wc()->cart->add_to_cart($prod->get_id(), 1, 0, [], ['mwc_off_discount' => $discount]);
 
                         endif;
 
@@ -164,7 +176,6 @@ if (!trait_exists('AddToCartLinkedAjAction')) :
                         endif;
 
                     endforeach;
-
 
                 endif;
 
@@ -176,12 +187,9 @@ if (!trait_exists('AddToCartLinkedAjAction')) :
                     // linked prods
                     $linked_free_prods = $_POST['linked_free_prods'];
 
-                    // print_r($linked_free_prods);
                     // loop through linked prods and add to cart
                     foreach ($linked_free_prods as $prod_data) :
 
-                        // echo $prod_data['paid_id'];
-                        // echo $prod_data['free_id'];
 
                         // free prods
                         if (isset($prod_data['free_id'])) :
@@ -208,13 +216,13 @@ if (!trait_exists('AddToCartLinkedAjAction')) :
                                 endforeach;
 
                                 // add to cart
-                                $cart_keys[] = wc()->cart->add_to_cart($prod_data['free_id'], 1, $var_id, [], ['mwc_bun_free_prod' => $discount]);
+                                $cart_keys[] = wc()->cart->add_to_cart($prod->get_id(), 1, $var_id, [], ['mwc_bun_free_prod' => $discount]);
 
                             // if simple prod
                             else :
 
                                 // add to cart
-                                $cart_keys[] = wc()->cart->add_to_cart($prod_data['free_id'], 1, 0, [], ['mwc_bun_free_prod' => $discount]);
+                                $cart_keys[] = wc()->cart->add_to_cart($prod->get_id(), 1, 0, [], ['mwc_bun_free_prod' => $discount]);
 
                             endif;
                         endif;
@@ -244,13 +252,13 @@ if (!trait_exists('AddToCartLinkedAjAction')) :
                                 endforeach;
 
                                 // add to cart
-                                $cart_keys[] = wc()->cart->add_to_cart($prod_data['paid_id'], 1, $var_id, [], ['mwc_bun_paid_prod' => $discount]);
+                                $cart_keys[] = wc()->cart->add_to_cart($prod->get_id(), 1, $var_id, [], ['mwc_bun_paid_prod' => $discount]);
 
                             // if simple prod
                             else :
 
                                 // add to cart
-                                $cart_keys[] = wc()->cart->add_to_cart($prod_data['paid_id'], 1, 0, [], ['mwc_bun_paid_prod' => $discount]);
+                                $cart_keys[] = wc()->cart->add_to_cart($prod->get_id(), 1, 0, [], ['mwc_bun_paid_prod' => $discount]);
 
                             endif;
 

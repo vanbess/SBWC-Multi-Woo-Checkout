@@ -55,7 +55,8 @@ if (!trait_exists('ApplyRegPriceCart')) :
                     get_post_meta($product_id, '_regular_price', true);
 
                 // debug
-                $cart_item['data']->set_price($reg_price);
+                // $cart_item['data']->set_price($reg_price);
+                $cart_item['data']->set_price(57.00);
 
             endforeach;
 

@@ -7,18 +7,24 @@
  * Plugin URI:
  * Description: Multi Woo Checkout
  * Author: Webmaster0313 w/ lots of bugfixes and tweaks by WC Bessinger
- * Version: 2.4.4
+ * Version: 2.4.5
  * Author URI:
  * Text Domain: mwc
  * Domain Path: /languages
  */
 
-define('MWCVersion', '2.4.4');
+define('MWCVersion', '2.4.5');
 define('MWC_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('MWC_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('MWC_PROTECTION_H', plugin_basename(__FILE__));
-define('MWC_NAME', 'woocommerce');
-define('MWC_PAGE_LINK', 'woocommerce');
+
+try {
+    // if WooCommerce is active, require the main class
+    if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
+        require_once(MWC_PLUGIN_DIR . 'lib/front/class.mwc.php');
+    }
+} catch (\Throwable $th) {
+    error_log('Error loading MWC plugin: ' . $th->getMessage() . $th->getTraceAsString());
+}
 
 /**
  * Create admin menu dashboard
@@ -37,13 +43,12 @@ add_action('admin_menu', function () {
     );
 });
 
+
 // Require template and template functions
 require_once(MWC_PLUGIN_DIR . 'lib/front/class-add-template.php');
 require_once(MWC_PLUGIN_DIR . 'functions.php');
 
-// Require main class and init
-require_once(MWC_PLUGIN_DIR . 'lib/front/class.mwc.php');
-add_action('init', array('MWC', 'init'));
+// add_action('init', array('MWC', 'init'));
 
 // Load correct classes based on location
 if (is_admin()) {
@@ -52,6 +57,7 @@ if (is_admin()) {
     require_once(MWC_PLUGIN_DIR . 'lib/front/class-add-shortcode.php');
 }
 
+return;
 // Require addon product class
 require_once(MWC_PLUGIN_DIR . 'lib/front/class-addon-product.php');
 
@@ -98,16 +104,13 @@ add_action('wp_footer', function () {
             $.post('<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) {
 
 
-    setTimeout(() => {
-        $('#payment').prepend(response);
-    }, 6000);
+                setTimeout(() => {
+                    $('#payment').prepend(response);
+                }, 6000);
 
             });
         </script>
     <?php endif;
-
-    
-
 });
 
 add_action('wp_ajax_nopriv_mwc_fetch_gateways', function () {

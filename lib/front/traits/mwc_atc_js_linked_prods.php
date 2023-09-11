@@ -19,7 +19,7 @@ if (!trait_exists('AddToCartLinkedJS')) :
                     if ($(document).find('.linked_product').length) {
 
                         // debug
-                        console.log('linked products present');
+                        // console.log('linked products present');
 
                         /*********************************************
                          * Setup json data array for atc ajax request
@@ -235,7 +235,7 @@ if (!trait_exists('AddToCartLinkedJS')) :
                             if ($(this).hasClass('template_h')) {
 
                                 // debug
-                                console.log('is template H');
+                                // console.log('is template H');
 
                                 // set template and main target for use in functions
                                 var template = 'H';
@@ -247,7 +247,7 @@ if (!trait_exists('AddToCartLinkedJS')) :
                                 if ($(this).hasClass('mwc_selected_default_opt')) {
 
                                     // debug
-                                    console.log('default option present');
+                                    // console.log('default option present');
 
                                     $(this).find('.mwc_package_checkbox').click();
 
@@ -1064,9 +1064,9 @@ if (!trait_exists('AddToCartLinkedJS')) :
                             return prods;
                         }
 
-                        
-                        
-                        
+
+
+
                     }
 
 
@@ -1076,23 +1076,39 @@ if (!trait_exists('AddToCartLinkedJS')) :
                         var ajaxurl = '<?php echo admin_url('admin-ajax.php') ?>';
 
                         // debug
-                        console.log('triggering mwc_atc_linked...');
-                        console.log(linked_data);
+                        // console.log(linked_data);
 
                         setTimeout(() => {
 
-// debug
-console.log('triggering mwc_atc_linked after 1 second...');
+                            // debug
+                            // console.log('triggering mwc_atc_linked after 1 second...');
 
-                            $.post(ajaxurl, linked_data, function(response) {
+                            // send ajax request without cache
+                            $.ajax({
+                                url: ajaxurl,
+                                type: 'POST',
+                                data: linked_data,
+                                cache: false,
+                                success: function(response) {
 
-                                // debug
-                                console.log(response);
+                                    // debug
+                                    console.log(response);
 
-                                // update cart
-                                // $(document.body).trigger('update_checkout');
-                                // $(document.body).trigger('wc_fragment_refresh');
+                                    // update cart
+                                    $(document.body).trigger('update_checkout');
+                                    $(document.body).trigger('wc_fragment_refresh');
+                                }
                             });
+
+                            // $.post(ajaxurl, linked_data, function(response) {
+
+                            //     // debug
+                            //     console.log(response);
+
+                            //     // update cart
+                            //     // $(document.body).trigger('update_checkout');
+                            //     // $(document.body).trigger('wc_fragment_refresh');
+                            // });
                         }, 1000);
 
                     }

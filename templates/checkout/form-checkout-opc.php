@@ -38,15 +38,15 @@ $sidebar_classes = implode(' ', $sidebar_classes);
 do_action('woocommerce_before_checkout_form', $checkout);
 
 // If checkout registration is disabled and not logged in, the user cannot checkout.
-if (!$checkout->is_registration_enabled() && $checkout->is_registration_required() && !is_user_logged_in()) {
-	echo esc_html(apply_filters('woocommerce_checkout_must_be_logged_in_message', __('You must be logged in to checkout.', 'woocommerce')));
-	return;
-}
+// if (!$checkout->is_registration_enabled() && $checkout->is_registration_required() && !is_user_logged_in()) {
+// 	echo esc_html(apply_filters('woocommerce_checkout_must_be_logged_in_message', __('You must be logged in to checkout.', 'woocommerce')));
+// 	return;
+// }
 
 // Social login.
-if (function_exists('flatsome_option') && flatsome_option('facebook_login_checkout') && get_option('woocommerce_enable_myaccount_registration') == 'yes' && !is_user_logged_in()) {
-	wc_get_template('checkout/social-login.php');
-}
+// if (function_exists('flatsome_option') && flatsome_option('facebook_login_checkout') && get_option('woocommerce_enable_myaccount_registration') == 'yes' && !is_user_logged_in()) {
+// 	wc_get_template('checkout/social-login.php');
+// }
 ?>
 
 <form name="checkout" method="post" class="mwc_checkout checkout woocommerce-checkout <?php echo esc_attr($wrapper_classes); ?>" action="<?php echo esc_url(wc_get_checkout_url()); ?>" enctype="multipart/form-data">

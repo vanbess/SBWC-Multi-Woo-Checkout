@@ -202,7 +202,7 @@ if (!empty($package_product_ids)) {
 									$variation_price[trim($prod_data['bun_id'])][$value['variation_id']]['variation_id'] = $value['variation_id'];
 
 									// if custom price is set
-									if ($prod['custom_price'] && isset($prod['custom_price'][$var_data['variation_id']][$current_curr])) :
+									if (isset($prod['custom_price']) && isset($prod['custom_price'][$var_data['variation_id']][$current_curr])) :
 										$variation_price[trim($prod['bun_id'])][$var_data['variation_id']]['price'] = $prod['custom_price'][$var_data['variation_id']][$current_curr];
 
 									// if custom price is not set
@@ -223,7 +223,17 @@ if (!empty($package_product_ids)) {
 
 										// if current currency is default currency, get regular price
 										else :
-											$variation_price[trim($prod['bun_id'])][$var_data['variation_id']]['price'] = $var_data['display_regular_price'];
+
+											// if $var_data['variation_id'] is not defined, continue
+											if (!isset($var_data['variation_id'])) :
+												continue;
+											else :
+
+												$prod_price = $var_data['variation_id'] ?
+													get_post_meta($var_data['variation_id'], '_regular_price', true) :
+													get_post_meta($var_data['variation_id'], '_price', true);
+											endif;
+										// isset($variation_price[trim($prod_data['bun_id'])][$var_data['variation_id']])? $variation_price[trim($prod_data['bun_id'])][$var_data['variation_id']]['price'] = $var_data['display_regular_price']: '';
 										endif;
 
 									endif;
@@ -817,7 +827,7 @@ if (!empty($package_product_ids)) {
 
 						wc_get_template('checkout/form-checkout.php', array('checkout' => $checkout)); ?>
 
-						
+
 					</div>
 				</div>
 			</div>

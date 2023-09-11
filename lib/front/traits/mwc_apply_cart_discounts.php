@@ -259,7 +259,7 @@ if (!trait_exists('ApplyCartDiscounts')) :
                     // $disc_mp = (100 - $addon_off_perc) / 100;
 
                     // addon discount total
-                    $addon_disc_total += ($item_total - ($item_total * ($addon_off_perc / 100)));
+                    $addon_disc_total += $item_total * ($addon_off_perc / 100);
 
                     // add discount fee name
                     $add_fee_name = __('Add-on Product Discount', 'woocommerce');
@@ -273,7 +273,8 @@ if (!trait_exists('ApplyCartDiscounts')) :
             // Do cart fee calc for bundle discount
             // ***************************************
             if ($disc_perc !== 0) :
-                $disc_amt = $bundle_stotal - ($bundle_stotal * ($disc_perc / 100));
+                $disc_amt = number_format($bundle_stotal * ($disc_perc / 100), 2, '.', '');
+                
                 $cart->add_fee($fee_name, -$disc_amt, true);
             endif;
 
@@ -281,8 +282,14 @@ if (!trait_exists('ApplyCartDiscounts')) :
             // Do cart fee calc for buy x get x off products
             // **********************************************
             if ($off_perc !== 0) :
-                $disc_amt = $bundle_stotal - ($bundle_stotal * ($off_perc / 100));
+
+                // get discount amount
+                $disc_amt     = number_format($bundle_stotal * ($off_perc / 100), 2, '.', '');
+
+                // get fee name
                 $off_fee_name = sprintf(__('Buy %s + Get %d&#37; Off', 'woocommerce'), $item_qty_fee, $off_perc);
+
+                // add fee
                 $cart->add_fee($off_fee_name, -$disc_amt, true);
             endif;
 
@@ -290,9 +297,20 @@ if (!trait_exists('ApplyCartDiscounts')) :
             // Do cart fee calc for free products
             // ***********************************
             if ($free_discount) :
-                $disc_mp = $free_prod_count / ($paid_prod_count + $free_prod_count);
-                $disc_amt = $bundle_stotal * $disc_mp;
-                $fee_name = sprintf(__('Buy %d + Get %d Free', 'woocommerce'), $paid_prod_count, $free_prod_count);
+
+                // get total items
+                $total_items = $paid_prod_count + $free_prod_count;
+
+                // get discount multiplier
+                $disc_mp     = $free_discount / $total_items;
+
+                // get discount amount
+                $disc_amt    = number_format($bundle_stotal * $disc_mp * $free_prod_count, 2, '.', '');
+
+                // set fee name
+                $fee_name    = sprintf(__('Buy %d + Get %d Free', 'woocommerce'), $paid_prod_count, $free_prod_count);
+
+                // add fee
                 $cart->add_fee($fee_name, -$disc_amt, true);
             endif;
 

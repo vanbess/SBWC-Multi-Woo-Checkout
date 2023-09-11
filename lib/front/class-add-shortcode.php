@@ -77,7 +77,7 @@ if (!class_exists('MWCShortCode')) {
             add_action('wp_ajax_nopriv_mwc_fetch_pmt_gateways',  [__CLASS__ , 'mwc_fetch_pmt_gateways']);
 
             // if any item in the cart has a price of 0.00, remove said item
-            // add_action('woocommerce_before_calculate_totals', array(__CLASS__, 'remove_free_products_from_cart'), 10, 1);
+            add_action('woocommerce_before_calculate_totals', array(__CLASS__, 'remove_free_products_from_cart'), 10, 1);
         }
 
         /**
@@ -219,29 +219,46 @@ if (!class_exists('MWCShortCode')) {
 
                 $checkout = WC()->checkout();
 
-                // To have control over when the create account fields are displayed - we'll display them all the time and hide/show with js
-                if (!is_user_logged_in()) {
-                    if (false === $checkout->enable_guest_checkout) {
-                        $checkout->enable_guest_checkout = true;
-                        self::$guest_checkout_option_changed = true;
-                    }
-                }
+                // force enable guest checkout
+                $checkout->__set('enable_guest_checkout', true);
 
-                // Add non-blocked order review fragment
                 ob_start();
+
                 woocommerce_order_review();
+
                 $fragments['.woocommerce-checkout-review-order-table'] = ob_get_clean();
 
-                // Reset guest checkout option
-                if (true === self::$guest_checkout_option_changed) {
-                    $checkout->enable_guest_checkout = false;
-                    self::$guest_checkout_option_changed = false;
-                }
-
-                // Add non-blocked checkout payment fragement
                 ob_start();
+
                 woocommerce_checkout_payment();
+
                 $fragments['.woocommerce-checkout-payment'] = ob_get_clean();
+
+
+
+                // // To have control over when the create account fields are displayed - we'll display them all the time and hide/show with js
+                // if (!is_user_logged_in()) {
+                //     if (false === $checkout->enable_guest_checkout) {
+                //         $checkout->enable_guest_checkout = true;
+                //         self::$guest_checkout_option_changed = true;
+                //     }
+                // }
+
+                // // Add non-blocked order review fragment
+                // ob_start();
+                // woocommerce_order_review();
+                // $fragments['.woocommerce-checkout-review-order-table'] = ob_get_clean();
+
+                // // Reset guest checkout option
+                // if (true === self::$guest_checkout_option_changed) {
+                //     $checkout->enable_guest_checkout = false;
+                //     self::$guest_checkout_option_changed = false;
+                // }
+
+                // // Add non-blocked checkout payment fragement
+                // ob_start();
+                // woocommerce_checkout_payment();
+                // $fragments['.woocommerce-checkout-payment'] = ob_get_clean();
             }
 
             return $fragments;
