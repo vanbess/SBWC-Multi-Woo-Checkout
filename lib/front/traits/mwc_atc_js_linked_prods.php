@@ -1095,8 +1095,8 @@ if (!trait_exists('AddToCartLinkedJS')) :
                                     console.log(response);
 
                                     // update cart
-                                    $(document.body).trigger('update_checkout');
-                                    $(document.body).trigger('wc_fragment_refresh');
+                                    // $(document.body).trigger('update_checkout');
+                                    // $(document.body).trigger('wc_fragment_refresh');
                                 }
                             });
 

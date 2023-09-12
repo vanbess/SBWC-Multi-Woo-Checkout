@@ -7,13 +7,13 @@
  * Plugin URI:
  * Description: Multi Woo Checkout
  * Author: Webmaster0313 w/ lots of bugfixes and tweaks by WC Bessinger
- * Version: 2.4.5
+ * Version: 2.4.6
  * Author URI:
  * Text Domain: mwc
  * Domain Path: /languages
  */
 
-define('MWCVersion', '2.4.5');
+define('MWCVersion', '2.4.6');
 define('MWC_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('MWC_PLUGIN_DIR', plugin_dir_path(__FILE__));
 

@@ -76,7 +76,9 @@ if (!empty($package_product_ids)) {
 		$default_currency = get_option('woocommerce_currency');
 
 		// get alg exchange rate
-		$ex_rate = get_option("alg_currency_switcher_exchange_rate_USD_$current_curr") ? get_option("alg_currency_switcher_exchange_rate_USD_$current_curr") : 1;
+		$ex_rate = get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") ? get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") : 1;
+
+		// $ex_rate = 1;
 
 		// if product count is 1
 		if ($product_count == 1) : ?>
@@ -290,12 +292,24 @@ if (!empty($package_product_ids)) {
 							// buy x get x free
 							if ($prod_data['type'] == 'free') :
 
-								$total_prod_qty     = (int)$prod_data['qty'] + (int)$prod_data['qty_free'];
-								$bundle_price       = ($prod_price * $prod_data['qty']) / $total_prod_qty;
+								$total_prod_qty = (int)$prod_data['qty'] + (int)$prod_data['qty_free'];
+								$bundle_coupon  = round(($prod_data['qty_free'] * 100) / $total_prod_qty);
+								$to_subtract    = $prod_price * ($bundle_coupon / 100);
+								$bundle_price   = $prod_price - $to_subtract;
 								$sum_price_regular  = $prod_price * $total_prod_qty;
 								$bundle_price_total = $bundle_price * $total_prod_qty;
 								$price_discount     = ($prod_price * $total_prod_qty) - $bundle_price_total;
-								$bundle_coupon      = ($prod_data['qty_free'] * 100) / $total_prod_qty;
+
+								// DEBUG
+								// echo 'to subtract:' . $prod_price * ($bundle_coupon / 100) . '<br>';
+								// echo 'final:' . $final . '<br>';
+								// echo 'prod price: ' . $prod_price . '<br>';
+								// echo 'discounted prod price: ' . $prod_price - $to_subtract . '<br>';
+								// echo 'bundle price total: ' . $bundle_price_total . '<br>';
+								// echo 'bundle price: ' . $bundle_price . '<br>';
+								// echo 'sum price regular: ' . $sum_price_regular . '<br>';
+								// echo 'bundle coupon: ' . $bundle_coupon . '<br>';
+								// echo 'price discount: ' . $price_discount . '<br>';
 
 								// js input data package
 								$js_discount_type  = 'free';
@@ -307,7 +321,7 @@ if (!empty($package_product_ids)) {
 
 								$total_prod_qty     = (int)$prod_data['qty'];
 								$i_tt               = $prod_price * $prod_data['qty'];
-								$bundle_coupon      = (int)$prod_data['coupon'];
+								$bundle_coupon      = round((int)$prod_data['coupon']);
 								$bundle_price       = $prod_price - ($prod_price * ($bundle_coupon / 100));
 								$sum_price_regular  = $prod_price * $prod_data['qty'];
 								$bundle_price_total = $bundle_price * $prod_data['qty'];
@@ -316,7 +330,7 @@ if (!empty($package_product_ids)) {
 								// js input data package
 								$js_discount_type  = 'percentage';
 								$js_discount_qty   = 1;
-								$js_discount_value = $prod_data['coupon'];
+								$js_discount_value = round($prod_data['coupon']);
 
 							// buy product bundle
 							else :
@@ -366,7 +380,7 @@ if (!empty($package_product_ids)) {
 								endforeach;
 
 								// discount percent
-								$bundle_coupon = $prod_data['discount_percentage'];
+								$bundle_coupon = round($prod_data['discount_percentage']);
 
 								// get price total bundle
 								if ($bundle_price) :
@@ -446,7 +460,7 @@ if (!empty($package_product_ids)) {
 
 											<!-- discount percent -->
 											<?php if (0 != $bundle_coupon) : ?>
-												<h4 class="mwc-discount-text mt-0 mb-0"><?php pll_e('Save', 'woocommerce') ?>: <?php echo (round($bundle_coupon, 0)) ?>%</h4>
+												<h4 class="mwc-discount-text mt-0 mb-0"><?php pll_e('Save', 'woocommerce') ?>: <?php echo round($bundle_coupon, 0) ?>%</h4>
 											<?php endif; ?>
 
 											<div class="op_c_package_image mt-2 mb-0">

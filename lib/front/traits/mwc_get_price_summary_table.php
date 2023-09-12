@@ -16,7 +16,9 @@ if (!trait_exists('GetPriceSummaryTable')) :
             check_ajax_referer('get set summary prices');
 
             // retrieve price list
-            $price_list = $_POST['price_list'];
+            // $price_list = $_POST['price_list'];
+
+            // wp_send_json($_POST);
 
             // start session
             if (!session_id()) :
@@ -61,31 +63,38 @@ if (!trait_exists('GetPriceSummaryTable')) :
             // current currency
             $current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_option('woocommerce_currency');
 
-            // get woocommerce default currency
-            $default_curr = get_option('woocommerce_currency');
+            // calculate $b_total_arr total
+            $b_total_arr_sum = array_sum($b_total_arr);
 
-            // calculate total
-            $b_total_full = round(array_sum($b_total_arr), 2);
+            $b_total_full = $b_total_arr_sum;
 
             // calculate discounted total
-            $b_discounted_total = round($b_total_full - ($b_total_full * ($discount_perc / 100)));
+            $b_discounted_total = $b_total_full - ($b_total_full * ($discount_perc / 100));
 
             // calculate discounted product price
-            $p_price = round($b_discounted_total / intval($_POST['product_qty']), 2);
+            $p_price = $b_discounted_total / intval($_POST['product_qty']);
+
+            // if only setting base pricing
+            if($_POST['setting_bundle_pricing']):
+
+                $b_pricing = [
+                    'is_b_pricing' => true,
+                    'old_total'    => '<del>' . wc_price($b_total_full, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</del>',
+                    'mc_total'     => wc_price($b_discounted_total, ['ex_tax_label' => false, 'currency' => $current_curr]),
+                    'p_price'      => '<b>' . wc_price($p_price, ['ex_tax_label' => false, 'currency' => $current_curr]) . __('</b> / Each', 'woocommerce')
+                ];
+
+                // send json
+                wp_send_json($b_pricing);
+                
+            endif;
 
             // add mwc data to session for later ref
             $_SESSION['mwc_bundle_total_full']       = $b_total_full;
             $_SESSION['mwc_bundle_discounted_total'] = $b_discounted_total;
             $_SESSION['mwc_product_price']           = $p_price;
             $_SESSION['mwc_bundle_discount_perc']    = $discount_perc;
-            $_SESSION['mwc_bundle_label']            = $price_list['sale_price']['label'];
-
-            // wp_send_json($b_total_full.'--'.$b_discounted_total.'--'.$p_price);
-
-            // wp_send_json($_SESSION);
-
-            // uncomment to debug specific currency conversion
-            // $current_curr = 'EUR';
+            $_SESSION['mwc_bundle_label']            = $_POST['bundle_label'];
 
             // setup default/failed response
             $return = [
@@ -93,63 +102,60 @@ if (!trait_exists('GetPriceSummaryTable')) :
             ];
 
             // build table HTML as needed
-            if ($price_list) :
+            $html = '<table>';
 
-                $html = '<table>';
+            // old price
+            $html .= '<tr id="mwc-summ-old-price">';
+            $html .= '<td>' . __('Old Price', 'woocommerce') . '</td>';
+            $html .= '<td style="text-align: right;"><del>' . wc_price($b_total_full, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</del></td>';
+            $html .= '</tr>';
 
-                // old price
-                $html .= '<tr id="mwc-summ-old-price">';
-                $html .= '<td>' . __('Old Price', 'woocommerce') . '</td>';
-                $html .= '<td style="text-align: right;"><del>' . wc_price($b_total_full, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</del></td>';
-                $html .= '</tr>';
+            // bundle price
+            $html .= '<tr id="mwc-summ-bundle-price">';
+            $html .= '<td>' . $_POST['bundle_label'] . '</td>';
+            $html .= '<td style="text-align: right;">' . wc_price($b_discounted_total, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</td>';
+            $html .= '</tr>';
 
-                // bundle price
-                $html .= '<tr id="mwc-summ-bundle-price">';
-                $html .= '<td>' . $price_list['sale_price']['label'] . '</td>';
-                $html .= '<td style="text-align: right;">' . wc_price($b_discounted_total, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</td>';
-                $html .= '</tr>';
+            // get shipping total
+            $meta          = isset($_POST['bundle_id']) ? get_post_meta($_POST['bundle_id'], 'product_discount', true) : [];
+            $free_shipping = isset($meta['free_shipping']) ? $meta['free_shipping'] : false;
 
-                // get shipping total
-                $meta          = isset($_POST['bundle_id']) ? get_post_meta($_POST['bundle_id'], 'product_discount', true) : [];
-                $free_shipping = isset($meta['free_shipping']) ? $meta['free_shipping'] : false;
+            if ($free_shipping) :
+                WC()->cart->set_shipping_total(0);
+            endif;
 
-                if ($free_shipping) :
-                    WC()->cart->set_shipping_total(0);
-                endif;
+            $html .= '<tr id="mwc-summ-ship-cost">';
+            $html .= '<td>' . __('Shipping', 'woocommerce') . '</td>';
 
-                $html .= '<tr id="mwc-summ-ship-cost">';
-                $html .= '<td>' . __('Shipping', 'woocommerce') . '</td>';
+            $shipping_total = WC()->cart->get_shipping_total();
 
-                $shipping_total = WC()->cart->get_shipping_total();
+            if ($shipping_total) :
 
-                if ($shipping_total) :
+                $html .= '<td  style="text-align: right"><span class="amount">' . wc_price($shipping_total, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</span></td>';
+                $b_discounted_total += $shipping_total;
 
-                    $html .= '<td  style="text-align: right"><span class="amount">' . wc_price($shipping_total, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</span></td>';
-                    $b_discounted_total += $shipping_total;
+            else :
 
-                else :
-
-                    $html .= '<td  style="text-align: right"><span class="amount">' . __('Free Shipping', 'woocommerce') . '</span></td>';
-
-                endif;
-
-                $html .= '</tr>';
-                $html .= '<tr id="mwc-summ-bun-total">';
-                $html .= '<td><b>' . __('Total', 'woocommerce') . '</b></td>';
-                $html .= '<td style="text-align: right"><b>' . wc_price($b_discounted_total, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</b></td>';
-                $html .= '</tr>';
-                $html .= '</table>';
-
-                // setup response
-                $return = [
-                    'status'   => true,
-                    'html'     => $html,
-                    'old_total' => '<del>' . wc_price($b_total_full, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</del>',
-                    'mc_total' => wc_price($b_discounted_total, ['ex_tax_label' => false, 'currency' => $current_curr]),
-                    'p_price'  => '<b>' . wc_price($p_price, ['ex_tax_label' => false, 'currency' => $current_curr]) . __('</b> / Each', 'woocommerce')
-                ];
+                $html .= '<td  style="text-align: right"><span class="amount">' . __('Free Shipping', 'woocommerce') . '</span></td>';
 
             endif;
+
+            $html .= '</tr>';
+            $html .= '<tr id="mwc-summ-bun-total">';
+            $html .= '<td><b>' . __('Total', 'woocommerce') . '</b></td>';
+            $html .= '<td style="text-align: right"><b>' . wc_price($b_discounted_total, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</b></td>';
+            $html .= '</tr>';
+            $html .= '</table>';
+
+            // setup response
+            $return = [
+                'status'   => true,
+                'html'     => $html,
+                'old_total' => '<del>' . wc_price($b_total_full, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</del>',
+                'mc_total' => wc_price($b_discounted_total, ['ex_tax_label' => false, 'currency' => $current_curr]),
+                'p_price'  => '<b>' . wc_price($p_price, ['ex_tax_label' => false, 'currency' => $current_curr]) . __('</b> / Each', 'woocommerce')
+            ];
+
 
             // send json
             wp_send_json($return);

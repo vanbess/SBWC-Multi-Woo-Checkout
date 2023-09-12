@@ -56,7 +56,7 @@ if (!trait_exists('ApplyRegPriceCart')) :
 
                 // debug
                 // $cart_item['data']->set_price($reg_price);
-                $cart_item['data']->set_price(57.00);
+                $cart_item['data']->set_price($reg_price);
 
             endforeach;
 

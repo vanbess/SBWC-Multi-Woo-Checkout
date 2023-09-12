@@ -24,6 +24,10 @@
     transition: color .3s;
 }
 
+div.sbhtml_chart_modal{
+    top: 56% !important;
+}
+
 .mwc-checkbox-wrapper {
     position: absolute;
     opacity: 0;

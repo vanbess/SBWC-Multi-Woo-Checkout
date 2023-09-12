@@ -1,5 +1,7 @@
 <?php
 
+use Elementor\Core\Logger\Items\PHP;
+
 if (!class_exists('MWC')) :
 
     // include traits
@@ -90,8 +92,8 @@ if (!class_exists('MWC')) :
             add_action('wp_footer', [__CLASS__, 'mwc_disable_other_coupons']);
 
             // action get price mwc package
-            add_action('wp_ajax_mwc_get_price_package', array(__CLASS__, 'mwc_get_price_package'));
-            add_action('wp_ajax_nopriv_mwc_get_price_package', array(__CLASS__, 'mwc_get_price_package'));
+            // add_action('wp_ajax_mwc_get_price_package', array(__CLASS__, 'mwc_get_price_package'));
+            // add_action('wp_ajax_nopriv_mwc_get_price_package', array(__CLASS__, 'mwc_get_price_package'));
 
             // action to set item prices to regular
             add_action('woocommerce_before_calculate_totals', array(__CLASS__, 'mwc_cart_apply_regular_prices'), 10, 1);
@@ -105,6 +107,9 @@ if (!class_exists('MWC')) :
             // action to apply cart discount
             // add_action('woocommerce_cart_calculate_fees', array(__CLASS__, 'mwc_apply_cart_discounts'));
 
+            /**
+             * Append bundle name to cart item name
+             */
             add_filter('woocommerce_cart_item_name', function ($product_name, $cart_item, $cart_item_key) {
                 if (
                     isset($cart_item['mwc_bun_discount'])
@@ -122,53 +127,39 @@ if (!class_exists('MWC')) :
                 return $product_name;
             }, 10, 3);
 
-            add_filter('woocommerce_cart_item_price', function ($price, $cart_item, $cart_item_key) {
-
-                if (
-                    isset($cart_item['mwc_bun_discount'])
-                    || isset($cart_item['mwc_off_discount'])
-                    || isset($cart_item['mwc_bun_free_prod'])
-                    || isset($cart_item['mwc_bun_paid_prod'])
-                ) {
-
-                    // get original price
-                    $original_price = $cart_item['data']->get_regular_price();
-
-                    // retrieve bundle data from session
-                    $disc_p_price  = $_SESSION['mwc_product_price'];
-
-                    $price = sprintf(
-                        __('<del>%s</del><br><b>%s</b>', 'woocommerce'),
-                        wc_price($original_price),
-                        wc_price($disc_p_price)
-                    );
-                }
-                return $price;
-            }, 10, 3);
-
-            add_action('woocommerce_before_calculate_totals', function($cart_obj) {
-
-                if (is_admin() && !defined('DOING_AJAX')) {
+            /**
+             * Add bundle discount as fee
+             */
+            add_action('woocommerce_cart_calculate_fees', function() {
+                if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
                     return;
                 }
-            
-                $disc_p_price  = $_SESSION['mwc_product_price'];
-            
-                foreach ($cart_obj->get_cart() as $key => $value) {
-                    if (
-                        isset($value['mwc_bun_discount'])
-                        || isset($value['mwc_off_discount'])
-                        || isset($value['mwc_bun_free_prod'])
-                        || isset($value['mwc_bun_paid_prod'])
-                    ) {
-                        
-                        $value['data']->set_price($disc_p_price);
-                    }
-                }
-            }, 10, 1);
 
-            
+                 // current currency
+                 $current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_option('woocommerce_currency');
 
+                 // get default currency
+                 $default_currency = get_option('woocommerce_currency');
+ 
+                 // get alg exchange rate
+                 $ex_rate = get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") ? get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") : 1;
+ 
+
+                //  get cart total
+                $cart_total = WC()->cart->subtotal;
+
+                // get mwc bundle total from session
+                $mwc_bundle_total = $_SESSION['mwc_bundle_discounted_total'];
+
+                // get bundle title from session
+                $bundle_label  = $_SESSION['mwc_bundle_label'] ? __($_SESSION['mwc_bundle_label'], 'woocommerce') : __('Bundle Discount', 'woocommerce');
+
+                // if cart total > bundle total, calc fee by subtracting bundle total from cart total
+                if($cart_total > $mwc_bundle_total):
+                    $fee = ($cart_total - $mwc_bundle_total) / $ex_rate;  // Define your fee amount
+                    WC()->cart->add_fee(__($bundle_label, 'woocommerce'), -$fee);
+                endif;
+            });
 
             // action add referer to order note
             add_action('woocommerce_order_status_processing', array(__CLASS__, 'mwc_add_referer_url_order_note'), 10, 1);

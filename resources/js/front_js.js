@@ -244,228 +244,13 @@ jQuery(document).ready(function ($) {
     });
 
     /**
-     * Gets/sets summary prices for default bundles
-     */
-    function mwc_set_summary_prices_default_bun() {
-
-        let $ = jQuery;
-
-        // price list
-        let price_list = {};
-
-        // product qty
-        let product_qty = $('.mwc_item_div.mwc_selected_default_opt .mwc_bundle_product_qty_hidden').val();
-
-        // sale price
-        let sale_price = $('.mwc_item_div.mwc_selected_default_opt .mwc_bundle_price_hidden');
-
-        // discount/coupon value
-        let disc_perc = parseFloat($('.mwc_item_div.mwc_active_product').attr('data-coupon'));
-
-        price_list['sale_price'] = {
-            sum: 1,
-            label: sale_price.data('label'),
-            price: sale_price.val()
-        }
-
-        // Old Price
-        let old_price = $('.mwc_item_div.mwc_selected_default_opt .mwc_bundle_price_regular_hidden');
-
-        price_list['old_price'] = {
-            sum: 0,
-            label: old_price.data('label'),
-            price: old_price.val()
-        }
-
-        // Add-ons price
-        let addon_label = '';
-        let addon_price = 0;
-
-        if ($('.mwc_upsell_product_wrap').length) {
-
-            addon_label = $('.mwc_upsell_product_wrap').data('label');
-
-            $('.mwc_item_addon.i_selected').each(function (i, e) {
-                let e_price = parseFloat($(e).find('.mwc_addon_price_hidden').val());
-                let e_qty = parseFloat($(e).find('.addon_prod_qty').val());
-                addon_price += e_price * e_qty;
-            });
-        }
-
-        price_list['addon_price'] = {
-            sum: 1,
-            label: addon_label,
-            price: addon_price
-        }
-
-        // setup and send AJAX request
-        let ajaxurl = mwc_ajax_obj.ajax_url;
-
-        let data = {
-            'action': 'mwc_get_price_summary_table',
-            '_ajax_nonce': mwc_ajax_obj.summary_price_nonce,
-            'price_list': price_list,
-            'bundle_id': $('.mwc_item_div.mwc_selected_default_opt').data('bundle_id'),
-            'product_qty': product_qty,
-            'disc_perc': disc_perc
-        };
-
-        $.post(ajaxurl, data, function (response) {
-
-            // console.log(response);
-            //  return;
-
-            let result = response;
-
-            if (result.status !== false) {
-                let img = $('.mwc_item_div.mwc_selected_default_opt').find('.op_c_package_image img').attr('src');
-                $('#s_image').find('img').attr('src', img);
-                $('.mwc_summary_table').empty();
-                $('.mwc_summary_table').append(result.html);
-                $('#order_summary').show();
-
-                setTimeout(function () {
-                    $('.mwc_items_div #order_summary').removeClass('mwc_loading');
-                }, 500);
-
-            } else {
-                console.log('Price summary table HTML could not be fetched.');
-            }
-
-        });
-
-    }
-
-    /**
      * Set summary prices default bun
      */
     function mwc_set_summary_prices_default_bun() {
 
-        // console.log('mwc_set_summary_prices default');
+        // return;
 
         let $ = jQuery;
-
-        // price list
-        let price_list = {};
-
-        let has_template_h = $('.template_h').length,
-            product_ids = [],
-            var_attribs = [],
-            bundle_id = $('.mwc_item_div.mwc_selected_default_opt').data('bundle_id');
-
-        // discount/coupon value
-        let disc_perc = parseFloat($('.mwc_item_div.mwc_selected_default_opt').attr('data-coupon'));
-
-        $('.mwc_product_variations_' + bundle_id).find('.c_prod_item').each(function (index, element) {
-            product_ids.push($(this).attr('data-id'));
-            var_attribs.push($(this).find('.var_prod_attr').val());
-
-            // change all types to int
-            product_ids = product_ids.map(Number);
-            var_attribs = var_attribs.map(Number);
-
-        });
-
-        // product qty
-        let product_qty = $('.mwc_item_div.mwc_selected_default_opt .mwc_bundle_product_qty_hidden').val();
-
-        $('.mwc_items_div #order_summary').addClass('mwc_loading');
-
-        // sale price
-        let sale_price = $('.mwc_item_div.mwc_selected_default_opt .mwc_bundle_price_hidden');
-
-        price_list['sale_price'] = {
-            sum: 1,
-            label: sale_price.data('label'),
-            price: sale_price.val()
-        }
-
-        // Old Price
-        let old_price = $('.mwc_item_div.mwc_selected_default_opt .mwc_bundle_price_regular_hidden');
-
-        price_list['old_price'] = {
-            sum: 0,
-            label: old_price.data('label'),
-            price: old_price.val()
-        }
-
-        // addon price
-        let addon_label = '';
-        let addon_price = 0;
-
-        if ($('.mwc_upsell_product_wrap').length) {
-
-            addon_label = $('.mwc_upsell_product_wrap').data('label');
-
-            $('.mwc_item_addon.i_selected').each(function (i, e) {
-                let e_price = parseFloat($(e).find('.mwc_addon_price_hidden').val());
-                let e_qty = parseFloat($(e).find('.addon_prod_qty').val());
-                addon_price += e_price * e_qty;
-            });
-        }
-
-        price_list['addon_price'] = {
-            sum: 1,
-            label: addon_label,
-            price: addon_price
-        }
-
-        // setup and send AJAX request
-        let ajaxurl = mwc_ajax_obj.ajax_url;
-
-        let data = {
-            'action': 'mwc_get_price_summary_table',
-            '_ajax_nonce': mwc_ajax_obj.summary_price_nonce,
-            'price_list': price_list,
-            'bundle_id': bundle_id,
-            'product_qty': product_qty,
-            'product_ids': product_ids,
-            'var_attribs': var_attribs,
-            'disc_perc': disc_perc
-        };
-
-        $.post(ajaxurl, data, function (response) {
-
-            let result = response;
-
-            // console.log(response);
-
-            // return;
-
-            if (result.status !== false) {
-
-                let img = $('.mwc_item_div.mwc_selected_default_opt').find('.op_c_package_image img').attr('src');
-
-                $('#s_image').find('img').attr('src', img);
-                $('.mwc_summary_table').empty();
-                $('.mwc_summary_table').append(result.html);
-                $('#order_summary').show();
-                $('.mwc_item_div_' + bundle_id).find('.mwc-sub-price').empty().append(result.p_price);
-                $('.mwc_item_div_' + bundle_id).find('.mwc-total-price').empty().append(result.old_total + ' ' + result.mc_total);
-
-                setTimeout(function () {
-                    $('.mwc_items_div #order_summary').removeClass('mwc_loading');
-                }, 500);
-
-            } else {
-                console.log('Price summary table HTML could not be fetched.');
-            }
-
-        });
-
-    }
-
-    /**
-     * Set summary prices on click
-     */
-    function mwc_set_summary_prices() {
-
-        console.log('mwc_set_summary_prices');
-
-        let $ = jQuery;
-
-        // price list
-        let price_list = {};
 
         let has_template_h = $('.template_h').length,
             product_ids = [],
@@ -488,30 +273,18 @@ jQuery(document).ready(function ($) {
         // product qty
         let product_qty = $('.mwc_item_div.mwc_active_product .mwc_bundle_product_qty_hidden').val();
 
-        $('.mwc_items_div #order_summary').addClass('mwc_loading');
-
         // sale price
         let sale_price = $('.mwc_item_div.mwc_active_product .mwc_bundle_price_hidden');
-
-        price_list['sale_price'] = {
-            sum: 1,
-            label: sale_price.data('label'),
-            price: sale_price.val()
-        }
 
         // Old Price
         let old_price = $('.mwc_item_div.mwc_active_product .mwc_bundle_price_regular_hidden');
 
-        price_list['old_price'] = {
-            sum: 0,
-            label: old_price.data('label'),
-            price: old_price.val()
-        }
+        // bundle label
+        let bundle_label = $('.mwc_item_div.mwc_active_product .mwc_bundle_price_hidden').attr('data-label');
 
-        // addon price
-        let addon_label = '';
-        let addon_price = 0;
+        $('.mwc_items_div #order_summary').addClass('mwc_loading');
 
+        // addons
         if ($('.mwc_upsell_product_wrap').length) {
 
             addon_label = $('.mwc_upsell_product_wrap').data('label');
@@ -523,11 +296,11 @@ jQuery(document).ready(function ($) {
             });
         }
 
-        price_list['addon_price'] = {
-            sum: 1,
-            label: addon_label,
-            price: addon_price
-        }
+        // price_list['addon_price'] = {
+        //     sum: 1,
+        //     label: addon_label,
+        //     price: addon_price
+        // }
 
         // setup and send AJAX request
         let ajaxurl = mwc_ajax_obj.ajax_url;
@@ -535,19 +308,22 @@ jQuery(document).ready(function ($) {
         let data = {
             'action': 'mwc_get_price_summary_table',
             '_ajax_nonce': mwc_ajax_obj.summary_price_nonce,
-            'price_list': price_list,
+            // 'price_list': price_list,
             'bundle_id': bundle_id,
             'product_qty': product_qty,
             'product_ids': product_ids,
             'var_attribs': var_attribs,
-            'disc_perc': disc_perc
+            'disc_perc': disc_perc,
+            'sale_price': sale_price.val(),
+            'old_price': old_price.val(),
+            'bundle_label': bundle_label
         };
 
         $.post(ajaxurl, data, function (response) {
 
             let result = response;
 
-            console.log(response);
+            // console.log(response);
 
             // return;
 
@@ -559,6 +335,7 @@ jQuery(document).ready(function ($) {
                 $('.mwc_summary_table').empty();
                 $('.mwc_summary_table').append(result.html);
                 $('#order_summary').show();
+
                 $('.mwc_item_div_' + bundle_id).find('.mwc-sub-price').empty().append(result.p_price);
                 $('.mwc_item_div_' + bundle_id).find('.mwc-total-price').empty().append(result.old_total + ' ' + result.mc_total);
 
@@ -575,70 +352,133 @@ jQuery(document).ready(function ($) {
     }
 
     /**
-     * Set bundle pricing on page load
+     * Set summary prices on click
      */
-    function mwc_set_bundle_pricing_on_load() {
+    function mwc_set_summary_prices() {
 
         let $ = jQuery;
 
-        $('.mwc_item_div').each(function (index, element) {
+        let has_template_h = $('.template_h').length,
+            product_ids = [],
+            var_attribs = [],
+            bundle_id = $('.mwc_item_div.mwc_active_product').data('bundle_id');
 
-            // if has default bundle class, skip
-            if ($(element).hasClass('mwc_selected_default_opt')) {
-                return;
+        // discount/coupon value
+        let disc_perc = parseFloat($('.mwc_item_div.mwc_active_product').attr('data-coupon'));
+
+        $('.mwc_product_variations_' + bundle_id).find('.c_prod_item').each(function (index, element) {
+            product_ids.push($(this).attr('data-id'));
+            var_attribs.push($(this).find('.var_prod_attr').val());
+
+            // change all types to int
+            product_ids = product_ids.map(Number);
+            var_attribs = var_attribs.map(Number);
+
+        });
+
+        // product qty
+        let product_qty = $('.mwc_item_div.mwc_active_product .mwc_bundle_product_qty_hidden').val();
+
+        // sale price
+        let sale_price = $('.mwc_item_div.mwc_active_product .mwc_bundle_price_hidden');
+
+        // Old Price
+        let old_price = $('.mwc_item_div.mwc_active_product .mwc_bundle_price_regular_hidden');
+
+        // bundle label
+        let bundle_label = $('.mwc_item_div.mwc_active_product .mwc_bundle_price_hidden').attr('data-label');
+
+        $('.mwc_items_div #order_summary').addClass('mwc_loading');
+
+        // addons
+        if ($('.mwc_upsell_product_wrap').length) {
+
+            addon_label = $('.mwc_upsell_product_wrap').data('label');
+
+            $('.mwc_item_addon.i_selected').each(function (i, e) {
+                let e_price = parseFloat($(e).find('.mwc_addon_price_hidden').val());
+                let e_qty = parseFloat($(e).find('.addon_prod_qty').val());
+                addon_price += e_price * e_qty;
+            });
+        }
+
+        // price_list['addon_price'] = {
+        //     sum: 1,
+        //     label: addon_label,
+        //     price: addon_price
+        // }
+
+        // setup and send AJAX request
+        let ajaxurl = mwc_ajax_obj.ajax_url;
+
+        let data = {
+            'action': 'mwc_get_price_summary_table',
+            '_ajax_nonce': mwc_ajax_obj.summary_price_nonce,
+            // 'price_list': price_list,
+            'bundle_id': bundle_id,
+            'product_qty': product_qty,
+            'product_ids': product_ids,
+            'var_attribs': var_attribs,
+            'disc_perc': disc_perc,
+            'sale_price': sale_price.val(),
+            'old_price': old_price.val(),
+            'bundle_label': bundle_label
+        };
+
+        $.post(ajaxurl, data, function (response) {
+
+            let result = response;
+
+            // console.log(response);
+
+            // return;
+
+            if (result.status !== false) {
+
+                let img = $('.mwc_item_div.mwc_active_product').find('.op_c_package_image img').attr('src');
+
+                $('#s_image').find('img').attr('src', img);
+                $('.mwc_summary_table').empty();
+                $('.mwc_summary_table').append(result.html);
+                $('#order_summary').show();
+
+                $('.mwc_item_div_' + bundle_id).find('.mwc-sub-price').empty().append(result.p_price);
+                $('.mwc_item_div_' + bundle_id).find('.mwc-total-price').empty().append(result.old_total + ' ' + result.mc_total);
+
+                setTimeout(function () {
+                    $('.mwc_items_div #order_summary').removeClass('mwc_loading');
+                }, 500);
+
+            } else {
+                console.log('Price summary table HTML could not be fetched.');
             }
-
-            // get bundle id
-            let bundle_id = $(element).data('bundle_id');
-
-            // get currency symbol
-            let currency_sym = $('span.woocommerce-Price-currencySymbol:first').text();
-
-            // get per product price
-            let per_prod_price = $(element).find('.mwc-sub-price span.woocommerce-Price-amount.amount > bdi').text().replace(currency_sym, '');
-
-            // round product price to 2 decimal places using math.round
-            per_prod_price = Math.round(per_prod_price).toFixed(2);
-
-            // get bundle product count
-            let bundle_prod_count = $('.mwc_product_variations_' + bundle_id).find('.c_prod_item').length;
-
-            // calc bundle total
-            let bundle_total = per_prod_price * bundle_prod_count;
-
-            // pricing html single product
-            let pricing_html = '<span class="woocommerce-Price-amount amount"><bdi><span class="woocommerce-Price-currencySymbol">' + currency_sym + '</span>' + per_prod_price + '</bdi></span>';
-
-            // pricing html bundle
-            let pricing_html_bundle = '<span class="woocommerce-Price-amount amount"><bdi><span class="woocommerce-Price-currencySymbol">' + currency_sym + '</span>' + bundle_total.toFixed(2) + '</bdi></span>';
-
-            // set pricing html
-            $(element).find('.mwc-sub-price').empty().append(pricing_html);
-
-            // set pricing html bundle
-            $(element).find('.mwc-total-price').find('span.woocommerce-Price-amount.amount:eq(1)').replaceWith(pricing_html_bundle);
 
         });
 
     }
 
-    mwc_set_bundle_pricing_on_load();
+    /**
+     * Round to 2 decimals
+     */
+    function roundToTwo(num) {
+        return +(Math.round(num + "e+2") + "e-2");
+    }
 
     /**
      * Trigger mini cart refresh each time ajax is complete
      */
-    jQuery(document).ajaxComplete(function(event, xhr, settings) {
+    jQuery(document).ajaxComplete(function (event, xhr, settings) {
 
-        // console.log(settings);
+        // console.log(settings.data.split('&'));
 
-        if (settings.data.split('&')[0] === 'action=mwc_get_price_summary_table') {
+        if (settings.data.split('&')[0] === 'action=mwc_get_price_summary_table' || settings.data.split('&')[0] === 'action=mwc_atc_linked_products') {
 
             jQuery.post({
                 url: wc_cart_fragments_params.ajax_url,
                 data: { action: 'woocommerce_get_refreshed_fragments' },
-                success: function(data) {
+                success: function (data) {
                     if (data && data.fragments) {
-                        jQuery.each(data.fragments, function(key, value) {
+                        jQuery.each(data.fragments, function (key, value) {
                             jQuery(key).replaceWith(value);
                         });
                     }
