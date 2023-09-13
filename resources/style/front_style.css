@@ -23,6 +23,19 @@
     background-color: var(--rio-secondary-color);
 }
 
+#mwc_checkout .sbhtml_label_wrap {
+    /* display: inline-block; */
+    float: right !important;
+}
+
+tr.c_prod_item {
+    font-weight: 600;
+}
+
+svg.sbhtml-chart-svg {
+    margin-right: 10px;
+}
+
 div.sbhtml_chart_modal{
 	top: 56% !important;
 }

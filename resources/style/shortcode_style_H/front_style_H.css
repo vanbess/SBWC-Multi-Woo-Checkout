@@ -24,6 +24,21 @@
     transition: color .3s;
 }
 
+tr.c_prod_item.free-item {
+    font-weight: 600;
+    color: black;
+}
+
+tr.c_prod_item .sbhtml_label_wrap {
+    position: relative;
+    top: 7px !important;
+}
+
+tr.c_prod_item.free-item .sbhtml_label_wrap {
+    position: relative;
+    top: initial !important;
+}
+
 div.sbhtml_chart_modal{
     top: 56% !important;
 }
