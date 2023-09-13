@@ -1,16 +1,23 @@
 <?php
 if (!trait_exists('LoadResources')) :
 
-    trait LoadResources {
+    trait LoadResources
+    {
 
         /**
          * load_resources
          *
          * @return void
          */
-        public static function mwc_load_resources() {
+        public static function mwc_load_resources()
+        {
 
             global $woocommerce;
+
+            if (is_product()) :
+                WC()->cart->empty_cart();
+                return;
+            endif;
 
             // setup cart and checkout urls
             $cart_url = '/cart/';

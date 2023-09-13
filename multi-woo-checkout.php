@@ -86,6 +86,10 @@ require_once MWC_PLUGIN_DIR . 'tracking/thank-you-page.php';
 // reset tracking data for addons and bundles
 require_once MWC_PLUGIN_DIR . 'tracking/reset-tracking.php';
 
+// *****************************
+// FORCE FETCH PAYMENT GATEWAYS
+// *****************************
+
 add_action('wp_footer', function () {
 
     global $post;
