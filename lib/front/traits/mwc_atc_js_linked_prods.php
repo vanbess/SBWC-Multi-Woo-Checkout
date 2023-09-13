@@ -1092,7 +1092,7 @@ if (!trait_exists('AddToCartLinkedJS')) :
                                 success: function(response) {
 
                                     // debug
-                                    console.log(response);
+                                    // console.log(response);
 
                                     // update cart
                                     // $(document.body).trigger('update_checkout');

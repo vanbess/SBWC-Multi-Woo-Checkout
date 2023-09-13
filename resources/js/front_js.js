@@ -140,7 +140,7 @@ jQuery(document).ready(function ($) {
     $('.var_prod_attr').change(function () {
 
         // debug
-        console.log('var_prod_attr change');
+        // console.log('var_prod_attr change');
 
         // vars
         let reg_price_total = 0, disc_perc = 0, disc_mp = 0, bundle_id, currency_sym, old_price_html;
@@ -366,6 +366,7 @@ jQuery(document).ready(function ($) {
         // discount/coupon value
         let disc_perc = parseFloat($('.mwc_item_div.mwc_active_product').attr('data-coupon'));
 
+        // Template H
         $('.mwc_product_variations_' + bundle_id).find('.c_prod_item').each(function (index, element) {
             product_ids.push($(this).attr('data-id'));
             var_attribs.push($(this).find('.var_prod_attr').val());
@@ -402,19 +403,12 @@ jQuery(document).ready(function ($) {
             });
         }
 
-        // price_list['addon_price'] = {
-        //     sum: 1,
-        //     label: addon_label,
-        //     price: addon_price
-        // }
-
         // setup and send AJAX request
         let ajaxurl = mwc_ajax_obj.ajax_url;
 
         let data = {
             'action': 'mwc_get_price_summary_table',
             '_ajax_nonce': mwc_ajax_obj.summary_price_nonce,
-            // 'price_list': price_list,
             'bundle_id': bundle_id,
             'product_qty': product_qty,
             'product_ids': product_ids,
@@ -442,6 +436,7 @@ jQuery(document).ready(function ($) {
                 $('.mwc_summary_table').append(result.html);
                 $('#order_summary').show();
 
+                // Template H
                 $('.mwc_item_div_' + bundle_id).find('.mwc-sub-price').empty().append(result.p_price);
                 $('.mwc_item_div_' + bundle_id).find('.mwc-total-price').empty().append(result.old_total + ' ' + result.mc_total);
 

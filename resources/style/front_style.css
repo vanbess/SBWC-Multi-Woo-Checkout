@@ -23,6 +23,10 @@
     background-color: var(--rio-secondary-color);
 }
 
+div.sbhtml_chart_modal{
+	top: 56% !important;
+}
+
 .linked_product.imgclasssmall.tooltipplugify {
     display: inline-block;
 }

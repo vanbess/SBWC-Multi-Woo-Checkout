@@ -21,9 +21,6 @@ if (!trait_exists('ApplyRegPriceCart')) :
             // get current currency
             $current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_option('woocommerce_currency');
 
-            // get default currency
-            $default_curr = get_option('woocommerce_currency');
-
             // mwc product count
             global $mwc_prod_count;
 

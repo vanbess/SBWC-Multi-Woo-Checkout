@@ -70,6 +70,9 @@ if (!empty($package_product_ids)) {
 ?>
 
     <div class="mwc_items_div mwc_package_items_div i_clearfix" id="mwc_checkout">
+
+ek is hier
+
         <input type="hidden" id="shortcode_type" value="package_order">
 
         <?php
