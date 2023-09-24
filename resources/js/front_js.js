@@ -323,7 +323,7 @@ jQuery(document).ready(function ($) {
 
             let result = response;
 
-            console.log(response);
+            // console.log(response);
             // return;
 
             if (result.status !== false) {
@@ -339,11 +339,10 @@ jQuery(document).ready(function ($) {
                 if (result.is_bundle) {
 
                     $('.mwc_item_div_' + bundle_id).find('.mwc-sub-price').empty().append((result.old_total));
-                    // $('.mwc_item_div_' + bundle_id).find('.mwc-sub-price').empty().append(result.mc_total);
-                    $('.mwc_item_div_' + bundle_id).find('.mwc-sub-price').empty().append('wtf');
+                    $('.mwc_item_div_' + bundle_id).find('.mwc-sub-price').empty().append(result.mc_total);
 
-                    console.log(result.old_total);
-                    console.log(result.mc_total);
+                    // console.log(result.old_total);
+                    // console.log(result.mc_total);
 
                     // if is 'off' or 'free'
                 } else {
