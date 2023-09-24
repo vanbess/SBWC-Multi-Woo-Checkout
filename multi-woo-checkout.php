@@ -69,9 +69,25 @@ add_action('plugins_loaded', function () {
     load_plugin_textdomain('mwc', false, $plugin_rel_path);
 });
 
-/**
- * FORCE FETCH PAYMENT GATEWAYS FOR MWC
- */
+// *********
+// TRACKING
+// *********
+
+// add Polylang support out of the box
+require_once MWC_PLUGIN_DIR . 'tracking/add-pll-support.php';
+
+// update clicks
+require_once MWC_PLUGIN_DIR . 'tracking/update-clicks.php';
+
+// cron to update impressions every 5 minutes
+require_once MWC_PLUGIN_DIR . 'tracking/caching/update-impressions-chron.php';
+
+// update conversions via thank you page hook
+require_once MWC_PLUGIN_DIR . 'tracking/thank-you-page.php';
+
+// reset tracking data for addons and bundles
+require_once MWC_PLUGIN_DIR . 'tracking/reset-tracking.php';
+
 add_action('wp_footer', function () {
 
     global $post;
@@ -144,22 +160,3 @@ add_action('wp_ajax_nopriv_mwc_fetch_gateways', function () {
 <?php
     wp_die();
 });
-
-// *********
-// TRACKING
-// *********
-
-// add Polylang support out of the box
-require_once MWC_PLUGIN_DIR . 'tracking/add-pll-support.php';
-
-// update clicks
-require_once MWC_PLUGIN_DIR . 'tracking/update-clicks.php';
-
-// cron to update impressions every 5 minutes
-require_once MWC_PLUGIN_DIR . 'tracking/caching/update-impressions-chron.php';
-
-// update conversions via thank you page hook
-require_once MWC_PLUGIN_DIR . 'tracking/thank-you-page.php';
-
-// reset tracking data for addons and bundles
-require_once MWC_PLUGIN_DIR . 'tracking/reset-tracking.php';
