@@ -323,8 +323,7 @@ jQuery(document).ready(function ($) {
 
             let result = response;
 
-            // console.log(response);
-
+            console.log(response);
             // return;
 
             if (result.status !== false) {
@@ -336,8 +335,22 @@ jQuery(document).ready(function ($) {
                 $('.mwc_summary_table').append(result.html);
                 $('#order_summary').show();
 
-                $('.mwc_item_div_' + bundle_id).find('.mwc-sub-price').empty().append(result.p_price);
-                $('.mwc_item_div_' + bundle_id).find('.mwc-total-price').empty().append(result.old_total + ' ' + result.mc_total);
+                // if is product bundle
+                if (result.is_bundle) {
+
+                    $('.mwc_item_div_' + bundle_id).find('.mwc-sub-price').empty().append((result.old_total));
+                    // $('.mwc_item_div_' + bundle_id).find('.mwc-sub-price').empty().append(result.mc_total);
+                    $('.mwc_item_div_' + bundle_id).find('.mwc-sub-price').empty().append('wtf');
+
+                    console.log(result.old_total);
+                    console.log(result.mc_total);
+
+                    // if is 'off' or 'free'
+                } else {
+
+                    $('.mwc_item_div_' + bundle_id).find('.mwc-sub-price').empty().append(result.p_price);
+                    $('.mwc_item_div_' + bundle_id).find('.mwc-total-price').empty().append(result.old_total + ' ' + result.mc_total);
+                }
 
                 setTimeout(function () {
                     $('.mwc_items_div #order_summary').removeClass('mwc_loading');
@@ -437,8 +450,8 @@ jQuery(document).ready(function ($) {
                 $('#order_summary').show();
 
                 // Template H
-                $('.mwc_item_div_' + bundle_id).find('.mwc-sub-price').empty().append(result.p_price);
-                $('.mwc_item_div_' + bundle_id).find('.mwc-total-price').empty().append(result.old_total + ' ' + result.mc_total);
+                // $('.mwc_item_div_' + bundle_id).find('.mwc-sub-price').empty().append(result.p_price);
+                // $('.mwc_item_div_' + bundle_id).find('.mwc-total-price').empty().append(result.old_total + ' ' + result.mc_total);
 
                 setTimeout(function () {
                     $('.mwc_items_div #order_summary').removeClass('mwc_loading');
@@ -510,5 +523,15 @@ jQuery(document).ready(function ($) {
             }
         }
     });
+
+    /**
+     * Trigger click on default bundle when all ajax requests have stopped on page load
+     */
+
+        // $('.mwc_selected_default_opt').trigger('click');
+
+        // $(document.body).off('updated_cart_totals');
+        // $(document.body).off('wc_fragments_refresh');
+        // $(document.body).off('added_to_cart');
 
 });

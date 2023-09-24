@@ -18,12 +18,13 @@ jQuery(document).ready(function ($) {
 
     $.each(attrs, function () {
         var chart_append = $(this).siblings('.variation_name'),
-            chart_set = $(this).parents().parents().parents().parents().parents().siblings('#sbhtml-show-chart').val();
+            chart_set = $(this).parents('.c_prod_item').attr('has-size-chart'),
+            pid = $(this).parents('.c_prod_item').attr('data-id');
 
-        if (chart_append && chart_set) {
+        if (chart_set == 'true') {
             var sbhtml_label_text = '',
-                sbhtml_link_text = $(this).parents().parents().parents().parents().parents().siblings('#sbhtml_text_open_modal').val(),
-                label_text_content = '<div class="sbhtml_label_wrap">' + sbhtml_label_text + ' <span class="sbhtml_link_text">' + sbhtml_link_text + '</span></div>';
+                sbhtml_link_text = $('#sbhtml_text_open_modal').val(),
+                label_text_content = '<div class="sbhtml_label_wrap">' + sbhtml_label_text + ' <span class="sbhtml_link_text" target="' + pid + '">' + sbhtml_link_text + '</span></div>';
 
             chart_append.after(label_text_content);
         }
@@ -44,13 +45,22 @@ jQuery(document).ready(function ($) {
     // show modal and overlay
     $('.sbhtml_link_text').on('click', function (e) {
         e.preventDefault();
-        $(this).parents().parents().parents().parents().parents().parents().parents('.mwc_product_variations').find('.sbhtml_chart_overlay, .sbhtml_chart_modal').show();
+
+        var target_id = $(this).attr('target');
+        $('#sbhtml_chart_modal-' + target_id).show();
+        $('#sbhtml_chart_overlay-' + target_id).show();
+
     });
 
     // stop modal
-    $('.sbhtml_chart_modal').on('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-    });
+    // $('.sbhtml_chart_modal').on('click', function (e) {
+    //     e.preventDefault();
+    //     e.stopPropagation();
+    // });
+
+    /**
+     * Fixes for product bundles
+     */
+
 
 });

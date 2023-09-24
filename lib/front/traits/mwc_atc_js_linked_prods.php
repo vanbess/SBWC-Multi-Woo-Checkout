@@ -42,7 +42,7 @@ if (!trait_exists('AddToCartLinkedJS')) :
                             var linked_prod;
 
                             // Add basic data to AJAX data object
-                            linked_data.type = type, linked_data.bundle_id = bundle_id;
+                            // linked_data.type = type, linked_data.bundle_id = bundle_id;
 
                             // --------------------
                             // Variation selectors
@@ -156,6 +156,7 @@ if (!trait_exists('AddToCartLinkedJS')) :
                                         linked_data.linked_free_prods = build_free_prod_dataset(target_main, v_dd, template);
                                     }
 
+
                                     mwc_atc_linked();
 
                                 })
@@ -222,7 +223,7 @@ if (!trait_exists('AddToCartLinkedJS')) :
 
                                         // console.log(linked_data);
 
-                                        mwc_atc_linked()
+                                        mwc_atc_linked('linked product on mousedown')
 
                                     }, 500);
                                 });
@@ -248,6 +249,8 @@ if (!trait_exists('AddToCartLinkedJS')) :
 
                                     // debug
                                     // console.log('default option present');
+
+                                    mwc_atc_linked('default bundle on load');
 
                                     $(this).find('.mwc_package_checkbox').click();
 
@@ -336,7 +339,7 @@ if (!trait_exists('AddToCartLinkedJS')) :
                                     // debug
                                     // console.log(linked_data);
 
-                                    mwc_atc_linked();
+                                    mwc_atc_linked('template h bundle on mouse down');
 
                                 });
 
@@ -366,7 +369,7 @@ if (!trait_exists('AddToCartLinkedJS')) :
 
                                         // console.log(linked_data);
 
-                                        mwc_atc_linked();
+                                        mwc_atc_linked('variation select on change');
 
                                     }, 500);
                                 });
@@ -401,7 +404,7 @@ if (!trait_exists('AddToCartLinkedJS')) :
 
                                         // console.log(linked_data);
 
-                                        mwc_atc_linked()
+                                        mwc_atc_linked('linked product on mousedown');
 
                                     }, 500);
 
@@ -502,9 +505,7 @@ if (!trait_exists('AddToCartLinkedJS')) :
                                         };
                                     }
 
-                                    console.log(linked_data);
-
-
+                                    // console.log(linked_data);
 
                                 } else {
 
@@ -515,15 +516,10 @@ if (!trait_exists('AddToCartLinkedJS')) :
 
                                 // add to cart
                                 try {
-                                    mwc_atc_linked();
+                                    mwc_atc_linked('checkbox on click - 1st instance');
                                 } catch (error) {
                                     console.log(error);
                                 }
-
-
-
-
-                                // console.log(data);
 
                             });
                             // ====================================
@@ -577,7 +573,7 @@ if (!trait_exists('AddToCartLinkedJS')) :
                                     };
 
                                     // add to cart
-                                    mwc_atc_linked();
+                                    mwc_atc_linked('addon checkbox checked');
                                 }
 
                                 // console.log(data);
@@ -602,7 +598,7 @@ if (!trait_exists('AddToCartLinkedJS')) :
                                     }
 
                                     // add to cart
-                                    mwc_atc_linked();
+                                    mwc_atc_linked('addon qty changed');
                                 }
 
                                 // console.log(data);
@@ -610,7 +606,7 @@ if (!trait_exists('AddToCartLinkedJS')) :
                             });
                         });
 
-                        mwc_atc_linked();
+                        // mwc_atc_linked('in the midst of nowhere');
 
                         // **********
                         // FUNCTIONS
@@ -1063,19 +1059,15 @@ if (!trait_exists('AddToCartLinkedJS')) :
 
                             return prods;
                         }
-
-
-
-
                     }
 
-
                     // 5. Add linked products to cart
-                    function mwc_atc_linked() {
+                    function mwc_atc_linked(source) {
 
                         var ajaxurl = '<?php echo admin_url('admin-ajax.php') ?>';
 
                         // debug
+                        // console.log(source);
                         // console.log(linked_data);
 
                         setTimeout(() => {
@@ -1094,33 +1086,10 @@ if (!trait_exists('AddToCartLinkedJS')) :
                                     // debug
                                     // console.log(response);
 
-                                    // update cart
-                                    // $(document.body).trigger('update_checkout');
-                                    // $(document.body).trigger('wc_fragment_refresh');
                                 }
                             });
 
-                            // $.post(ajaxurl, linked_data, function(response) {
-
-                            //     // debug
-                            //     console.log(response);
-
-                            //     // update cart
-                            //     // $(document.body).trigger('update_checkout');
-                            //     // $(document.body).trigger('wc_fragment_refresh');
-                            // });
                         }, 1000);
-
-                    }
-
-                    // if class mwc_active_product is found in document after load, trigger mwc_atc_linked after 2 seconds
-                    if ($('.mwc_active_product').length) {
-                        setTimeout(() => {
-
-                            console.log('mwc_active_product found');
-
-                            mwc_atc_linked();
-                        }, 2000);
                     }
 
                 });

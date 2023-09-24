@@ -127,23 +127,23 @@ if (!class_exists('MWC')) :
                 return $product_name;
             }, 10, 3);
 
-            /**
+            /*****************************
              * Add bundle discount as fee
-             */
-            add_action('woocommerce_cart_calculate_fees', function() {
-                if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+             *****************************/
+            add_action('woocommerce_cart_calculate_fees', function () {
+
+                if (is_admin() && !defined('DOING_AJAX')) {
                     return;
                 }
 
-                 // current currency
-                 $current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_option('woocommerce_currency');
+                // current currency
+                $current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_option('woocommerce_currency');
 
-                 // get default currency
-                 $default_currency = get_option('woocommerce_currency');
- 
-                 // get alg exchange rate
-                 $ex_rate = get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") ? get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") : 1;
- 
+                // get default currency
+                $default_currency = get_option('woocommerce_currency');
+
+                // get alg exchange rate
+                $ex_rate = get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") ? get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") : 1;
 
                 //  get cart total
                 $cart_total = WC()->cart->subtotal;
@@ -155,7 +155,7 @@ if (!class_exists('MWC')) :
                 $bundle_label  = $_SESSION['mwc_bundle_label'] ? __($_SESSION['mwc_bundle_label'], 'woocommerce') : __('Bundle Discount', 'woocommerce');
 
                 // if cart total > bundle total, calc fee by subtracting bundle total from cart total
-                if($cart_total > $mwc_bundle_total):
+                if ($cart_total > $mwc_bundle_total) :
                     $fee = ($cart_total - $mwc_bundle_total) / $ex_rate;  // Define your fee amount
                     WC()->cart->add_fee(__($bundle_label, 'woocommerce'), -$fee);
                 endif;

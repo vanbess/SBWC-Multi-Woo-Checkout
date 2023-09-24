@@ -17,6 +17,8 @@ define('MWCVersion', '2.4.6');
 define('MWC_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('MWC_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
+
+
 try {
     // if WooCommerce is active, require the main class
     if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
@@ -67,52 +69,37 @@ add_action('plugins_loaded', function () {
     load_plugin_textdomain('mwc', false, $plugin_rel_path);
 });
 
-// *********
-// TRACKING
-// *********
-
-// add Polylang support out of the box
-require_once MWC_PLUGIN_DIR . 'tracking/add-pll-support.php';
-
-// update clicks
-require_once MWC_PLUGIN_DIR . 'tracking/update-clicks.php';
-
-// cron to update impressions every 5 minutes
-require_once MWC_PLUGIN_DIR . 'tracking/caching/update-impressions-chron.php';
-
-// update conversions via thank you page hook
-require_once MWC_PLUGIN_DIR . 'tracking/thank-you-page.php';
-
-// reset tracking data for addons and bundles
-require_once MWC_PLUGIN_DIR . 'tracking/reset-tracking.php';
-
+/**
+ * FORCE FETCH PAYMENT GATEWAYS FOR MWC
+ */
 add_action('wp_footer', function () {
 
     global $post;
 
     if (is_object($post) && has_shortcode($post->post_content, 'mwc_one_page_checkout')) : ?>
         <script>
-            console.log('has mwc shortcode');
+            $ = jQuery.noConflict();
 
-            $ = jQuery;
-
-            let data = {
+            var data = {
                 'action': 'mwc_fetch_gateways',
                 '_ajax_nonce': '<?php echo wp_create_nonce('mwc fetch payment gateways'); ?>',
             }
 
             $.post('<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) {
-
-
+                console.log(response);
                 setTimeout(() => {
                     $('#payment').prepend(response);
                 }, 6000);
-
+            }, function(error) {
+                console.log(error);
             });
         </script>
     <?php endif;
 });
 
+/**
+ * AJAX FETCH PAYMENT GATEWAYS FOR MWC
+ */
 add_action('wp_ajax_nopriv_mwc_fetch_gateways', function () {
 
     check_ajax_referer('mwc fetch payment gateways');
@@ -155,6 +142,24 @@ add_action('wp_ajax_nopriv_mwc_fetch_gateways', function () {
         ?>
     </ul>
 <?php
-
     wp_die();
 });
+
+// *********
+// TRACKING
+// *********
+
+// add Polylang support out of the box
+require_once MWC_PLUGIN_DIR . 'tracking/add-pll-support.php';
+
+// update clicks
+require_once MWC_PLUGIN_DIR . 'tracking/update-clicks.php';
+
+// cron to update impressions every 5 minutes
+require_once MWC_PLUGIN_DIR . 'tracking/caching/update-impressions-chron.php';
+
+// update conversions via thank you page hook
+require_once MWC_PLUGIN_DIR . 'tracking/thank-you-page.php';
+
+// reset tracking data for addons and bundles
+require_once MWC_PLUGIN_DIR . 'tracking/reset-tracking.php';

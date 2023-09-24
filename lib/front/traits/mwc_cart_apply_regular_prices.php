@@ -21,6 +21,12 @@ if (!trait_exists('ApplyRegPriceCart')) :
             // get current currency
             $current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_option('woocommerce_currency');
 
+            // get default currency
+            $default_curr = get_option('woocommerce_currency');
+
+            // if current currency is not default currency, get exchange rate
+            $ex_rate = $current_curr != $default_curr ? get_option("alg_currency_switcher_exchange_rate_{$default_curr}_{$current_curr}") : 1;
+
             // mwc product count
             global $mwc_prod_count;
 
@@ -53,7 +59,7 @@ if (!trait_exists('ApplyRegPriceCart')) :
 
                 // debug
                 // $cart_item['data']->set_price($reg_price);
-                $cart_item['data']->set_price($reg_price);
+                $cart_item['data']->set_price($reg_price * $ex_rate);
 
             endforeach;
 
