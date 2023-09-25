@@ -133,8 +133,8 @@ ek is hier
 
                     foreach ($package_product_ids as $opt_i => $prod) {
 
-                        // output contents of $prod to plugin directory
-                        file_put_contents(MWC_PLUGIN_DIR . 'prod.txt', print_r($prod, true));
+                        // // output contents of $prod to plugin directory
+                        // file_put_contents(MWC_PLUGIN_DIR . 'prod.txt', print_r($prod, true));
 
 
                         $p_id = ($prod['type'] == 'free' || $prod['type'] == 'off') ? $prod['id'] : $prod['prod'][0]['id'];
