@@ -32,6 +32,10 @@ td.variation_index {
     font-size: 16px;
 }
 
+ul.sbhtml_nav_tabs > .sbhtml_nav_item{
+    font-size: initial !important;
+}
+
 .small-4 {
     max-width: 33.33333%;
     -ms-flex-preferred-size: 33.33333%;
