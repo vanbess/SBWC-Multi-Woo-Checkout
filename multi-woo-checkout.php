@@ -7,7 +7,7 @@
  * Plugin URI:
  * Description: Multi Woo Checkout
  * Author: Webmaster0313 w/ lots of bugfixes and tweaks by WC Bessinger
- * Version: 2.4.6
+ * Version: 2.4.7
  * Author URI:
  * Text Domain: mwc
  * Domain Path: /languages
