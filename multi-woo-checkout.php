@@ -13,7 +13,7 @@
  * Domain Path: /languages
  */
 
-define('MWCVersion', '2.4.6');
+define('MWCVersion', '2.4.7');
 define('MWC_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('MWC_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
