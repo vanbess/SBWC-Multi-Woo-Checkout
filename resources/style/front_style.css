@@ -371,6 +371,11 @@ div.sbhtml_chart_modal{
 
 .variation_item .variation_name {
     margin-bottom: 1rem;
+	display: inline;
+}
+
+span.sbhtml_link_text {
+    font-size: initial !important;
 }
 
 .swatchinput {
