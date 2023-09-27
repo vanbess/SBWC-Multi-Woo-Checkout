@@ -136,28 +136,36 @@ if (!class_exists('MWC')) :
                     return;
                 }
 
-                // current currency
-                $current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_option('woocommerce_currency');
+                if (
+                    isset($cart_item['mwc_bun_discount'])
+                    || isset($cart_item['mwc_off_discount'])
+                    || isset($cart_item['mwc_bun_free_prod'])
+                    || isset($cart_item['mwc_bun_paid_prod'])
+                ) :
 
-                // get default currency
-                $default_currency = get_option('woocommerce_currency');
+                    // current currency
+                    $current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_option('woocommerce_currency');
 
-                // get alg exchange rate
-                $ex_rate = get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") ? get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") : 1;
+                    // get default currency
+                    $default_currency = get_option('woocommerce_currency');
 
-                //  get cart total
-                $cart_total = WC()->cart->subtotal;
+                    // get alg exchange rate
+                    $ex_rate = get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") ? get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") : 1;
 
-                // get mwc bundle total from session
-                $mwc_bundle_total = $_SESSION['mwc_bundle_discounted_total'];
+                    //  get cart total
+                    $cart_total = WC()->cart->subtotal;
 
-                // get bundle title from session
-                $bundle_label  = $_SESSION['mwc_bundle_label'] ? __($_SESSION['mwc_bundle_label'], 'woocommerce') : __('Bundle Discount', 'woocommerce');
+                    // get mwc bundle total from session
+                    $mwc_bundle_total = $_SESSION['mwc_bundle_discounted_total'];
 
-                // if cart total > bundle total, calc fee by subtracting bundle total from cart total
-                if ($cart_total > $mwc_bundle_total) :
-                    $fee = ($cart_total - $mwc_bundle_total) / $ex_rate;  // Define your fee amount
-                    WC()->cart->add_fee(__($bundle_label, 'woocommerce'), -$fee);
+                    // get bundle title from session
+                    $bundle_label  = $_SESSION['mwc_bundle_label'] ? __($_SESSION['mwc_bundle_label'], 'woocommerce') : __('Bundle Discount', 'woocommerce');
+
+                    // if cart total > bundle total, calc fee by subtracting bundle total from cart total
+                    if ($cart_total > $mwc_bundle_total) :
+                        $fee = ($cart_total - $mwc_bundle_total) / $ex_rate;  // Define your fee amount
+                        WC()->cart->add_fee(__($bundle_label, 'woocommerce'), -$fee);
+                    endif;
                 endif;
             });
 
