@@ -218,17 +218,18 @@ if (!empty($package_product_ids)) :
 										$prod_obj = wc_get_product($vid);
 
 										// retrieve regular price
-										$reg_price = $prod_obj->get_regular_price();
+										$prod_price = $prod_obj->get_regular_price();
 
 									endforeach;
 								endforeach;
 
 							else :
 
+								// get product object
 								$prod_obj = wc_get_product($p_id);
 
 								// retrieve regular price
-								$reg_price = $prod_obj->get_regular_price();
+								$prod_price = $prod_obj->get_regular_price();
 
 							endif;
 
@@ -239,36 +240,24 @@ if (!empty($package_product_ids)) :
 							// Buy x get x free
 							if ($prod_data['type'] == 'free') :
 
-								$total_prod_qty    = (int)$prod_data['qty'] + (int)$prod_data['qty_free'];
-								$bundle_coupon     = ($prod_data['qty_free'] * 100) / $total_prod_qty;
-								$to_subtract       = $prod_price * ($bundle_coupon / 100);
-								$bundle_prod_price = $prod_price - $to_subtract;
-								$sum_price_regular = $prod_price * $total_prod_qty;
-								$sum_price_bundle  = $bundle_prod_price * $total_prod_qty;
-								$total_saved       = ($prod_price * $total_prod_qty) - $sum_price_bundle;
+								$total_prod_qty       = (int)$prod_data['qty'] + (int)$prod_data['qty_free'];
+								$bundle_coupon        = ((int)$prod_data['qty_free'] / $total_prod_qty) * 100;
+								$to_subtract          = ($prod_price * $bundle_coupon) / 100;
+								$bundle_price_product = $prod_price - $to_subtract;
+								$sum_price_regular    = $prod_price * $total_prod_qty;
+								$bundle_price         = $bundle_price_product * $total_prod_qty;
+								$price_discount       = ($prod_price * $total_prod_qty) - $bundle_price_total;
 
-								// js input data package
-								$js_discount_type  = 'free';
-								$js_discount_qty   = $prod_data['qty_free'];
-								$js_discount_value = $prod_data['id_free'];
-
-
-							// Buy x get x off
+							// buy x get x off
 							elseif ($prod_data['type'] == 'off') :
 
-								$total_prod_qty    = (int)$prod_data['qty'];
-								$bundle_coupon     = (int)$prod_data['coupon'];
-								$to_subtract       = $prod_price * ($bundle_coupon / 100);
-								$bundle_prod_price = $prod_price - $to_subtract;
-								$sum_price_regular = $prod_price * $total_prod_qty;
-								$sum_price_bundle  = $bundle_prod_price * $total_prod_qty;
-								$total_saved       = ($prod_price * $total_prod_qty) - $sum_price_bundle;
-
-								// js input data package
-								$js_discount_type  = 'percentage';
-								$js_discount_qty   = 1;
-								$js_discount_value = $prod_data['coupon'];
-
+								$total_prod_qty       = $prod_data['qty'];
+								$i_tt                 = $prod_price * $prod_data['qty'];
+								$bundle_coupon        = $prod_data['coupon'];
+								$bundle_price_product = $prod_price - ($prod_price * ($bundle_coupon / 100));
+								$sum_price_regular    = $prod_price * $prod_data['qty'];
+								$bundle_price         = $bundle_price_product * $prod_data['qty'];
+								$price_discount       = $i_tt - $bundle_price_total;
 
 							// Product bundle
 							else :
@@ -354,11 +343,11 @@ if (!empty($package_product_ids)) :
 
 							if ($prod_data['type'] == 'free' || $prod_data['type'] == 'off') : ?>
 
-								<div data-bundle-data="<?php echo base64_encode(json_encode($prod_data)) ?>" data-nonce="<?php echo wp_create_nonce('get update bundle pricing'); ?>" class="template_a item-selection col-hover-focus mwc_item_div mwc_item_div_<?php echo $prod_data['bun_id'] ?> op_c_package_option <?= (self::$package_default_id == $prod_data['bun_id']) ? 'mwc_selected_default_opt' : '' ?>" data-type="<?php echo ($prod_data['type']) ?>" data-bundle_id="<?php echo ($prod_data['bun_id']) ?>" data-coupon="<?= round($bundle_coupon, 0) ?>">
+								<div data-bundle-data="<?php echo base64_encode(json_encode($prod_data)) ?>" data-nonce="<?php echo wp_create_nonce('get update bundle pricing'); ?>" class="template_a item-selection col-hover-focus mwc_item_div mwc_item_div_<?php echo $prod_data['bun_id'] ?> op_c_package_option <?= (self::$package_default_id == $prod_data['bun_id']) ? 'mwc_selected_default_opt' : '' ?>" data-type="<?php echo ($prod_data['type']) ?>" data-bundle_id="<?php echo ($prod_data['bun_id']) ?>" data-coupon="<?= $bundle_coupon ?>">
 								<?php
 							else : ?>
 
-									<div data-bundle-data="<?php echo base64_encode(json_encode($prod_data)) ?>" data-nonce="<?php echo wp_create_nonce('get update bundle pricing'); ?>" class="template_a item-selection col-hover-focus mwc_item_div mwc_item_div_<?php echo ($prod_data['bun_id']) ?> op_c_package_option <?= (self::$package_default_id == $prod_data['bun_id']) ? 'mwc_selected_default_opt' : '' ?>" data-type="<?php echo ($prod_data['type']) ?>" data-bundle_id="<?php echo ($prod_data['bun_id']) ?>" data-coupon="<?= round($bundle_coupon, 0) ?>">
+									<div data-bundle-data="<?php echo base64_encode(json_encode($prod_data)) ?>" data-nonce="<?php echo wp_create_nonce('get update bundle pricing'); ?>" class="template_a item-selection col-hover-focus mwc_item_div mwc_item_div_<?php echo ($prod_data['bun_id']) ?> op_c_package_option <?= (self::$package_default_id == $prod_data['bun_id']) ? 'mwc_selected_default_opt' : '' ?>" data-type="<?php echo ($prod_data['type']) ?>" data-bundle_id="<?php echo ($prod_data['bun_id']) ?>" data-coupon="<?= $bundle_coupon ?>">
 									<?php
 								endif; ?>
 
@@ -393,16 +382,20 @@ if (!empty($package_product_ids)) :
 										<div class="mwc_item_infos_div mwc_collapser_inner i_row i_clearfix">
 
 											<div class="op_c_package_header">
+
+												<!-- package title -->
 												<div class="op_c_header_first">
 													<div class="op_c_package_title">
 														<span><?php echo ($bundle_title) ?></span>
 													</div>
 												</div>
+
+												<!-- label -->
 												<div class="op_c_label">
 													<?php if ($bundle_coupon > 0) : ?>
 														<span class="s_save">
 															<?php pll_e('Save ', 'woocommerce'); ?>
-															<?php echo wc_price($total_saved) ?>
+															<?php echo wc_price($sum_price_regular - $bundle_price) ?>
 														</span>
 													<?php endif; ?>
 
@@ -417,6 +410,8 @@ if (!empty($package_product_ids)) :
 													?>
 
 												</div>
+
+												<!-- select button -->
 												<div class="op_c_select_package">
 													<button class="select_button">
 													</button>
@@ -427,6 +422,7 @@ if (!empty($package_product_ids)) :
 
 											<div class="op_c_package_content" data-hover-image="<?php echo isset($prod_data['image_package_hover']) ? $prod_data['image_package_hover'] : '' ?>">
 
+												<!-- checkbox cont -->
 												<div>
 													<label class="check_box">
 														<?php if ($prod_data['type'] == 'free' || $prod_data['type'] == 'off') : ?>
@@ -438,6 +434,7 @@ if (!empty($package_product_ids)) :
 													</label>
 												</div>
 
+												<!-- package imagery -->
 												<div class="op_c_package_image">
 													<?php if (wp_is_mobile() && $prod_data['image_package_mobile']) : ?>
 														<img src="<?php echo ($prod_data['image_package_mobile']) ?>" class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail" alt="">
@@ -450,35 +447,42 @@ if (!empty($package_product_ids)) :
 
 													// show discount label
 													if ($prod_data['show_discount_label']) : ?>
-														<span class="show_discount_label"><?php echo (sprintf(__('%s&#37; OFF', 'woocommerce'), round($bundle_coupon, 0))) ?></span>
+														<span class="show_discount_label"><?php echo (sprintf(__('%s&#37; OFF', 'woocommerce'), $bundle_coupon, 0)) ?></span>
 													<?php endif; ?>
 												</div>
 
+												<!-- package info -->
 												<div class="op_c_package_info">
+
+													<!-- product title -->
 													<div class="pi-1"><?php echo $product_title ?></div>
+
+													<!-- package type off or free -->
 													<?php if ($prod_data['type'] == 'free' || $prod_data['type'] == 'off') : ?>
 														<div class="op_c_package_subtitle">
 															<span><?php echo (($prod_data['qty'] + (isset($prod_data['qty_free']) ? $prod_data['qty_free'] : 0)) . 'x ' . $product_name) ?></span>
 														</div>
 													<?php endif; ?>
+
+													<!-- package type bun -->
 													<div class="pi-info">
 														<?php if ($prod_data['type'] == 'bun') : ?>
 
 															<div class="pi-price-sa pt-1"><?= __('Old price', 'woocommerce') ?>:</div>
 															<div class="pi-price-pricing">
 																<div class="pi-price-each pl-lg-1">
-																	<span class="js-label-price_total"><del><?php echo wc_price($bundle_prod_price); ?></del></span>
+																	<span class="js-label-price_total"><del><?php echo wc_price($sum_price_regular); ?></del></span>
 																</div>
 															</div>
 															<div class="pi-price-total">
 																<strong><?php pll_e('Total', 'woocommerce') ?>:</strong>
-																<span class="js-label-price_total"><?php echo wc_price($total_saved); ?></span>
+																<span class="js-label-price_total"><?php echo wc_price($bundle_price); ?></span>
 															</div>
 
 															<!-- get prices bundle -->
-															<input type="hidden" class="mwc_bundle_price_hidden" data-label="<?= $bundle_title ?>" value="<?= $total_saved ?>">
+															<input type="hidden" class="mwc_bundle_price_hidden" data-label="<?= $bundle_title ?>" value="<?= $bundle_price ?>">
 															<input type="hidden" class="mwc_bundle_price_regular_hidden" data-label="<?= __('Old Price', 'woocommerce') ?>" value="<?= $sum_price_regular ?>">
-															<input type="hidden" class="mwc_bundle_price_sale_hidden" data-label="<?= __('Sale Price', 'woocommerce') ?>" value="<?= $bundle_prod_price ?>">
+															<input type="hidden" class="mwc_bundle_price_sale_hidden" data-label="<?= __('Sale Price', 'woocommerce') ?>" value="<?= $bundle_price ?>">
 															<input type="hidden" class="mwc_bundle_product_qty_hidden" value="1">
 
 															<?php
@@ -489,7 +493,7 @@ if (!empty($package_product_ids)) :
 																<div class="pi-price-sa pt-1"><?= __('Same as', 'woocommerce') ?>:</div>
 																<div class="pi-price-pricing">
 																	<div class="pi-price-each pl-lg-1">
-																		<span><?php echo wc_price($bundle_prod_price); ?></span>
+																		<span><?php echo wc_price($bundle_price_product); ?></span>
 																		<span class="pi-price-each-txt">/<?php echo __('each', 'woocommerce'); ?></span>
 																	</div>
 																</div>
@@ -497,7 +501,7 @@ if (!empty($package_product_ids)) :
 																<div class="pi-price-sa pt-1"><?= __('Same as', 'woocommerce') ?>:</div>
 																<div class="pi-price-pricing">
 																	<div class="pi-price-each pl-lg-1">
-																		<span><?php echo wc_price($bundle_prod_price); ?></span>
+																		<span><?php echo wc_price($bundle_price_product); ?></span>
 																		<span class="pi-price-each-txt">/<?php echo __('each', 'woocommerce'); ?></span>
 																	</div>
 
@@ -506,13 +510,13 @@ if (!empty($package_product_ids)) :
 
 															<div class="pi-price-total">
 																<strong><?php pll_e('Total', 'woocommerce') ?>:</strong>
-																<span><?php echo wc_price($sum_price_bundle); ?></span>
+																<span><?php echo wc_price($bundle_price); ?></span>
 															</div>
 
 															<!-- get prices bundle -->
 															<input type="hidden" class="mwc_bundle_price_hidden" data-label="<?= $bundle_title ?>" value="<?= $sum_price_bundle ?>">
 															<input type="hidden" class="mwc_bundle_price_regular_hidden" data-label="<?= __('Old Price', 'woocommerce') ?>" value="<?= $sum_price_regular ?>">
-															<input type="hidden" class="mwc_bundle_price_sale_hidden" data-label="<?= __('Sale Price', 'woocommerce') ?>" value="<?= $bundle_prod_price ?>">
+															<input type="hidden" class="mwc_bundle_price_sale_hidden" data-label="<?= __('Sale Price', 'woocommerce') ?>" value="<?= $sum_price_bundle ?>">
 															<input type="hidden" class="mwc_bundle_product_qty_hidden" value="<?= $total_prod_qty ?>">
 														<?php
 														endif; ?>
@@ -561,7 +565,7 @@ if (!empty($package_product_ids)) :
 
 												<!-- discount percent -->
 												<?php if (0 != $bundle_coupon) : ?>
-													<span class="bullet-item"><?php pll_e('Discount', 'woocommerce') ?> : <?php echo round($bundle_coupon, 0) ?>%</span>
+													<span class="bullet-item"><?php pll_e('Discount', 'woocommerce') ?> : <?= round($bundle_coupon, 0) ?>%</span>
 												<?php endif; ?>
 
 												<!-- show popular -->
@@ -586,6 +590,12 @@ if (!empty($package_product_ids)) :
 										</div> <!-- end mwc_item_infos_div -->
 									</div>
 
+									<?php
+									// echo '<pre>';
+									// print_r($prod_obj);
+									// echo '</pre>';
+									?>
+
 									<?php if ($prod_obj->is_type('variable') && 2 > count($prod_obj->get_available_variations())) :
 										echo '<div class="d-none">';
 									endif;	?>
@@ -599,6 +609,9 @@ if (!empty($package_product_ids)) :
 												//package selection variations free and off
 												if ($prod_data['type'] == 'free' || $prod_data['type'] == 'off') :
 
+													// retrieve product object
+													$prod_obj = wc_get_product($prod_data['id']);
+
 													// get variation images product
 													if (!isset($var_data[$p_id]) && $prod_obj->is_type('variable')) :
 
@@ -608,7 +621,7 @@ if (!empty($package_product_ids)) :
 
 															array_push($variation_arr, [
 																'id'         => $value['variation_id'],
-																'price'      => key_exists('custom_price', $prod_data) ? $prod_data['custom_price'][$value['variation_id']][$current_curr] : '',
+																'price'      => isset($prod_data['custom_price'][$value['variation_id']]) ? $prod_data['custom_price'][$value['variation_id']][$current_curr] : '',
 																'attributes' => $value['attributes'],
 																'image'      => $value['image']['url']
 															]);
@@ -618,22 +631,36 @@ if (!empty($package_product_ids)) :
 														$var_data[$p_id] = $variation_arr;
 
 													endif;
+
 												?>
 
-													<?php for ($i = 0; $i < $prod_data['qty']; $i++) : ?>
-														<tr class="c_prod_item" data-id="<?php echo ($p_id) ?>" <?= (!$prod_obj->is_type('variable')) ? 'hidden' : '' ?>>
+													<?php for ($i = 0; $i < $prod_data['qty']; $i++) :
+
+														// check if has size chart
+														$has_size_chart = get_post_meta($prod_data['id'], 'sbarray_chart_data', true) ? 'true' : 'false';
+
+													?>
+														<!-- c prod item -->
+														<tr class="c_prod_item" has-size-chart="<?php echo $has_size_chart; ?>" data-id="<?php echo ($p_id) ?>" <?= (!$prod_obj->is_type('variable')) ? 'hidden' : '' ?>>
+
 															<?php if ($prod_obj->is_type('variable')) : ?>
 
+																<!-- index -->
 																<td class="variation_index"><?= $i + 1 ?></td>
+
+																<!-- variation image -->
 																<td class="variation_img">
 																	<img class="mwc_variation_img" src="<?= wp_get_attachment_image_src($prod_obj->get_image_id())[0] ?>">
 																</td>
+
+																<!-- variation selectors -->
 																<td class="variation_selectors">
+
 																	<?php
 
-																	// // show variations linked by variations
+																	// show variations linked by variations
 																	echo MWC::mwc_return_linked_variations_dropdown([
-																		'product_id'		=> $p_id,
+																		'product_id'		=> $prod_data['id'],
 																		'class' 			=> 'var_prod_attr checkou_prod_attr select-variation-' . $prod_data['type'],
 																	], $var_data, $prod_data);
 
@@ -649,7 +676,7 @@ if (!empty($package_product_ids)) :
 																			<!-- load dropdown variations -->
 																			<?php
 																			echo MWC::mwc_return_onepage_checkout_variation_dropdown([
-																				'product_id'		=> $p_id,
+																				'product_id'		=> $prod_data['id'],
 																				'options' 			=> $options,
 																				'attribute_name'	=> $attribute_name,
 																				'default_option'	=> $default_opt,
@@ -673,6 +700,9 @@ if (!empty($package_product_ids)) :
 														$p_id      = $i_prod['id'];
 														$b_product = wc_get_product($p_id);
 
+														// has size chart
+														$has_size_chart = get_post_meta($p_id, 'sbarray_chart_data', true) ? 'true' : 'false';
+
 														// get variation images product
 														if (!isset($var_data[$p_id]) && $b_product->is_type('variable')) :
 
@@ -694,7 +724,7 @@ if (!empty($package_product_ids)) :
 
 														for ($i = 1; $i <= $i_prod['qty']; $i++) :	?>
 
-															<tr class="c_prod_item" data-id="<?php echo ($p_id) ?>" <?= (!$b_product->is_type('variable')) ? 'hidden' : '' ?>>
+															<tr class="c_prod_item" has-size-chart="<?php echo $has_size_chart; ?>" data-id="<?php echo ($p_id) ?>" <?= (!$b_product->is_type('variable')) ? 'hidden' : '' ?>>
 
 																<?php if ($b_product->is_type('variable')) : ?>
 
@@ -731,6 +761,14 @@ if (!empty($package_product_ids)) :
 																				?>
 
 																			</div>
+
+																			<?php
+																			// Size chart
+																			if (defined('SBHTML_VERSION')) :
+																				do_action('mwc_size_chart', $p_id);
+																			endif;
+																			?>
+
 																		<?php endforeach; ?>
 																	</td>
 																<?php endif; ?>
@@ -742,7 +780,12 @@ if (!empty($package_product_ids)) :
 										</table>
 
 										<!-- variations free products -->
-										<?php if ($prod_data['type'] == 'free' && isset($prod_data['qty_free']) && $prod_data['qty_free'] > 0) : ?>
+										<?php if ($prod_data['type'] == 'free' && isset($prod_data['qty_free']) && $prod_data['qty_free'] > 0) : 
+											
+											// has size chart
+											$has_size_chart = get_post_meta($p_id, 'sbarray_chart_data', true) ? 'true' : 'false';
+
+											?>
 
 											<h5 class="title_form" style="font-size: calc(1.8rem * var(--rio-typo-ratio,1));"><?= __('Select Free Product', 'woocommerce') ?>:</h5>
 
@@ -750,7 +793,7 @@ if (!empty($package_product_ids)) :
 												<tbody>
 													<?php for ($i = 0; $i < $prod_data['qty_free']; $i++) : ?>
 
-														<tr class="c_prod_item free-item" data-id="<?php echo ($p_id) ?>" <?= (!$prod_obj->is_type('variable')) ? 'hidden' : '' ?>>
+														<tr class="c_prod_item free-item"  has-size-chart="<?php echo $has_size_chart; ?>" data-id="<?php echo ($p_id) ?>" <?= (!$prod_obj->is_type('variable')) ? 'hidden' : '' ?>>
 															<?php if ($prod_obj->is_type('variable')) :
 															?>
 																<td class="variation_index"><?= $i + 1 ?></td>
@@ -797,14 +840,17 @@ if (!empty($package_product_ids)) :
 
 										<?php
 										endif;
-										// Size chart
-										if (defined('SBHTML_VERSION')) :
-											do_action('mwc_size_chart', $p_id);
-										endif;
+
 										?>
 									</div>
 									<!-- end product variations form -->
 									<?php
+
+									// Size chart
+									if (defined('SBHTML_VERSION')) :
+										do_action('mwc_size_chart', $p_id);
+									endif;
+
 									if ($prod_obj->is_type('variable') && 2 > count($prod_obj->get_available_variations())) :
 										echo '</div>';
 									endif;

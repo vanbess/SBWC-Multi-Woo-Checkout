@@ -91,7 +91,7 @@ if (!trait_exists('AddToCartLinkedJS')) :
 
                                     linked_data.discount = discount;
 
-                                    $(document).find('.mwc_product_variations').hide();
+                                    $(document).find('.mwc_product_variations').slideUp();
                                     $(this).find('.mwc_product_variations').slideDown();
 
                                     // type bun
@@ -136,7 +136,7 @@ if (!trait_exists('AddToCartLinkedJS')) :
                                     linked_data.discount = $(this).attr('data-coupon');
 
                                     if (!$(this).find('.mwc_product_variations').is(':visible')) {
-                                        $(document).find('.mwc_product_variations').hide();
+                                        $(document).find('.mwc_product_variations').slideUp();
                                         $(this).find('.mwc_product_variations').slideDown();
                                     }
 

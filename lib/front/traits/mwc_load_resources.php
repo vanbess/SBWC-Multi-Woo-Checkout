@@ -30,7 +30,7 @@ if (!trait_exists('LoadResources')) :
 
             wp_enqueue_style('mwc_common_style', MWC_PLUGIN_URL . 'resources/style/common.css', array(), MWCVersion, 'all');
             wp_enqueue_style('mwc_style', MWC_PLUGIN_URL . 'resources/style/front_style.css', array(), MWCVersion . time(), 'all');
-            wp_enqueue_script('mwc_front_script_js', MWC_PLUGIN_URL . 'resources/js/front_js.js', ['jquery'], time(), true);
+            wp_enqueue_script('mwc_front_script_js', MWC_PLUGIN_URL . 'resources/js/front_js.js', ['jquery'], MWCVersion . time(), true);
 
             wp_localize_script(
                 'mwc_front_script_js',

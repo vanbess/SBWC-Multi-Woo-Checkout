@@ -1,5 +1,7 @@
 jQuery(document).ready(function ($) {
 
+    console.log('you are here padawan');
+
     // check if class .mwc_items_div exists and bail if not
     if (!$('.mwc_items_div').length) {
         return;
@@ -367,7 +369,7 @@ jQuery(document).ready(function ($) {
      */
     function mwc_set_summary_prices() {
 
-        console.log('wtf');
+        // console.log('wtf');
 
         let $ = jQuery;
 
@@ -542,5 +544,12 @@ jQuery(document).ready(function ($) {
     // $(document.body).off('updated_cart_totals');
     // $(document.body).off('wc_fragments_refresh');
     // $(document.body).off('added_to_cart');
+
+    $('.op_c_package_option').click(function (e) { 
+        e.preventDefault();
+
+        console.log('wtf');
+        
+    });
 
 });
