@@ -18,6 +18,11 @@ if (!trait_exists('ApplyRegPriceCart')) :
                 return;
             endif;
 
+            // if did action >= 2, return
+            if (did_action('woocommerce_before_calculate_totals') >= 2) :
+                return;
+            endif;
+
             // get bundle id from session
             $bundle_id = WC()->session->get('mwc_bundle_id');
 
