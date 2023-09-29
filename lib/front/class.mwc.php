@@ -90,12 +90,25 @@ if (!class_exists('MWC')) :
              *****************************/
             add_action('woocommerce_cart_calculate_fees', function () {
 
+                // is mwc
+                $is_mwc = false;
+
                 if (is_admin() && !defined('DOING_AJAX')) {
+                    return;
+                }
+
+                // don't run this more than once
+                if (did_action('woocommerce_cart_calculate_fees') >= 2) {
                     return;
                 }
 
                 // get bundle id from session
                 $bundle_id = WC()->session->get('mwc_bundle_id');
+
+                // if bundle id is not set, return
+                if (!$bundle_id) :
+                    return;
+                endif;
 
                 // file put contents bundle id
                 // file_put_contents(MWC_PLUGIN_DIR . 'bundle_id.txt', print_r($bundle_id, true));
@@ -162,6 +175,12 @@ if (!class_exists('MWC')) :
                 // loop through cart contents and check for cart item meta 'mwc_bun_discount' or 'mwc_off_discount' or 'mwc_bun_free_prod' or 'mwc_bun_paid_prod'
                 foreach ($cart_contents as $cart_item) :
 
+                    // if any mwc item is present, increment mwc product count
+                    if (isset($cart_item['mwc_bun_discount']) || isset($cart_item['mwc_off_discount']) || isset($cart_item['mwc_bun_free_prod']) || isset($cart_item['mwc_bun_paid_prod'])) :
+                        $mwc_prod_count += $cart_item['quantity'];
+                        $is_mwc = true;
+                    endif;
+
                     // set bundle type
                     if (isset($cart_item['mwc_bun_discount'])) :
                         $bundle_type = 'bundle';
@@ -171,11 +190,6 @@ if (!class_exists('MWC')) :
                         $bundle_type = 'free';
                     else :
                         $bundle_type = null;
-                    endif;
-
-                    // if any mwc item is present, increment mwc product count
-                    if (isset($cart_item['mwc_bun_discount']) || isset($cart_item['mwc_off_discount']) || isset($cart_item['mwc_bun_free_prod']) || isset($cart_item['mwc_bun_paid_prod'])) :
-                        $mwc_prod_count += $cart_item['quantity'];
                     endif;
 
                     // if is bundle discount or off discount, get/set discount %
@@ -200,6 +214,14 @@ if (!class_exists('MWC')) :
 
                 endforeach;
 
+                // DEBUG
+                // $is_mwc = false;
+
+                // if not mwc, return
+                if (!$is_mwc) :
+                    return;
+                endif;
+
                 // file put contents paid and free product count
                 // file_put_contents(MWC_PLUGIN_DIR . 'paid_and_free_prod_count.txt', print_r($paid_prod_count . ' ' . $free_prod_count, true));
 
@@ -214,7 +236,7 @@ if (!class_exists('MWC')) :
                 // file put contents discount percent
                 // file_put_contents(MWC_PLUGIN_DIR . 'discount_percent.txt', print_r($discount_percent, true));
 
-                // if discount percent is not 0, calculate fee
+                // if discount percent is not 0 and product count === to mwc product count, calculate fee
                 if ($discount_percent != 0 && $bundle_product_quantity == $mwc_prod_count) :
 
                     //  get cart total
@@ -243,7 +265,6 @@ if (!class_exists('MWC')) :
                     }
 
                     if ($bundle_fee != 0) :
-                        // $bundle_fee = $bundle_fee * $ex_rate;  // Define your fee amount
 
                         // file put contents fee
                         // file_put_contents(MWC_PLUGIN_DIR . 'fee.txt', print_r($bundle_fee, true));

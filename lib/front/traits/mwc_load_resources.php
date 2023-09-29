@@ -14,17 +14,12 @@ if (!trait_exists('LoadResources')) :
 
             global $woocommerce;
 
-            if (is_product()) :
-                WC()->cart->empty_cart();
-                return;
-            endif;
-
             // setup cart and checkout urls
             $cart_url = '/cart/';
             $checkout_url = '/checkout/';
 
             if (!empty($woocommerce)) :
-                $cart_url = wc_get_cart_url();
+                $cart_url     = wc_get_cart_url();
                 $checkout_url = wc_get_checkout_url();
             endif;
 
@@ -52,6 +47,7 @@ if (!trait_exists('LoadResources')) :
             wp_enqueue_script('mwc_atc_reworked', self::mwc_atc_js(), ['jquery'], time(), true);
             wp_enqueue_script('mwc_atc_linked_prods', self::mwc_atc_js_linked_prods(), ['jquery'], time(), true);
         }
+
     }
 
 endif;

@@ -272,10 +272,6 @@ if (!trait_exists('AddToCartLinkedAjAction')) :
             // set bundle id to session
             wc()->session->set('mwc_bundle_id', $bundle_id);
 
-            // UNCOMMENT TO DEBUG SESSION
-            // print_r($_SESSION);
-            // wp_die();
-
             // set mwc bundle flag to session - used to remove all other coupons and discounts
             wc()->session->set('is_mwc_bundle', 'yes');
 
