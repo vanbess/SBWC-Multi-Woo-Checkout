@@ -1,4 +1,3 @@
-.vscode/sftp.json
-multi-woo-checkout-v2.4.zip
+*.vscode
 *.zip
-prod.txt
+*.txt

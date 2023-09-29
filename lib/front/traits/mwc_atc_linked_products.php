@@ -14,27 +14,6 @@ if (!trait_exists('AddToCartLinkedAjAction')) :
 
             check_ajax_referer('add linked products to cart');
 
-            // init session
-            WC()->session->init();
-            WC()->session->set_customer_session_cookie(true);
-
-            // UNCOMMENT TO DEBUG PAYLOAD
-            // wp_send_json($_POST);
-
-            // force init cart
-            WC()->cart;
-
-            // holds total mwc product count
-            global $mwc_prod_count;
-
-            // count linked_bun_prods OR linked_off_prods OR linked_free_prods and addon_variable_prods and addon_simple_prods
-            $linked_prods_count         = isset($_POST['linked_bun_prods']) ? count($_POST['linked_bun_prods']) : (isset($_POST['linked_off_prods']) ? count($_POST['linked_off_prods']) : (isset($_POST['linked_free_prods']) ? count($_POST['linked_free_prods']) : 0));
-            $addon_simple_prods_count   = isset($_POST['addon_simple_prods']) ? count($_POST['addon_simple_prods']) : 0;
-            $addon_variable_prods_count = isset($_POST['addon_variable_prods']) ? count($_POST['addon_variable_prods']) : 0;
-
-            // set mwc_prod_count
-            $mwc_prod_count = $linked_prods_count + $addon_simple_prods_count + $addon_variable_prods_count;
-
             // debug cart object
             // wp_send_json(WC()->cart);
 
@@ -43,15 +22,8 @@ if (!trait_exists('AddToCartLinkedAjAction')) :
             $bundle_id   = isset($_POST['bundle_id']) ? (int)$_POST['bundle_id'] : false;
             $discount    = isset($_POST['discount']) ? $_POST['discount'] : false;
 
-            // UNCOMMENT TO DEBUG SESSION
-            // wp_send_json($_SESSION);
-
             // empty cart
             wc()->cart->empty_cart();
-
-            // $cart_keys[] = wc()->cart->add_to_cart(14190, 1, 14195, [], ['mwc_off_discount' => $discount]);
-
-            // wp_send_json($cart_keys);
 
             // holds cart keys
             $cart_keys = [];
@@ -298,7 +270,7 @@ if (!trait_exists('AddToCartLinkedAjAction')) :
             endif;
 
             // set bundle id to session
-            $_SESSION['mwc_bundle_id'] = $bundle_id;
+            wc()->session->set('mwc_bundle_id', $bundle_id);
 
             // UNCOMMENT TO DEBUG SESSION
             // print_r($_SESSION);

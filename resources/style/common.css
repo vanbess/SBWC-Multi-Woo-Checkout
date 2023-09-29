@@ -42,6 +42,14 @@ ul.sbhtml_nav_tabs > .sbhtml_nav_item{
     flex-basis: 33.33333%
 }
 
+tr.fee td {
+    text-align: right;
+}
+
+tr.fee th {
+    font-size: large;
+}
+
 .small-5 {
     max-width: 41.66667%;
     -ms-flex-preferred-size: 41.66667%;

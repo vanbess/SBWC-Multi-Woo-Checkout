@@ -18,23 +18,6 @@ if (!trait_exists('AddToCartBasicAjAction')) :
             // print_r($_POST);
             // wp_die();
 
-            // start session if not started
-            if (!session_id()) :
-                session_start();
-            endif;
-
-            // holds total mwc product count
-            global $mwc_prod_count;
-
-            // count bun_variable_prods and bun_simple_prods and addon_simple_prods and addon_variable_prods
-            $bun_variable_prods_count   = isset($_POST['bun_variable_prods']) ? count($_POST['bun_variable_prods']) : 0;
-            $bun_simple_prods_count     = isset($_POST['bun_simple_prods']) ? count($_POST['bun_simple_prods']) : 0;
-            $addon_simple_prods_count   = isset($_POST['addon_simple_prods']) ? count($_POST['addon_simple_prods']) : 0;
-            $addon_variable_prods_count = isset($_POST['addon_variable_prods']) ? count($_POST['addon_variable_prods']) : 0;
-
-            // set mwc_prod_count
-            $mwc_prod_count = $bun_variable_prods_count + $bun_simple_prods_count + $addon_simple_prods_count + $addon_variable_prods_count;
-
             // empty cart if cart total is 0
             if (wc()->cart->get_cart_contents_total() == 0) :
                 wc()->cart->empty_cart();
@@ -199,7 +182,7 @@ if (!trait_exists('AddToCartBasicAjAction')) :
             endif;
 
             // add bundle id to session for AFTER items added to cart later ref
-            $_SESSION['mwc_bundle_id'] = $bundle_id;
+            wc()->session->set('mwc_bundle_id', $bundle_id);
 
             // set mwc bundle flag to session - used to remove all other coupons and discounts
             wc()->session->set('is_mwc_bundle', 'yes');

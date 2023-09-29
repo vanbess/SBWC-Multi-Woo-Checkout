@@ -4,10 +4,10 @@ global $woocommerce;
 
 $cart_items            = $woocommerce->cart->get_cart();
 $currency              = get_woocommerce_currency_symbol();
-$package_product_ids   = self::$package_product_ids;
+$bundle_data           = self::$package_product_ids;
 $package_number_item_2 = self::$package_number_item_2;
 
-if (!empty($package_product_ids)) {
+if (!empty($bundle_data)) {
 
 	// ********************************************
 	// IMPRESSIONS TRACKING CACHE WP CACHE & REDIS
@@ -36,7 +36,7 @@ if (!empty($package_product_ids)) {
 		$impressions = [];
 
 		// push impressions
-		foreach ($package_product_ids as $opt_i => $prod_data) :
+		foreach ($bundle_data as $opt_i => $prod_data) :
 
 			// retrieve correct product id
 			if ($prod_data['type'] == 'free') :
@@ -67,7 +67,7 @@ if (!empty($package_product_ids)) {
 		<?php endif;
 
 		// get product count
-		$product_count = count($package_product_ids);
+		$product_count = count($bundle_data);
 
 		// current currency
 		$current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_option('woocommerce_currency');
@@ -113,40 +113,94 @@ if (!empty($package_product_ids)) {
 			<div id="mwc-bundles-cont" class="col-lg-7 col-md-6 col-sm-12 col-xs-12">
 				<div class="mwc-nav-wrapper row">
 
-					<?php foreach ($package_product_ids as $opt_i => $prod_data) :
+					<?php foreach ($bundle_data as $opt_i => $prod_data) :
 
-						// output contents of $prod to plugin directory
-						// file_put_contents(MWC_PLUGIN_DIR . 'prod.txt', print_r($prod_data, true), FILE_APPEND);
+						// echo '<pre>';
+						// print_r($prod_data);
+						// echo '</pre>';
 
-						$bundle_title           = '';
-						$cus_bundle_total_price = 0;
+						$bundle_id = $prod_data['bun_id'];
 
-						// free type bundle
+						$bundle_data_full = get_post_meta($bundle_id, 'product_discount', true);
+
+						echo '<pre>';
+						print_r($bundle_data_full);
+						echo '</pre>';
+
+						switch ($bundle_data_full['selValue']) {
+
+								// ==========
+								// type free
+								// ==========
+							case 'free':
+
+								// bundle title
+								$bundle_title = $bundle_data_full['title_package'] ?: __('Bundle option', 'woocommerce');
+
+								// products
+
+								break;
+
+								// =========
+								// type off
+								// =========
+							case 'off':
+
+								// bundle title
+								$bundle_title = $bundle_data_full['title_package'] ?: __('Bundle option', 'woocommerce');
+
+								// product
+								$product_id  = $bundle_data_full['selValue_off']['post']['id'];
+
+								// qty
+								$product_qty = $bundle_data_full['selValue_off']['quantity'];
+
+								// coupon
+								$coupon      = $bundle_data_full['selValue_off']['coupon'];
+
+								// get product object
+								$prod_obj = wc_get_product($product_id);
+
+								// get first child id
+								$var_id = $prod_obj->get_children()[0];
+
+								// get child object
+								$var_obj = wc_get_product($var_id);
+
+								// get regular price
+								$prod_price = $var_obj->get_regular_price();
+
+								// calculate bundle total
+								$regular_total = $prod_price * $product_qty;
+
+								// calculate bundle price
+								$bundle_total = ($prod_price - ($prod_price * ($coupon / 100)))* $product_qty;
+
+								// per product bundle price
+								$per_product_bundle_price = $bundle_total / $product_qty;
+
+								break;
+
+								// =========
+								// type bun
+								// =========
+							case 'bun':
+								$bundle_title = $bundle_data_full['title_package'] ?: __('Bundle option', 'woocommerce');
+								break;
+
+								// default
+							default:
+								$bundle_title =  __('Bundle option', 'woocommerce');
+								break;
+						}
+
+						// get product id
 						if ($prod_data['type'] == 'free') :
-
 							$p_id = $prod_data['id'];
-
-							if ($prod_data['qty_free'] == 0) :
-								$bundle_title = sprintf(__('Buy %s',  'woocommerce'), $prod_data['qty']);
-							else :
-								$bundle_title = sprintf(__('Buy %s + Get %d FREE', 'woocommerce'), $prod_data['qty'], $prod_data['qty_free']);
-							endif;
-
-						// off type bundle
 						elseif ($prod_data['type'] == 'off') :
-
 							$p_id = $prod_data['id'];
-
-							if (0 == $prod_data['coupon']) :
-								$bundle_title = sprintf(__('Buy %s', 'woocommerce'), $prod_data['qty']);
-							else :
-								$bundle_title = sprintf(__('Buy %s + Get %d&#37;', 'woocommerce'), $prod_data['qty'], $prod_data['coupon']) . ' ' . __('Off', 'woocommerce');
-							endif;
-
-						// product type bundle
 						else :
-							$p_id         = $prod_data['prod'][0]['id'];
-							$bundle_title = $prod_data['title_header'] ?: __('Bundle option', 'woocommerce');
+							$p_id = $prod_data['prod'][0]['id'];
 						endif;
 
 						// get product object
@@ -161,198 +215,279 @@ if (!empty($package_product_ids)) {
 
 							<?php else :
 
-							$product_separate   = 1;
+							// $product_separate   = 1;
 
-							// package title
-							$package_title = isset($prod_data['title_package']) ?
-								$prod_data['title_package'] :
-								$prod_obj->get_title();
+							// // package title
+							// $package_title = isset($prod_data['title_package']) ?
+							// 	$prod_data['title_package'] :
+							// 	$prod_obj->get_title();
 
-							// product name
-							$product_name = isset($prod_data['product_name']) ?
-								$prod_data['product_name'] :
-								$prod_obj->get_title();
+							// // product name
+							// $product_name = isset($prod_data['product_name']) ?
+							// 	$prod_data['product_name'] :
+							// 	$prod_obj->get_title();
 
-							// product price
-							$prod_price = $prod_obj->get_regular_price();
+							// // product price
+							// $prod_price = get_post_meta($p_id, '_regular_price', true) ?
+							// 	get_post_meta($p_id, '_regular_price', true) :
+							// 	get_post_meta($p_id, '_price', true);
+
+							// calculate pricing based on current currency as needed 
+							// $prod_price =
+							// 	get_post_meta($p_id, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) != '' ?
+							// 	get_post_meta($p_id, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) :
+							// 	$prod_price * $ex_rate;
 
 							// mwc product option has custom price
-							if (key_exists('custom_price', $prod_data)) :
+							// if (key_exists('custom_price', $prod_data)) :
 
-								if (is_array($prod_data['custom_price']) && !empty($prod_data['custom_price'])) :
-									if (!is_null(current($prod_data['custom_price'])[$current_curr])) :
-										$prod_price      = current($prod_data['custom_price'])[$current_curr];
-									endif;
-								endif;
+							// 	if (is_array($prod_data['custom_price']) && !empty($prod_data['custom_price'])) :
+							// 		if (!is_null(current($prod_data['custom_price'])[$current_curr])) :
+							// 			$prod_price      = current($prod_data['custom_price'])[$current_curr];
+							// 		endif;
+							// 	endif;
 
-							endif;
+							// endif;
 
 							// get mwc price variation
-							if ($prod_obj->is_type('variable')) :
+							// if ($prod_obj->is_type('variable')) :
 
-								// variations loop
-								foreach ($prod_obj->get_available_variations() as $key => $value) :
+							// 	// variations loop
+							// 	foreach ($prod_obj->get_available_variations() as $key => $value) :
 
-									$variation_price[trim($prod_data['bun_id'])][$value['variation_id']]['variation_id'] = $value['variation_id'];
+							// 		$variation_price[trim($prod_data['bun_id'])][$value['variation_id']]['variation_id'] = $value['variation_id'];
 
-									// if custom price is set
-									if (isset($prod['custom_price']) && isset($prod['custom_price'][$var_data['variation_id']][$current_curr])) :
-										$variation_price[trim($prod['bun_id'])][$var_data['variation_id']]['price'] = $prod['custom_price'][$var_data['variation_id']][$current_curr];
+							// 		// if custom price is set
+							// 		if (isset($prod['custom_price']) && isset($prod['custom_price'][$var_data['variation_id']][$current_curr])) :
+							// 			$variation_price[trim($prod['bun_id'])][$var_data['variation_id']]['price'] = $prod['custom_price'][$var_data['variation_id']][$current_curr];
 
-									// if custom price is not set
-									else :
+							// 		// if custom price is not set
+							// 		else :
 
-										// get variation product
-										$var_prod = wc_get_product($value['variation_id']);
+							// 			// get regular variation price
+							// 			$prod_price = get_post_meta($value['variation_id'], '_regular_price', true) ?
+							// 				get_post_meta($value['variation_id'], '_regular_price', true) :
+							// 				get_post_meta($value['variation_id'], '_price', true);
 
-										// get variation price
-										$prod_price = $var_prod->get_regular_price();
+							// 			// // if current currency is not default currency, get alg price, else calculate price based on exchange rate
+							// 			// if ($current_curr !== $default_currency) :
 
-									endif;
+							// 			// 	$prod_price =
+							// 			// 		get_post_meta($var_data['variation_id'], "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) != '' ?
+							// 			// 		get_post_meta($var_data['variation_id'], "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) :
+							// 			// 		$product_price * $ex_rate;
 
-								endforeach;
+							// 			// // if current currency is default currency, get regular price
+							// 			// else :
 
-							endif;
+							// 			// 	// if $var_data['variation_id'] is not defined, continue
+							// 			// 	if (!isset($var_data['variation_id'])) :
+							// 			// 		continue;
+							// 			// 	else :
+
+							// 			// 		$prod_price = $var_data['variation_id'] ?
+							// 			// 			get_post_meta($var_data['variation_id'], '_regular_price', true) :
+							// 			// 			get_post_meta($var_data['variation_id'], '_price', true);
+							// 			// 	endif;
+							// 			// // isset($variation_price[trim($prod_data['bun_id'])][$var_data['variation_id']])? $variation_price[trim($prod_data['bun_id'])][$var_data['variation_id']]['price'] = $var_data['display_regular_price']: '';
+							// 			// endif;
+
+							// 		endif;
+
+							// 	endforeach;
+
+							// endif;
 
 							// get price reg, sale product of package free, off
 							// ALG mod added 08 Feb 2023
-							if ($prod_obj->is_type('variable')) :
+							// if ($prod_obj->is_type('variable')) :
 
-								// get children
-								$children = $prod_obj->get_children();
+							// 	// get children
+							// 	$children = $prod_obj->get_children();
 
-								// loop through children
-								foreach ($children as $vid) :
+							// 	// loop through children
+							// 	foreach ($children as $vid) :
 
-									// get variation object
-									$var_obj = wc_get_product($vid);
+							// 		// get regular price
+							// 		$prod_price =
+							// 			get_post_meta($vid, '_regular_price', true) ?
+							// 			get_post_meta($vid, '_regular_price', true) :
+							// 			get_post_meta($vid, '_price', true);
 
-									// get regular price
-									$prod_price = $var_obj->get_regular_price();
+							// 		// // get alg price if defined, else calculate price based on exchange rate
+							// 		// $prod_price = get_post_meta($vid, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) != '' ?
+							// 		// 	get_post_meta($vid, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) :	$reg_price * $ex_rate;
 
-								endforeach;
+							// 	endforeach;
 
-							// if is simple product
-							else :
+							// // if is simple product
+							// else :
 
-								// get product object
-								$prod_obj = wc_get_product($p_id);
+							// 	// get regular price
+							// 	$prod_price =
+							// 		get_post_meta($p_id, '_regular_price', true) ?
+							// 		get_post_meta($p_id, '_regular_price', true) :
+							// 		get_post_meta($p_id, '_price', true);
 
-								// get regular price
-								$prod_price = $prod_obj->get_regular_price();
-							
-							endif;
+							// 	// // get alg price if defined, else calculate price based on exchange rate
+							// 	// $prod_price = get_post_meta($p_id, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) != '' ?
+							// 	// 	get_post_meta($p_id, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) : $reg_price * $ex_rate;
+
+							// endif;
 
 							// *****************
 							// CALCULATE PRICES
 							// *****************
 
-							// buy x get x free
-							if ($prod_data['type'] == 'free') :
+							// // buy x get x free
+							// if ($prod_data['type'] == 'free') :
 
-								$total_prod_qty     = (int)$prod_data['qty'] + (int)$prod_data['qty_free'];
-								$bundle_coupon      = ((int)$prod_data['qty_free'] / $total_prod_qty) * 100;
-								$to_subtract        = ($prod_price * $bundle_coupon) / 100;
-								$bundle_price       = $prod_price - $to_subtract;
-								$sum_price_regular  = $prod_price * $total_prod_qty;
-								$bundle_price_total = $bundle_price * $total_prod_qty;
-								$price_discount     = ($prod_price * $total_prod_qty) - $bundle_price_total;
+							// 	$total_prod_qty     = (int)$prod_data['qty'] + (int)$prod_data['qty_free'];
+							// 	$bundle_coupon      = ((int)$prod_data['qty_free'] / $total_prod_qty) * 100;
+							// 	$to_subtract        = ($prod_price * $bundle_coupon) / 100;
+							// 	$bundle_price       = $prod_price - $to_subtract;
+							// 	$sum_price_regular  = $prod_price * $total_prod_qty;
+							// 	$bundle_price_total = $bundle_price * $total_prod_qty;
+							// 	$price_discount     = ($prod_price * $total_prod_qty) - $bundle_price_total;
 
-								// js input data package
-								$js_discount_type  = 'free';
-								$js_discount_qty   = $prod_data['qty_free'];
-								$js_discount_value = $prod_data['id_free'];
+							// 	// DEBUG
+							// 	// echo 'to subtract:' . $prod_price * ($bundle_coupon / 100) . '<br>';
+							// 	// echo 'final:' . $final . '<br>';
+							// 	// echo 'prod price: ' . $prod_price . '<br>';
+							// 	// echo 'discounted prod price: ' . $prod_price - $to_subtract . '<br>';
+							// 	// echo 'bundle price total: ' . $bundle_price_total . '<br>';
+							// 	// echo 'bundle price: ' . $bundle_price . '<br>';
+							// 	// echo 'sum price regular: ' . $sum_price_regular . '<br>';
+							// 	// echo 'bundle coupon: ' . $bundle_coupon . '<br>';
+							// 	// echo 'price discount: ' . $price_discount . '<br>';
 
-							// buy x get x off
-							elseif ($prod_data['type'] == 'off') :
+							// 	// js input data package
+							// 	$js_discount_type  = 'free';
+							// 	$js_discount_qty   = $prod_data['qty_free'];
+							// 	$js_discount_value = $prod_data['id_free'];
 
-								// // $prod_price         = $prod_price * $ex_rate;
-								$total_prod_qty     = $prod_data['qty'];
-								$i_tt               = $prod_price * $prod_data['qty'];
-								$bundle_coupon      = $prod_data['coupon'];
-								$bundle_price       = $prod_price - ($prod_price * ($bundle_coupon / 100));
-								$sum_price_regular  = $prod_price * $prod_data['qty'];
-								$bundle_price_total = $bundle_price * $prod_data['qty'];
-								$price_discount     = $i_tt - $bundle_price_total;
+							// // buy x get x off
+							// elseif ($prod_data['type'] == 'off') :
 
-							// *****************************
-							// BUNDLE TYPE: BUNDLED PRODUCTS
-							// *****************************
-							else :
+							// 	// // $prod_price         = $prod_price * $ex_rate;
+							// 	// $total_prod_qty     = (int)$prod_data['qty'];
+							// 	// $i_tt               = $prod_price * $prod_data['qty'];
+							// 	// $bundle_coupon      = (int)$prod_data['coupon'];
+							// 	// $bundle_price       = $prod_price - ($prod_price * ($bundle_coupon / 100));
+							// 	// $sum_price_regular  = $prod_price * $prod_data['qty'];
+							// 	// $bundle_price_total = $bundle_price * $prod_data['qty'];
+							// 	// $price_discount     = $i_tt - $bundle_price_total;
 
-								// total product qty
-								foreach ($prod_data['prod'] as $i => $i_prod) :
-									$total_prod_qty = $total_prod_qty + $i_prod['qty'];
-								endforeach;
+							// 	// // js input data package
+							// 	// $js_discount_type  = 'percentage';
+							// 	// $js_discount_qty   = 1;
+							// 	// $js_discount_value = $prod_data['coupon'];
 
-								// get bundle id
-								$bun_id = $prod_data['bun_id'];
+							// // *****************************
+							// // BUNDLE TYPE: BUNDLED PRODUCTS
+							// // *****************************
+							// else :
 
-								// get bundle data
-								$bundle_data = get_post_meta($bun_id, 'product_discount', true);
+							// 	// DEBUG
+							// 	// file_put_contents(MWC_PLUGIN_DIR . 'bundle.txt', print_r($prod_data, true));
+							// 	// echo '<pre>';
+							// 	// print_r($_SESSION);
+							// 	// echo '</pre>';
 
-								// echo '<pre>';
-								// print_r($bundle_data);
-								// echo '</pre>';
+							// 	// total product qty
+							// 	foreach ($prod_data['prod'] as $i => $i_prod) :
+							// 		$total_prod_qty = $total_prod_qty + $i_prod['qty'];
+							// 	endforeach;
 
-								// get bundle products
-								$bundle_products = array_column($bundle_data, 'post')[0];
+							// 	// get bundle id
+							// 	$bun_id = $prod_data['bun_id'];
 
-								// get pricing array
-								$pricing_array = $bundle_data['selValue_bun']['price_currency'];
+							// 	// get bundle data
+							// 	// $bundle_data = get_post_meta($bun_id, 'product_discount', true);
 
-								// bundle price (if custom defined for current currency, prioritize that, else calculate based on exchange rate)
-								$bundle_price = $pricing_array[$current_curr] != '' ? $pricing_array[$current_curr] : $pricing_array[$default_currency] * $ex_rate;
+							// 	// get pricing array
+							// 	$pricing_array = $bundle_data['selValue_bun']['price_currency'];
 
-								// calculate total regular price of bundle
-								$sum_price_regular = 0;
+							// 	// bundle price (if custom defined for current currency, prioritize that, else calculate based on exchange rate)
+							// 	$bundle_price = $pricing_array[$current_curr] != '' ? $pricing_array[$current_curr] : $prod_data['total_price'] * $ex_rate;
 
-								// loop through products
-								foreach ($bundle_products as $b_prod) :
+							// 	// // calculate total regular price of bundle
+							// 	// $sum_price_regular = 0;
 
-									//  get product object
-									$prod_obj = wc_get_product($b_prod['id']);
+							// 	// // loop through products
+							// 	// foreach ($prod_data['prod'] as $i => $i_prod) :
 
-									// get product type
-									$prod_type = $prod_obj->get_type();
+							// 	// 	//  get product object
+							// 	// 	$prod_obj = wc_get_product($i_prod['id']);
 
-									// if product is variable
-									if ($prod_type == 'variable') :
+							// 	// 	// get product type
+							// 	// 	$prod_type = $prod_obj->get_type();
 
-										// get first child
-										$var_id = $prod_obj->get_children()[0];
+							// 	// 	// if product is variable
+							// 	// 	if ($prod_type == 'variable') :
 
-										// get child object
-										$var_obj = wc_get_product($var_id);
+							// 	// 		// get first child
+							// 	// 		$var_id = $prod_obj->get_children()[0];
 
-										// get regular price
-										$prod_price = $var_obj->get_regular_price() * $b_prod['quantity'];
+							// 	// 		// get child object
+							// 	// 		$var_obj = wc_get_product($var_id);
 
-										// add price to total
-										$sum_price_regular += $prod_price;
+							// 	// 		// get regular price
+							// 	// 		$prod_price = $var_obj->get_regular_price();
 
-									// if product is simple
-									else :
+							// 	// 		// if not default currency, retrieve converted price, or calculate converted price
+							// 	// 		// if ($current_curr !== $default_currency) :
 
-										// retrieve regular price
-										$prod_price = $prod_obj->get_regular_price() * $b_prod['quantity'];
+							// 	// 			// if alg price is defined, use that, else calculate price based on exchange rate
+							// 	// 			// $prod_price =
+							// 	// 			// 	get_post_meta($var_id, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) != '' ?
+							// 	// 			// 	get_post_meta($var_id, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) :
+							// 	// 			// 	$prod_price * $ex_rate;
 
-										// add price to total
-										$sum_price_regular += $prod_price;
+							// 	// 		// 	// add price to total
+							// 	// 			$sum_price_regular += $prod_price;
 
-									endif;
+							// 	// 		// // if default currency, add price to total
+							// 	// 		// else :
+							// 	// 			// $sum_price_regular += $prod_price;
+							// 	// 		// endif;
 
-								endforeach;
+							// 	// 	// if product is simple
+							// 	// 	else :
 
-								// calculate discount %
-								$bundle_coupon = (($sum_price_regular - $bundle_price) / $sum_price_regular) * 100;
+							// 	// 		// retrieve regular price
+							// 	// 		$prod_price = $prod_obj->get_regular_price();
 
-								// js input data package
-								$js_discount_type  = 'percentage';
-								$js_discount_qty   = 1;
-								$js_discount_value = $bundle_coupon;
+							// 	// 		// if not default currency, retrieve converted price, or calculate converted price
+							// 	// 		// if ($current_curr !== $default_currency) :
 
-							endif;
+							// 	// 		// 	// if alg price is defined, use that, else calculate price based on exchange rate
+							// 	// 			// $prod_price =
+							// 	// 			// 	get_post_meta($i_prod['id'], "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) != '' ?
+							// 	// 			// 	get_post_meta($i_prod['id'], "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) :
+							// 	// 			// 	$prod_price * $ex_rate;
+
+							// 	// 		// 	// add price to total
+							// 	// 			$sum_price_regular += $prod_price;
+
+							// 	// 		// // if default currency, add price to total
+							// 	// 		// else :
+							// 	// 			// $sum_price_regular += $prod_price;
+							// 	// 		// endif;
+
+							// 	// 	endif;
+
+							// 	// endforeach;
+
+							// 	// calculate discount %
+							// 	$bundle_coupon = (($sum_price_regular - $bundle_price) / $sum_price_regular) * 100;
+
+							// 	// js input data package
+							// 	$js_discount_type  = 'percentage';
+							// 	$js_discount_qty   = 1;
+							// 	$js_discount_value = $bundle_coupon;
+
+							// endif;
 
 							//prevent Addon product to display here
 							if (in_array($p_id, $addon_products)) :
@@ -364,7 +499,7 @@ if (!empty($package_product_ids)) {
 							// ****************************
 							if ($prod_data['type'] == 'free' || $prod_data['type'] == 'off') : ?>
 
-								<div data-bundle-data="<?php echo base64_encode(json_encode($prod_data)) ?>" class="item-selection item-selection-h col-hover-focus mwc_item_div template_h mwc_item_div_<?php echo (trim($prod_data['bun_id'])) ?> op_c_package_option <?= (self::$package_default_id == $prod_data['bun_id']) ? 'mwc_selected_default_opt' : '' ?> col-lg-4 col-md-4 col-sm-4 col-xs-4" data-type="<?php echo ($prod_data['type']) ?>" data-bundle_id="<?php echo (trim($prod_data['bun_id'])) ?> " data-coupon="<?= $bundle_coupon ?>">
+								<div data-bundle-data="<?php echo base64_encode(json_encode($prod_data)) ?>" class="item-selection item-selection-h col-hover-focus mwc_item_div template_h mwc_item_div_<?php echo (trim($prod_data['bun_id'])) ?> op_c_package_option <?= (self::$package_default_id == $prod_data['bun_id']) ? 'mwc_selected_default_opt' : '' ?> col-lg-4 col-md-4 col-sm-4 col-xs-4" data-type="<?php echo ($prod_data['type']) ?>" data-bundle_id="<?php echo (trim($prod_data['bun_id'])) ?> " data-coupon="<?= $coupon ?>">
 
 								<?php
 							// ******************
@@ -372,7 +507,7 @@ if (!empty($package_product_ids)) {
 							// ******************
 							else : ?>
 
-									<div data-bundle-data="<?php echo base64_encode(json_encode($prod_data)) ?>" class="item-selection item-selection-h col-hover-focus mwc_item_div template_h mwc_item_div_<?php echo (trim($prod_data['bun_id'])) ?> op_c_package_option <?= (self::$package_default_id == $prod_data['bun_id']) ? 'mwc_selected_default_opt' : '' ?> col-lg-4 col-md-4 col-sm-4 col-xs-4" data-type="<?php echo ($prod_data['type']) ?>" data-bundle_id="<?php echo (trim($prod_data['bun_id'])) ?>" data-coupon="<?= $bundle_coupon ?>">
+									<div data-bundle-data="<?php echo base64_encode(json_encode($prod_data)) ?>" class="item-selection item-selection-h col-hover-focus mwc_item_div template_h mwc_item_div_<?php echo (trim($prod_data['bun_id'])) ?> op_c_package_option <?= (self::$package_default_id == $prod_data['bun_id']) ? 'mwc_selected_default_opt' : '' ?> col-lg-4 col-md-4 col-sm-4 col-xs-4" data-type="<?php echo ($prod_data['type']) ?>" data-bundle_id="<?php echo (trim($prod_data['bun_id'])) ?>" data-coupon="<?= $coupon ?>">
 
 									<?php endif; ?>
 
@@ -388,6 +523,7 @@ if (!empty($package_product_ids)) {
 
 										<div class="op_c_package_content" data-hover-image="<?php echo isset($prod_data['image_package_hover']) ? $prod_data['image_package_hover'] : '' ?>">
 
+											<!-- checkbox wrapper -->
 											<div class="mwc-checkbox-wrapper">
 												<label class="check_box">
 													<?php if ($prod_data['type'] == 'free' || $prod_data['type'] == 'off') :	?>
@@ -414,13 +550,15 @@ if (!empty($package_product_ids)) {
 												</h3>
 											<?php endif; ?>
 
-											<h2 class="mwc-title mt-2 mb-0"><?php echo $package_title ?></h2>
+											<!-- package title -->
+											<h2 class="mwc-title mt-2 mb-0"><?php echo $bundle_title ?></h2>
 
 											<!-- discount percent -->
 											<?php if (0 != $bundle_coupon) : ?>
 												<h4 class="mwc-discount-text mt-0 mb-0"><?php pll_e('Save', 'woocommerce') ?>: <?php echo round($bundle_coupon, 0) ?>%</h4>
 											<?php endif; ?>
 
+											<!-- package images (desktop, hover etc) -->
 											<div class="op_c_package_image mt-2 mb-0">
 												<?php if (wp_is_mobile() && $prod_data['image_package_mobile']) : ?>
 													<img src="<?php echo $prod_data['image_package_mobile'] ?>" class="attachment-woocommerce_thumbnail size-woocommerce_thumbnail" alt="">
@@ -467,19 +605,19 @@ if (!empty($package_product_ids)) {
 											else :	?>
 
 												<h3 class="mwc-sub-price mt-4 mb-0">
-													<strong><?php echo wc_price($bundle_price); ?></strong>
+													<strong><?php echo wc_price($per_product_bundle_price); ?></strong>
 													<span class="pi-price-each-txt"> / <?php echo __('each', 'woocommerce'); ?></span>
 												</h3>
 
 												<h4 class="mwc-total-price mt-2">
-													<?php echo wc_price($sum_price_regular); ?> <?php echo wc_price($bundle_price_total); ?>
+													<?php echo wc_price($regular_total); ?> <?php echo wc_price($bundle_total); ?>
 												</h4>
 
 												<!-- get prices bundle -->
-												<input type="hidden" class="mwc_bundle_price_hidden" data-label="<?= $bundle_title ?>" value="<?= $bundle_price_total ?>">
-												<input type="hidden" class="mwc_bundle_price_regular_hidden" data-label="<?= __('Old Price', 'woocommerce') ?>" value="<?= $sum_price_regular ?>">
-												<input type="hidden" class="mwc_bundle_price_sale_hidden" data-label="<?= __('Sale Price', 'woocommerce') ?>" value="<?= $sum_price_regular - $price_discount ?>">
-												<input type="hidden" class="mwc_bundle_product_qty_hidden" value="<?= $total_prod_qty ?>">
+												<input type="hidden" class="mwc_bundle_price_hidden" data-label="<?= $bundle_title ?>" value="<?= $bundle_total ?>">
+												<input type="hidden" class="mwc_bundle_price_regular_hidden" data-label="<?= __('Old Price', 'woocommerce') ?>" value="<?= $regular_total ?>">
+												<input type="hidden" class="mwc_bundle_price_sale_hidden" data-label="<?= __('Sale Price', 'woocommerce') ?>" value="<?= $bundle_total ?>">
+												<input type="hidden" class="mwc_bundle_product_qty_hidden" value="<?= $product_qty ?>">
 
 											<?php endif; ?>
 
@@ -495,7 +633,7 @@ if (!empty($package_product_ids)) {
 									<?php
 
 									// Tab content (variation dropdowns)
-									foreach ($package_product_ids as $opt_i => $prod_data) :
+									foreach ($bundle_data as $opt_i => $prod_data) :
 
 										/**
 										 * Code which checks for presence of variable

@@ -67,9 +67,6 @@ if (!class_exists('MWC')) :
 
             self::$initiated = true;
 
-            // disable coupons
-            add_filter('woocommerce_coupons_enabled', '__return_false');
-
             // script
             add_action('wp_footer', array(__CLASS__, 'mwc_load_resources'));
 
@@ -85,47 +82,8 @@ if (!class_exists('MWC')) :
             add_action('wp_ajax_mwc_get_price_summary_table', array(__CLASS__, 'mwc_get_price_summary_table'));
             add_action('wp_ajax_nopriv_mwc_get_price_summary_table', array(__CLASS__, 'mwc_get_price_summary_table'));
 
-            // action to remove all other discounts/coupons if mwc bundle in cart
-            add_action('woocommerce_coupon_is_valid', [__CLASS__, 'mwc_remove_other_coupons'], 10, 3);
-
-            // footer action to disable other coupons if mwc bundle is present on any page
-            add_action('wp_footer', [__CLASS__, 'mwc_disable_other_coupons']);
-
-            // action get price mwc package
-            // add_action('wp_ajax_mwc_get_price_package', array(__CLASS__, 'mwc_get_price_package'));
-            // add_action('wp_ajax_nopriv_mwc_get_price_package', array(__CLASS__, 'mwc_get_price_package'));
-
-            // action to set item prices to regular
-            add_action('woocommerce_before_calculate_totals', array(__CLASS__, 'mwc_cart_apply_regular_prices'), 10, 1);
-
-            // apply regular pricing to mini cart
-            // add_filter('woocommerce_cart_item_price', [__CLASS__, 'mwc_apply_regular_price_mini_cart'], 30, 3);
-
-            // update mini cart prices
-            // add_action('wp_footer', array(__CLASS__, 'mwc_update_minicart_prices'));
-
-            // action to apply cart discount
-            // add_action('woocommerce_cart_calculate_fees', array(__CLASS__, 'mwc_apply_cart_discounts'));
-
-            /**
-             * Append bundle name to cart item name
-             */
-            add_filter('woocommerce_cart_item_name', function ($product_name, $cart_item, $cart_item_key) {
-                if (
-                    isset($cart_item['mwc_bun_discount'])
-                    || isset($cart_item['mwc_off_discount'])
-                    || isset($cart_item['mwc_bun_free_prod'])
-                    || isset($cart_item['mwc_bun_paid_prod'])
-                ) {
-
-                    // get bundle label
-                    $bundle_label  = $_SESSION['mwc_bundle_label'] ? __($_SESSION['mwc_bundle_label'], 'woocommerce') : __('Bundle Discount', 'woocommerce');
-
-                    // append to product name in cart
-                    $product_name .= '<br><p class="woocommerce-cart-item-bundle-discount">' . $bundle_label . '</p>';
-                }
-                return $product_name;
-            }, 10, 3);
+            // // action to set item prices to regular
+            add_action('woocommerce_before_calculate_totals', array(__CLASS__, 'mwc_cart_apply_regular_prices'), PHP_INT_MAX, 1);
 
             /*****************************
              * Add bundle discount as fee
@@ -136,38 +94,165 @@ if (!class_exists('MWC')) :
                     return;
                 }
 
-                if (
-                    isset($cart_item['mwc_bun_discount'])
-                    || isset($cart_item['mwc_off_discount'])
-                    || isset($cart_item['mwc_bun_free_prod'])
-                    || isset($cart_item['mwc_bun_paid_prod'])
-                ) :
+                // get bundle id from session
+                $bundle_id = WC()->session->get('mwc_bundle_id');
 
-                    // current currency
-                    $current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_option('woocommerce_currency');
+                // file put contents bundle id
+                // file_put_contents(MWC_PLUGIN_DIR . 'bundle_id.txt', print_r($bundle_id, true));
 
-                    // get default currency
-                    $default_currency = get_option('woocommerce_currency');
+                // get bundle data
+                $bundle_data = get_post_meta($bundle_id, 'product_discount', true);
 
-                    // get alg exchange rate
-                    $ex_rate = get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") ? get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") : 1;
+                // file put contents bundle data
+                // file_put_contents(MWC_PLUGIN_DIR . 'bundle_data.txt', print_r($bundle_data, true), FILE_APPEND);
+
+                // find bundle products and associated quantities
+
+                // ------------
+                // type bundle
+                // ------------
+                if ($bundle_data['selValue'] == 'bun') :
+
+                    // get products
+                    $product_data = array_column($bundle_data, 'post')[0];
+
+                    // sum values of all 'quantity' keys in $product_data array
+                    $bundle_product_quantity = array_sum(array_column($product_data, 'quantity'));
+
+                // ---------
+                // type off
+                // ---------
+                elseif ($bundle_data['selValue'] == 'off') :
+
+                    // get product qty
+                    $product_data = $bundle_data['selValue_off'];
+                    $bundle_product_quantity = $product_data['quantity'];
+
+                // ---------
+                // type free
+                // ---------
+                elseif ($bundle_data['selValue'] == 'free') :
+                    $bundle_product_quantity = array_sum(array_column($bundle_data, 'quantity'));
+                endif;
+
+                // file put contents product data
+                // file_put_contents(MWC_PLUGIN_DIR . 'product_data.txt', print_r($product_data, true), FILE_APPEND);
+
+                // file put contents bundle product quantity
+                // file_put_contents(MWC_PLUGIN_DIR . 'bundle_product_quantity.txt', print_r($bundle_product_quantity, true));
+
+                // get cart contents
+                $cart_contents = WC()->cart->get_cart_contents();
+
+                // bundle type
+                $bundle_type = '';
+
+                // mwc product count
+                $mwc_prod_count = 0;
+
+                // discount percent
+                $discount_percent = 0;
+
+                // free product count in the case of free and paid products
+                $free_prod_count = 0;
+
+                // paid product count in the case of free and paid products
+                $paid_prod_count = 0;
+
+                // loop through cart contents and check for cart item meta 'mwc_bun_discount' or 'mwc_off_discount' or 'mwc_bun_free_prod' or 'mwc_bun_paid_prod'
+                foreach ($cart_contents as $cart_item) :
+
+                    // set bundle type
+                    if (isset($cart_item['mwc_bun_discount'])) :
+                        $bundle_type = 'bundle';
+                    elseif (isset($cart_item['mwc_off_discount'])) :
+                        $bundle_type = 'off';
+                    elseif (isset($cart_item['mwc_bun_free_prod'])) :
+                        $bundle_type = 'free';
+                    else :
+                        $bundle_type = null;
+                    endif;
+
+                    // if any mwc item is present, increment mwc product count
+                    if (isset($cart_item['mwc_bun_discount']) || isset($cart_item['mwc_off_discount']) || isset($cart_item['mwc_bun_free_prod']) || isset($cart_item['mwc_bun_paid_prod'])) :
+                        $mwc_prod_count += $cart_item['quantity'];
+                    endif;
+
+                    // if is bundle discount or off discount, get/set discount %
+                    if (isset($cart_item['mwc_bun_discount']) || isset($cart_item['mwc_off_discount'])) :
+
+                        $discount_percent = isset($cart_item['mwc_bun_discount']) ? $cart_item['mwc_bun_discount'] : $cart_item['mwc_off_discount'] ?? 0;
+
+                        // skip to next iteration
+                        continue;
+
+                    endif;
+
+                    // count free products
+                    if (isset($cart_item['mwc_bun_free_prod'])) :
+                        $free_prod_count += $cart_item['quantity'];
+                    endif;
+
+                    // count paid products
+                    if (isset($cart_item['mwc_bun_paid_prod'])) :
+                        $paid_prod_count += $cart_item['quantity'];
+                    endif;
+
+                endforeach;
+
+                // file put contents paid and free product count
+                // file_put_contents(MWC_PLUGIN_DIR . 'paid_and_free_prod_count.txt', print_r($paid_prod_count . ' ' . $free_prod_count, true));
+
+                // file put contents bundle type
+                // file_put_contents(MWC_PLUGIN_DIR . 'bundle_type.txt', print_r($bundle_type, true));
+
+                // if free product count and paid product count is not 0, calculate discount percent
+                if ($free_prod_count != 0 && $paid_prod_count != 0) :
+                    $discount_percent = ($free_prod_count / $bundle_product_quantity) * 100;
+                endif;
+
+                // file put contents discount percent
+                // file_put_contents(MWC_PLUGIN_DIR . 'discount_percent.txt', print_r($discount_percent, true));
+
+                // if discount percent is not 0, calculate fee
+                if ($discount_percent != 0 && $bundle_product_quantity == $mwc_prod_count) :
 
                     //  get cart total
                     $cart_total = WC()->cart->subtotal;
 
-                    // get mwc bundle total from session
-                    $mwc_bundle_total = $_SESSION['mwc_bundle_discounted_total'];
+                    // calculate fee
+                    $bundle_fee = ($cart_total * $discount_percent) / 100;
 
-                    // get bundle title from session
-                    $bundle_label  = $_SESSION['mwc_bundle_label'] ? __($_SESSION['mwc_bundle_label'], 'woocommerce') : __('Bundle Discount', 'woocommerce');
+                    // // file put contents discounted total
+                    // file_put_contents(MWC_PLUGIN_DIR . 'discounted_total.txt', print_r($mwc_bundle_total, true));
 
-                    // if cart total > bundle total, calc fee by subtracting bundle total from cart total
-                    if ($cart_total > $mwc_bundle_total) :
-                        $fee = ($cart_total - $mwc_bundle_total) / $ex_rate;  // Define your fee amount
-                        WC()->cart->add_fee(__($bundle_label, 'woocommerce'), -$fee);
+                    // set up discount fee name based on bundle type
+                    switch ($bundle_type) {
+                        case 'bundle':
+                            $bundle_label = sprintf(__('Bundle Discount - %s%%', 'woocommerce'), round($discount_percent));
+                            break;
+                        case 'off':
+                            $bundle_label = sprintf(__('Buy %s Get %s%% Off', 'woocommerce'), $mwc_prod_count, round($discount_percent));
+                            break;
+                        case 'free':
+                            $bundle_label = sprintf(__('Buy %s Get %s Free', 'woocommerce'), $paid_prod_count, $free_prod_count);
+                            break;
+                        default:
+                            $bundle_label = __('Bundle Discount', 'woocommerce');
+                            break;
+                    }
+
+                    if ($bundle_fee != 0) :
+                        // $bundle_fee = $bundle_fee * $ex_rate;  // Define your fee amount
+
+                        // file put contents fee
+                        // file_put_contents(MWC_PLUGIN_DIR . 'fee.txt', print_r($bundle_fee, true));
+
+                        WC()->cart->add_fee($bundle_label, -$bundle_fee);
                     endif;
+
                 endif;
-            });
+            }, PHP_INT_MAX);
 
             // action add referer to order note
             add_action('woocommerce_order_status_processing', array(__CLASS__, 'mwc_add_referer_url_order_note'), 10, 1);
@@ -175,6 +260,7 @@ if (!class_exists('MWC')) :
             // register PLL strings
             self::mwc_pll_register_strings();
         }
+
 
         /**
          * add_referer_url_order_note

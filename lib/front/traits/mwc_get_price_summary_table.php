@@ -40,17 +40,51 @@ if (!trait_exists('GetPriceSummaryTable')) :
             $ex_rate = get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") ? get_option("alg_currency_switcher_exchange_rate_{$default_currency}_{$current_curr}") : 1;
 
             // get product ids and variation attributes
-            $prod_ids    = $_POST['product_ids'];
-            $var_attribs = $_POST['var_attribs'];
+            // $prod_ids    = $_POST['product_ids'];
+            // $var_attribs = $_POST['var_attribs'];
 
             // discount percentage
             $discount_perc = $_POST['disc_perc'];
 
-            // get bundle type from bundle id
-            $bundle_data = get_post_meta($_POST['bundle_id'], 'product_discount', true);
+            // wp_send_json($discount_perc);
+
+            // get bundle data
+            $bundle_data = get_post_meta(trim($_POST['bundle_id']), 'product_discount', true);
+
+            // file put contents bundle data
+            // file_put_contents(MWC_PLUGIN_DIR . 'bundle_data.txt', print_r($bundle_data, true), FILE_APPEND);
+
+            // find bundle products and associated quantities
+
+            // ------------
+            // type bundle
+            // ------------
+            if ($bundle_data['selValue'] == 'bun') :
+
+                // get products
+                $product_data = array_column($bundle_data, 'post')[0];
+
+                // sum values of all 'quantity' keys in $product_data array
+                $product_qty = array_sum(array_column($product_data, 'quantity'));
+
+            // ---------
+            // type off
+            // ---------
+            elseif ($bundle_data['selValue'] == 'off') :
+
+                // get product qty
+                $product_data = $bundle_data['selValue_off'];
+                $product_qty = $product_data['quantity'];
+
+            // ---------
+            // type free
+            // ---------
+            elseif ($bundle_data['selValue'] == 'free') :
+                $product_qty = array_sum(array_column($bundle_data, 'quantity'));
+            endif;
 
             // product qty
-            $product_qty = intval($_POST['product_qty']);
+            // $product_qty = intval($_POST['product_qty']);
 
             // get bundle type
             $bun_type = $bundle_data['selValue'];
@@ -63,14 +97,11 @@ if (!trait_exists('GetPriceSummaryTable')) :
             // -----------------------
             if ($bun_type == 'bun') :
 
-                // reset product qty
-                $product_qty = 0;
-
                 // get products
-                $prods = $bundle_data['selValue_bun']['post'];
+                $prods = array_column($bundle_data, 'post')[0];
 
                 // get custom pricing array
-                $custom_pricing = $bundle_data['selValue_bun']['price_currency'];
+                $custom_pricing = array_column($bundle_data, 'price_currency')[0];
 
                 // get custom price for current currency
                 $custom_price = $custom_pricing[$current_curr];
@@ -101,24 +132,7 @@ if (!trait_exists('GetPriceSummaryTable')) :
                         // add to product qty
                         $product_qty += $prod['quantity'];
 
-                        // wp_send_json($prod_price);
-
-                        // if not default currency, retrieve converted price, or calculate converted price
-                        if ($current_curr !== $default_currency) :
-
-                            // if alg price is defined, use that, else calculate price based on exchange rate
-                            $prod_price =
-                                get_post_meta($var_id, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) ?
-                                get_post_meta($var_id, "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) :
-                                $prod_price * $ex_rate;
-
-                            // add price to total
-                            $b_total_arr[] = $prod_price;
-
-                        // if default currency, add price to total
-                        else :
-                            $b_total_arr[] = $prod_price;
-                        endif;
+                        $b_total_arr[] = $prod_price;
 
                     // if product is simple
                     else :
@@ -126,58 +140,20 @@ if (!trait_exists('GetPriceSummaryTable')) :
                         // retrieve regular price
                         $prod_price = $prod_obj->get_regular_price() * $prod['id'];
 
-                        // if not default currency, retrieve converted price, or calculate converted price
-                        if ($current_curr !== $default_currency) :
-
-                            // if alg price is defined, use that, else calculate price based on exchange rate
-                            $prod_price =
-                                get_post_meta($prod['id'], "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) ?
-                                get_post_meta($prod['id'], "_alg_currency_switcher_per_product_regular_price_{$current_curr}", true) :
-                                $prod_price * $ex_rate;
-
-                            // add price to total
-                            $b_total_arr[] = $prod_price;
-
-                        // if default currency, add price to total
-                        else :
-                            $b_total_arr[] = $prod_price;
-                        endif;
+                        $b_total_arr[] = $prod_price;
 
                     endif;
 
                 endforeach;
 
-                // wp_send_json($b_total_arr);
-
                 // calculate $b_total_arr total
-                $b_total_arr_sum = array_sum($b_total_arr);
-                $b_total_full = $b_total_arr_sum;
+                $b_total_full = array_sum($b_total_arr);
 
                 // calculate discounted total
                 $b_discounted_total = $custom_price !== '' ? $custom_price : $b_total_full - ($b_total_full * ($discount_perc / 100));
 
-                // wp_send_json('bd: '.$b_discounted_total);
-
                 // calculate discounted product price
                 $p_price = $b_discounted_total / $product_qty;
-
-                // if only setting base pricing
-                if ($_POST['setting_bundle_pricing']) :
-
-                    $b_pricing = [
-                        'is_bundle' => true,
-                        'old_total' => '<del>' . wc_price($b_total_full, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</del>',
-                        'mc_total'  => wc_price($b_discounted_total, ['ex_tax_label' => false, 'currency' => $current_curr]),
-                    ];
-
-                endif;
-
-                // add mwc data to session for later ref
-                $_SESSION['mwc_bundle_total_full']       = $b_total_full;
-                $_SESSION['mwc_bundle_discounted_total'] = $b_discounted_total;
-                $_SESSION['mwc_product_price']           = $p_price;
-                $_SESSION['mwc_bundle_discount_perc']    = $discount_perc;
-                $_SESSION['mwc_bundle_label']            = $_POST['bundle_label'];
 
                 // setup default/failed response
                 $return = [
@@ -190,13 +166,13 @@ if (!trait_exists('GetPriceSummaryTable')) :
                 // old price
                 $html .= '<tr id="mwc-summ-old-price">';
                 $html .= '<td>' . __('Old Price', 'woocommerce') . '</td>';
-                $html .= '<td style="text-align: right;"><del>' . wc_price($b_total_full, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</del></td>';
+                $html .= '<td style="text-align: right;"><del>' . wc_price($b_total_full) . '</del></td>';
                 $html .= '</tr>';
 
                 // bundle price
                 $html .= '<tr id="mwc-summ-bundle-price">';
                 $html .= '<td>' . $_POST['bundle_label'] . '</td>';
-                $html .= '<td style="text-align: right;">' . wc_price($b_discounted_total, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</td>';
+                $html .= '<td style="text-align: right;">' . wc_price($b_discounted_total) . '</td>';
                 $html .= '</tr>';
 
                 // get shipping total
@@ -214,7 +190,7 @@ if (!trait_exists('GetPriceSummaryTable')) :
 
                 if ($shipping_total) :
 
-                    $html .= '<td  style="text-align: right"><span class="amount">' . wc_price($shipping_total, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</span></td>';
+                    $html .= '<td  style="text-align: right"><span class="amount">' . wc_price($shipping_total) . '</span></td>';
                     $b_discounted_total += $shipping_total;
 
                 else :
@@ -226,7 +202,7 @@ if (!trait_exists('GetPriceSummaryTable')) :
                 $html .= '</tr>';
                 $html .= '<tr id="mwc-summ-bun-total">';
                 $html .= '<td><b>' . __('Total', 'woocommerce') . '</b></td>';
-                $html .= '<td style="text-align: right"><b>' . wc_price($b_discounted_total, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</b></td>';
+                $html .= '<td style="text-align: right"><b>' . wc_price($b_discounted_total) . '</b></td>';
                 $html .= '</tr>';
                 $html .= '</table>';
 
@@ -235,8 +211,8 @@ if (!trait_exists('GetPriceSummaryTable')) :
                     'status'    => true,
                     'is_bundle' => true,
                     'html'      => $html,
-                    'old_total' => __('<b>Normal Price:</b> <del>' . wc_price($b_total_full, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</del><br>', 'woocommerce'),
-                    'mc_total'  => __('<b>Bundle Price:</b> ' . wc_price($b_discounted_total, ['ex_tax_label' => false, 'currency' => $current_curr]), 'woocommerce'),
+                    'old_total' => __('<b>Normal Price:</b> <del>' . wc_price($b_total_full) . '</del><br>', 'woocommerce'),
+                    'mc_total'  => __('<b>Bundle Price:</b> ' . wc_price($b_discounted_total), 'woocommerce'),
                 ];
 
                 // send json
@@ -247,58 +223,46 @@ if (!trait_exists('GetPriceSummaryTable')) :
             // ----------------------------------
             else :
 
-                // get individual prices
-                foreach ($prod_ids as $index => $prod_id) :
+                // get products
+                $prods = array_column($bundle_data, 'post');
 
-                    $attrib     = $var_attribs[$index];
-                    $prod       = wc_get_product($prod_id);
-                    $variations = $prod->get_available_variations();
+                // loop and get product prices and qtys
+                foreach ($prods as $prod) :
 
-                    // get individual price
-                    foreach ($variations as $variation) :
+                    //  get product object
+                    $prod_obj = wc_get_product($prod['id']);
 
-                        $v_attribs = $variation['attributes'];
+                    // get product type
+                    $prod_type = $prod_obj->get_type();
 
-                        if (in_array($attrib, $v_attribs)) :
-                            $b_total_arr[] = $variation['display_regular_price'] ? $variation['display_regular_price'] : $variation['display_price'];
-                        endif;
+                    // if product is variable
+                    if ($prod_type == 'variable') :
 
-                    endforeach;
+                        // get first child
+                        $var_id = $prod_obj->get_children()[0];
+
+                        // get child object
+                        $var_obj = wc_get_product($var_id);
+
+                        // get regular price
+                        $b_total_full = $var_obj->get_regular_price() * $product_qty;
+
+                    // if product is simple
+                    else :
+
+                        // retrieve total regular price
+                        $b_total_full = $prod_obj->get_regular_price() * $product_qty;
+
+                    endif;
 
                 endforeach;
 
-                // calculate $b_total_arr total
-                $b_total_arr_sum = array_sum($b_total_arr);
-
-                $b_total_full = $b_total_arr_sum;
 
                 // calculate discounted total
                 $b_discounted_total = $b_total_full - ($b_total_full * ($discount_perc / 100));
 
                 // calculate discounted product price
                 $p_price = $b_discounted_total / $product_qty;
-
-                // if only setting base pricing
-                if ($_POST['setting_bundle_pricing']) :
-
-                    $b_pricing = [
-                        'is_bundle' => false,
-                        'old_total' => '<del>' . wc_price($b_total_full, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</del>',
-                        'mc_total'  => wc_price($b_discounted_total, ['ex_tax_label' => false, 'currency' => $current_curr]),
-                        'p_price'   => '<b>' . wc_price($p_price, ['ex_tax_label' => false, 'currency' => $current_curr]) . __('</b> / Each', 'woocommerce')
-                    ];
-
-                    // send json
-                    wp_send_json($b_pricing);
-
-                endif;
-
-                // add mwc data to session for later ref
-                $_SESSION['mwc_bundle_total_full']       = $b_total_full;
-                $_SESSION['mwc_bundle_discounted_total'] = $b_discounted_total;
-                $_SESSION['mwc_product_price']           = $p_price;
-                $_SESSION['mwc_bundle_discount_perc']    = $discount_perc;
-                $_SESSION['mwc_bundle_label']            = $_POST['bundle_label'];
 
                 // setup default/failed response
                 $return = [
@@ -311,13 +275,13 @@ if (!trait_exists('GetPriceSummaryTable')) :
                 // old price
                 $html .= '<tr id="mwc-summ-old-price">';
                 $html .= '<td>' . __('Old Price', 'woocommerce') . '</td>';
-                $html .= '<td style="text-align: right;"><del>' . wc_price($b_total_full, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</del></td>';
+                $html .= '<td style="text-align: right;"><del>' . wc_price($b_total_full) . '</del></td>';
                 $html .= '</tr>';
 
                 // bundle price
                 $html .= '<tr id="mwc-summ-bundle-price">';
                 $html .= '<td>' . $_POST['bundle_label'] . '</td>';
-                $html .= '<td style="text-align: right;">' . wc_price($b_discounted_total, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</td>';
+                $html .= '<td style="text-align: right;">' . wc_price($b_discounted_total) . '</td>';
                 $html .= '</tr>';
 
                 // get shipping total
@@ -335,7 +299,7 @@ if (!trait_exists('GetPriceSummaryTable')) :
 
                 if ($shipping_total) :
 
-                    $html .= '<td  style="text-align: right"><span class="amount">' . wc_price($shipping_total, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</span></td>';
+                    $html .= '<td  style="text-align: right"><span class="amount">' . wc_price($shipping_total) . '</span></td>';
                     $b_discounted_total += $shipping_total;
 
                 else :
@@ -347,18 +311,18 @@ if (!trait_exists('GetPriceSummaryTable')) :
                 $html .= '</tr>';
                 $html .= '<tr id="mwc-summ-bun-total">';
                 $html .= '<td><b>' . __('Total', 'woocommerce') . '</b></td>';
-                $html .= '<td style="text-align: right"><b>' . wc_price($b_discounted_total, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</b></td>';
+                $html .= '<td style="text-align: right"><b>' . wc_price($b_discounted_total) . '</b></td>';
                 $html .= '</tr>';
                 $html .= '</table>';
 
                 // setup response
                 $return = [
                     'status'    => true,
-                    'is_bundle' => true,
+                    'is_bundle' => false,
                     'html'      => $html,
-                    'old_total' => '<del>' . wc_price($b_total_full, ['ex_tax_label' => false, 'currency' => $current_curr]) . '</del>',
-                    'mc_total'  => wc_price($b_discounted_total, ['ex_tax_label' => false, 'currency' => $current_curr]),
-                    'p_price'   => '<b>' . wc_price($p_price, ['ex_tax_label' => false, 'currency' => $current_curr]) . __('</b> / Each', 'woocommerce')
+                    'old_total' => '<del>' . wc_price($b_total_full) . '</del>',
+                    'mc_total'  => wc_price($b_discounted_total),
+                    'p_price'   => '<b>' . wc_price($p_price) . __('</b> / Each', 'woocommerce')
                 ];
 
                 // send json

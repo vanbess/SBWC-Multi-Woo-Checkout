@@ -27,42 +27,17 @@ if (!trait_exists('ApplyRegPriceCart')) :
             // if current currency is not default currency, get exchange rate
             $ex_rate = $current_curr != $default_curr ? get_option("alg_currency_switcher_exchange_rate_{$default_curr}_{$current_curr}") : 1;
 
-            // mwc product count
-            global $mwc_prod_count;
-
-            // if product count is less than $mwc_prod_count, remove all fees from cart
-            if (wc()->cart->get_cart_contents_count() < $mwc_prod_count) :
-
-                // get fees
-                $fees = wc()->cart->get_fees();
-
-                // remove fees
-                foreach ($fees as $key => $fee) :
-                    unset($fees[$key]);
-                endforeach;
-
-            endif;
-
             // loop through cart items and set regular price (alg price if defined, else woocommerce regular price)
             foreach ($cart->get_cart() as $cart_item_key => $cart_item) :
 
                 // get product object
                 $product = $cart_item['data'];
 
-                // get product id
-                $product_id = $product->get_id();
-
-                // get regular price
-                $reg_price = get_post_meta($product_id, "alg_currency_switcher_per_product_regular_price_{$current_curr}", true) ?
-                    get_post_meta($product_id, "alg_currency_switcher_per_product_regular_price_{$current_curr}", true) :
-                    get_post_meta($product_id, '_regular_price', true);
-
                 // debug
                 // $cart_item['data']->set_price($reg_price);
-                $cart_item['data']->set_price($reg_price * $ex_rate);
+                $cart_item['data']->set_price($product->get_regular_price() / $ex_rate);
 
             endforeach;
-
         }
     }
 

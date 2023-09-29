@@ -29,7 +29,7 @@ if (!trait_exists('MWC_Remove_Other_Coupons')) :
         public static function mwc_disable_other_coupons()
         {
             // debug - var dump wc session data
-            var_dump(wc()->session->get('is_mwc_bundle'));
+            // var_dump(wc()->session->get('is_mwc_bundle'));
 
             // if current page or post content contains text "mwc_one_page_checkout" and is post type 'offer' or 'landing' or 'collection', set wc session to "is_mwc_bundle" = "yes"
             if (is_singular(['offer', 'landing', 'collection']) && strpos(get_the_content(), 'mwc_one_page_checkout') !== false) :
