@@ -12,6 +12,11 @@ if (!trait_exists('LoadResources')) :
         public static function mwc_load_resources()
         {
 
+            // if is not post type offer or landing, return
+            if (!is_singular(['offer', 'landing'])) :
+                return;
+            endif;
+
             global $woocommerce;
 
             // setup cart and checkout urls
