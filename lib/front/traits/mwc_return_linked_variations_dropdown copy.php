@@ -334,22 +334,26 @@ if (!trait_exists('ReturnLinkedProdVarDD')) :
                                                     else :
 
                                                         if ($attr_img) :
-															$attr_image = '';
-															$attr_image = wp_get_attachment_image_src( $attr_img, array( 32, 32 ) );
-															if ( $attr_image ) {
-																$attr_image = $attr_image[0];
-															}
 
-															if ( ! $attr_image ) {
-																$attr_image = wc_placeholder_img_src( array( 32, 32 ) );
-															}
-															?>
+                                                            $attr_image = '';
+                                                            $attr_image = wp_get_attachment_image_src($attr_img, array(32, 32));
 
-															<label selectedid="" class="wcvaswatchlabel wcvaround linked_product selected" data-attribute_name="attribute_pa_color" data-option="<?php echo filter_var($valueplugify[0]); ?>" data-linked_id="<?php echo $valueplugify[1] ?>" style="background-image:url('<?php echo filter_var($attr_image); ?>'); width: 32px; height: 32px; "></label>
-												
-															<?php
+                                                            if ($attr_image) :
+                                                                $attr_image = $attr_image[0];
+                                                            endif;
 
-															do_action( 'qm/debug', 'imgclasssmallactive 2' );
+                                                            if (!$attr_image) :
+                                                                $attr_image = wc_placeholder_img_src(array(32, 32));
+                                                            endif;
+                                                        ?>
+                                                            <div class="imgclasssmallactive tooltipplugify" style="margin: 0 5px;width:35px;height: 35px;border-radius: 50%;overflow: hidden;border: 1px solid green;">
+                                                                <img class="child_class_plugify" style="height: 35px;text-align: center;" src="<?php echo filter_var($attr_image); ?>">
+                                                                <div class="tooltiptextplugify">
+                                                                    <?php echo filter_var($valueplugify[0]); ?>
+                                                                </div>
+                                                            </div>
+                                                        <?php
+
                                                         else :
                                                         ?>
                                                             <div class="imgclasssmallactive" style="width:auto; border-radius: 2px;padding: 3px;border: 1px solid green;">
@@ -415,23 +419,36 @@ if (!trait_exists('ReturnLinkedProdVarDD')) :
                                                         <?php
                                                     else :
                                                         if ($attr_img) :
-															$attr_image = '';
-															$attr_image = wp_get_attachment_image_src( $attr_img, array( 32, 32 ) );
-															if ( $attr_image ) {
-																$attr_image = $attr_image[0];
-															}
 
-															if ( ! $attr_image ) {
-																$attr_image = wc_placeholder_img_src( array( 32, 32 ) );
-															}
-															?>
+                                                            $attr_image = '';
+                                                            $attr_image = wp_get_attachment_image_src($attr_img, array(32, 32));
 
-															<label selectedid="" class="wcvaswatchlabel wcvaround linked_product <?php echo ( empty( $style_cursor ) ? '' : 'disabled'  ) ?>" data-attribute_name="attribute_pa_color" data-option="<?php echo filter_var($valueplugify[0]); ?>" img-src="<?php echo get_the_post_thumbnail_url($valueplugify[1], 'single-post-thumbnail'); ?>" data-linked_id="<?php echo $valueplugify[1] ?>" style="background-image:url('<?php echo filter_var($attr_image); ?>'); width: 32px; height: 32px; <?php echo $style_cursor; ?>"></label>
+                                                            if ($attr_image) :
+                                                                $attr_image = $attr_image[0];
+                                                            endif;
 
-															<?php
+                                                            if (!$attr_image) :
+                                                                $attr_image = wc_placeholder_img_src(array(32, 32));
+                                                            endif;
+                                                        ?>
+                                                            <div class="linked_product imgclasssmall tooltipplugify <?php echo (empty($style_cursor) ? '' : 'disabled') ?>" style="margin: 0 5px;width:35px;height:35px;border-radius: 50%;overflow: hidden;border: 1px solid #ddd; <?php echo filter_var($style_cursor); ?>">
 
-															
-															do_action( 'qm/debug', 'imgclasssmallactive 2-1' );
+                                                                <a style="<?php echo filter_var($style_cursor); ?>" <?php echo filter_var($htmllpluigg); ?> <?php echo filter_var($is_hyper); ?> class="aclass-clr" href="<?php echo filter_var(get_permalink($valueplugify[1])); ?>">
+                                                                    <img class="child_class_plugify" style="height: 35px;text-align: center;" src="<?php echo filter_var($attr_image); ?>">
+                                                                </a>
+
+                                                                <div class="tooltiptextplugify">
+                                                                    <?php
+                                                                    if ('true' == $is_out_of_stock) :
+                                                                        echo esc_attr_e('Out Of Stock', 'woocommerce');
+                                                                    else :
+                                                                        echo filter_var($valueplugify[0]);
+                                                                    endif;
+                                                                    ?>
+                                                                </div>
+                                                            </div>
+
+                                                        <?php
                                                         else :
                                                         ?>
                                                             <div class="linked_product imgclasssmall <?php echo (empty($style_cursor) ? '' : 'disabled') ?>" style="width:auto;border-radius: 2px;padding: 3px;border: 1px solid #ddd; background-color: <?php echo sanitize_hex_color($attr_value);
@@ -443,7 +460,6 @@ if (!trait_exists('ReturnLinkedProdVarDD')) :
                             </div>
 
 <?php
-															do_action( 'qm/debug', 'imgclasssmallactive 2-2' );
                                                         endif;
                                                     endif;
                                                 endif;
