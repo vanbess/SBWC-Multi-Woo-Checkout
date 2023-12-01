@@ -6,6 +6,11 @@ $currency              = get_woocommerce_currency_symbol();
 $package_product_ids   = self::$package_product_ids;
 $package_number_item_2 = self::$package_number_item_2;
 
+// debug
+// echo '<pre>';
+// print_r($package_product_ids);
+// echo '</pre>';
+
 if (!empty($package_product_ids)) {
 
     // ********************************************
@@ -55,6 +60,74 @@ if (!empty($package_product_ids)) {
 
 ?>
 
+
+    <!-- debug js -->
+    <script id="mwc-template-d-debug-js">
+        $ = jQuery.noConflict();
+
+        $(window).load(function() {
+
+            // debug
+            // console.log('mwc-template-d-debug-js loaded');
+
+            // on load
+            $('.productRadioListItem').each(function(index, element) {
+
+                if ($(this).hasClass('mwc_active_product')) {
+
+                    let discount_total = $('.discount-total').text();
+                    let grand_total = $('.grand-total').text();
+
+                    // regex replace everything in totals but numbers and dots
+                    let regex = /[^0-9.]/g;
+
+                    discount_total = discount_total.replace(regex, '');
+                    grand_total = grand_total.replace(regex, '');
+
+                    let discount_percentage = (discount_total / grand_total) * 100;
+
+                    // debug
+                    // console.log('discount_percentage', discount_percentage);
+
+                    $('.label_text').text(parseFloat(discount_percentage).toFixed(0) + '% OFF');
+
+                    $('.label_secondary_text').text('Your ' + parseFloat(discount_percentage).toFixed(0) + '% Discount Has Been Applied');
+                }
+
+            });
+
+            // on click
+            $('.productRadioListItem').click(function() {
+
+                setTimeout(() => {
+                    let discount_total = $('.discount-total').text();
+                    let grand_total = $('.grand-total').text();
+
+                    // regex replace everything in totals but numbers and dots
+                    let regex = /[^0-9.]/g;
+
+                    discount_total = discount_total.replace(regex, '');
+                    grand_total = grand_total.replace(regex, '');
+
+                    // let discount_percentage = (discount_total / grand_total) * 100;
+                    let discount_percentage = parseFloat(discount_total) / (parseFloat(discount_total) + parseFloat(grand_total)) * 100;
+
+                    console.log(parseFloat(discount_total) + parseFloat(grand_total));
+
+                    // debug
+                    console.log('discount_percentage', discount_percentage);
+
+                    $('.label_text').text(parseFloat(discount_percentage).toFixed(0) + '% OFF');
+
+                    $('.label_secondary_text').text('Your ' + parseFloat(discount_percentage).toFixed(0) + '% Discount Has Been Applied');
+
+                }, 100);
+
+            });
+
+        });
+    </script>
+
     <div class="opc_style_d_container">
 
         <input type="hidden" id="step_2_of_3" value="<?php pll_e("Step 2: Customer Information", "woocommerce") ?>">
@@ -68,21 +141,23 @@ if (!empty($package_product_ids)) {
 
                             <!-- discount banner box select -->
                             <div class="banner_discount">
-                                <div class="label_discount">
-                                    <div class="border_inside"></div>
-                                    <div class="label_text">
-                                        50%<br><?= __('OFF', 'woocommerce') ?>
+
+                                <div class="label_discount_cont">
+                                    <div class="label_discount">
+                                        <div class="border_inside"></div>
+                                        <div class="label_text" data-translated="<?= __('{discount_perc}<br> OFF', 'woocommerce') ?>">
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div class="text_discount">
-                                    <p class="text_red"><?= __('Your 50% Discount Has Been Applied', 'woocommerce') ?></p>
-                                    <p><?= __('Your Order Qualifies For FREE SHIPPING When Ordered TODAY', 'woocommerce') ?></p>
+                                    <p class="text_red label_secondary_text" data-translated="<?= __('Your {discount_perc} Discount Has Been Applied', 'woocommerce') ?>"></p>
+                                    <p><?= __('Order TODAY To Qualify For FREE SHIPPING', 'woocommerce') ?></p>
                                 </div>
                             </div>
 
-                            <div class="title_step">
-                                <h3><?= __('Step #1: Select Quantity', 'woocommerce') ?></h3>
+                            <div class="title_bundle">
+                                <h3><?= __('Select your bundle below:', 'woocommerce') ?></h3>
                             </div>
 
                             <div class="products_list">
@@ -117,21 +192,19 @@ if (!empty($package_product_ids)) {
                                         $total_prod_qty     = $prod['qty'] + $prod['qty_free'];
                                         $bundle_price       = ($prod_price * $prod['qty']) / $total_prod_qty;
                                         $bundle_price_total = $bundle_price * $total_prod_qty;
-                                        $bundle_coupon      = ((($prod_price * $total_prod_qty) - $bundle_price_total) / $bundle_price_total) * 100;
-                                        $discount           = ($total_prod_qty* $prod_price) - $bundle_price_total;
-
+                                        $bundle_coupon      = $prod['qty_free'] / $total_prod_qty * 100;
+                                        $discount           = ($total_prod_qty * $prod_price) - $bundle_price_total;
                                     } else if ($prod['type'] == 'off') {
 
                                         $bundle_title       = sprintf(__('Buy %s + Get %d&#37;', 'woocommerce'), $prod['qty'], $prod['coupon']);
                                         $total_prod_qty     = $prod['qty'];
                                         $i_total            = $prod_price * $prod['qty'];
                                         $bundle_coupon      = $prod['coupon'];
-                                        $bundle_price       = ($i_total - ($i_total * ($bundle_coupon/ 100))) / $prod['qty'];
+                                        $bundle_price       = ($i_total - ($i_total * ($bundle_coupon / 100))) / $prod['qty'];
                                         $bundle_price_total = $bundle_price * $prod['qty'];
                                         $discount           = $i_total - $bundle_price_total;
-
                                     } else {
-                                        
+
                                         $prod['type']       = 'Bundle';
                                         $bundle_price       = $prod['price'];
                                         $bundle_price_total = $prod['price'];
@@ -162,7 +235,10 @@ if (!empty($package_product_ids)) {
                                         }
                                         ?>
 
-                                        <input type="radio" class="radio_select" id="product_<?php echo ($opt_i) ?>" name="product" value="<?php echo ($opt_i) ?>">
+                                        <!-- radio -->
+                                        <div class="radio_select_cont">
+                                            <input type="radio" class="radio_select" id="product_<?php echo ($opt_i) ?>" name="product" value="<?php echo ($opt_i) ?>">
+                                        </div>
 
                                         <div class="product_name">
 
@@ -171,9 +247,9 @@ if (!empty($package_product_ids)) {
                                             <?php } ?>
 
                                             <?php if ($prod['type'] == 'bun') { ?>
-                                                <div class="opt_title"><?php echo ($option_title . " (" . wp_strip_all_tags(wc_price($bundle_price_total)) . ") - " . round($i_coupon, 0) . '% ') ?><span style="text-transform: uppercase;"><?= $prod['type'] ?></span></div>
+                                                <div class="opt_title"><?php echo ($option_title . " (" . wp_strip_all_tags(wc_price($bundle_price_total)) . ") - " . round($bundle_coupon, 0) . '% ') ?><span style="text-transform: uppercase;"><?= $prod['type'] ?></span></div>
                                             <?php } else { ?>
-                                                <div class="opt_title"><?php echo ($option_title . " (" . wp_strip_all_tags(wc_price($bundle_price)) . "/" . __('ea', 'woocommerce') . ") - " . round($i_coupon, 0) . '% ') ?><span style="text-transform: uppercase;"><?= $prod['type'] ?></span></div>
+                                                <div class="opt_title"><?php echo ($option_title . " (" . wp_strip_all_tags(wc_price($bundle_price)) . "/" . __('ea', 'woocommerce') . ") - " . round($bundle_coupon, 0) . '% ') ?><span style="text-transform: uppercase;"><?= $prod['type'] ?></span></div>
                                             <?php } ?>
                                         </div>
 
@@ -291,7 +367,7 @@ if (!empty($package_product_ids)) {
                                     </tr>
                                     <tr>
                                         <td class="td-shipping-text"><?php pll_e('Shipping', 'woocommerce') ?>:</td>
-                                        <td class="td-shipping"></td>
+                                        <td class="td-shipping"><?php pll_e('FREE', 'woocommerce'); ?></td>
                                     </tr>
                                 </tbody>
                                 <tbody>
@@ -299,22 +375,33 @@ if (!empty($package_product_ids)) {
                                 </tbody>
                             </table>
 
-                            </p>
-                            <table style="border: 1px dashed #EA0013;">
-                                <tfoot>
-                                    <tr style="margin-top: 9px">
-                                        <td style="padding-bottom: 20px;"><img class="no-lazy" src="<?php echo (MWC_PLUGIN_URL . 'images/today-you-saved.png') ?>" width="200px">
-                                        </td>
-                                        <td style="padding-bottom: 20px;">
-                                            <p style="color: red; font-size: 18px; line-height: 22px; margin-right: 10px"><?php pll_e('Discount', 'woocommerce') ?>:
-                                                <span class="discount-total"></span>
-                                            <p style="font-size: 18px; line-height: 22px; margin-right: 10px"><?php pll_e('Grand Total', 'woocommerce') ?>:
-                                                <span class="grand-total"></span>
-                                            </p>
-                                        </td>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                            <!-- summary -->
+                            <div id="mwc_template_d_summary">
+
+                                <!-- summary image -->
+                                <div id="mwc_template_d_img">
+                                    <img class="no-lazy" src="<?php echo (MWC_PLUGIN_URL . 'images/today-you-saved.png') ?>" width="200px">
+                                </div>
+
+                                <!-- totals div -->
+                                <div id="mwc_template_d_totals">
+
+                                    <!-- discount -->
+                                    <div class="totals discount">
+                                        <span class="totals-title"><?php pll_e('Discount', 'woocommerce') ?>: </span>
+                                        <span class="totals-price discount-total"></span>
+                                    </div>
+
+                                    <!-- grand total -->
+                                    <div class="totals grand">
+                                        <span class="totals-title grand"><?php pll_e('Grand Total', 'woocommerce') ?>: </span>
+                                        <span class="totals-price grand-total"></span>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
                         </div>
                     </div>
                     <!--/span-->
@@ -338,6 +425,5 @@ if (!empty($package_product_ids)) {
         </section> <!-- /row-wrapper-->
 
     </div> <!-- /wrapper -->
-
 <?php
 }
