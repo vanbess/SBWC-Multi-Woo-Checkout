@@ -6,7 +6,7 @@ jQuery(document).ready( function( $ ) {
         $(document.body).trigger("update_checkout");
 
         // click default item
-        $('.mwc_active_product .radio_select').click();
+        $('.mwc_active_product').find('.radio_select').click();
     });
 
     $('.radio_select').change(function() {
@@ -20,7 +20,7 @@ jQuery(document).ready( function( $ ) {
         $('.statistical .grand-total').html(div_parent.find('.opc_total_price').val());
         $('.statistical .discount-total').html(div_parent.find('.opc_discount').val());
 
-        mwc_update_item_cart_ajax();
+        // mwc_update_item_cart_ajax();
         
     });
 

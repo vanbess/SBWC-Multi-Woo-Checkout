@@ -614,7 +614,7 @@ if (!class_exists('MWCShortCode')) {
             $suffix      = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
             $assets_path = str_replace(array('http:', 'https:'), '', WC()->plugin_url()) . '/assets/';
 
-            wp_enqueue_script('wc-checkout', $assets_path . 'js/frontend/checkout' . $suffix . '.js', array('jquery', 'woocommerce', 'wc-country-select', 'wc-address-i18n'), WC_VERSION, true);
+            wp_enqueue_script('wc-checkout', $assets_path . 'js/frontend/checkout' . $suffix . '.js', array('jquery', 'woocommerce', 'wc-country-select', 'wc-address-i18n'), time(), true);
             wp_enqueue_style('mwc_front_style_D', MWC_PLUGIN_URL . 'resources/style/shortcode_style_D/front_style_D.css', array(), time(), 'all');
             wp_enqueue_script('mwc_package_order_checkout_D', MWC_PLUGIN_URL . 'resources/js/shortcode_style_D/one_page_checkout_D.js', array(), time(), true);
             wp_enqueue_script('mwc_one_page_checkout_js', MWC_PLUGIN_URL . 'resources/js/one_page_checkout_js.js', array(), time(), true);

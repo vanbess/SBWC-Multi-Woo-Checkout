@@ -15,6 +15,13 @@ if (!trait_exists('AddToCartBasic')) :
             <script id="mwc-atc-updated">
                 jQuery(document).ready(function($) {
 
+                    // $(window).on('load', function() {
+                        if ($('.opc_style_d_container').length) {
+                            console.log('style D loaded, bailing style A and H JS');
+                            return;
+                        }
+                    // });
+
                     // debug
                     console.log('mwc atc js loaded');
 

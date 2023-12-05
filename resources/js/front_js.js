@@ -1,6 +1,9 @@
 jQuery(document).ready(function ($) {
 
-    console.log('you are here padawan');
+    // bail if template D
+    if ($('.opc_style_d_container').length) {
+        return;
+    }
 
     // check if class .mwc_items_div exists and bail if not
     if (!$('.mwc_items_div').length) {

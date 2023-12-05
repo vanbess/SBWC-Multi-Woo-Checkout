@@ -6,6 +6,11 @@ $currency              = get_woocommerce_currency_symbol();
 $package_product_ids   = self::$package_product_ids;
 $package_number_item_2 = self::$package_number_item_2;
 
+// debug
+// echo '<pre>';
+// print_r($package_product_ids);
+// echo '</pre>';
+
 if (!empty($package_product_ids)) {
 
     // ********************************************
@@ -55,6 +60,73 @@ if (!empty($package_product_ids)) {
 
 ?>
 
+
+    <!-- debug js -->
+    <script id="mwc-template-d-debug-js">
+        $ = jQuery.noConflict();
+
+        $(window).load(function() {
+
+            // debug
+            // console.log('mwc-template-d-debug-js loaded');
+
+            // on load
+            $('.productRadioListItem').each(function(index, element) {
+
+                if ($(this).hasClass('mwc_active_product')) {
+
+                    let discount_total = $('.discount-total').text();
+                    let grand_total = $('.grand-total').text();
+
+                    // regex replace everything in totals but numbers and dots
+                    let regex = /[^0-9.]/g;
+
+                    discount_total = discount_total.replace(regex, '');
+                    grand_total = grand_total.replace(regex, '');
+
+                    let discount_percentage = (discount_total / grand_total) * 100;
+
+                    // debug
+                    // console.log('discount_percentage', discount_percentage);
+
+                    $('.label_text').text(parseFloat(discount_percentage).toFixed(0) + '% OFF');
+
+                    $('.label_secondary_text').text('Your ' + parseFloat(discount_percentage).toFixed(0) + '% Discount Has Been Applied');
+                }
+
+            });
+
+            // on click
+            $('.productRadioListItem').click(function() {
+
+                setTimeout(() => {
+                    let discount_total = $('.discount-total').text();
+                    let grand_total = $('.grand-total').text();
+
+                    // regex replace everything in totals but numbers and dots
+                    let regex = /[^0-9.]/g;
+
+                    discount_total = discount_total.replace(regex, '');
+                    grand_total = grand_total.replace(regex, '');
+
+                    // let discount_percentage = (discount_total / grand_total) * 100;
+                    let discount_percentage = parseFloat(discount_total) / (parseFloat(discount_total) + parseFloat(grand_total)) * 100;
+
+                    // debug
+                    // console.log(parseFloat(discount_total) + parseFloat(grand_total));
+                    // console.log('discount_percentage', discount_percentage);
+
+                    $('.label_text').text(parseFloat(discount_percentage).toFixed(0) + '% OFF');
+
+                    $('.label_secondary_text').text('Your ' + parseFloat(discount_percentage).toFixed(0) + '% Discount Has Been Applied');
+
+                }, 100);
+
+            });
+
+        });
+    </script>
+
     <div class="opc_style_d_container">
 
         <input type="hidden" id="step_2_of_3" value="<?php pll_e("Step 2: Customer Information", "woocommerce") ?>">
@@ -68,21 +140,23 @@ if (!empty($package_product_ids)) {
 
                             <!-- discount banner box select -->
                             <div class="banner_discount">
-                                <div class="label_discount">
-                                    <div class="border_inside"></div>
-                                    <div class="label_text">
-                                        50%<br><?= __('OFF', 'woocommerce') ?>
+
+                                <div class="label_discount_cont">
+                                    <div class="label_discount">
+                                        <div class="border_inside"></div>
+                                        <div class="label_text" data-translated="<?= __('{discount_perc}<br> OFF', 'woocommerce') ?>">
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div class="text_discount">
-                                    <p class="text_red"><?= __('Your 50% Discount Has Been Applied', 'woocommerce') ?></p>
-                                    <p><?= __('Your Order Qualifies For FREE SHIPPING When Ordered TODAY', 'woocommerce') ?></p>
+                                    <p class="text_red label_secondary_text" data-translated="<?= __('Your {discount_perc} Discount Has Been Applied', 'woocommerce') ?>"></p>
+                                    <p><?= __('Order TODAY To Qualify For FREE SHIPPING', 'woocommerce') ?></p>
                                 </div>
                             </div>
 
-                            <div class="title_step">
-                                <h3><?= __('Step #1: Select Quantity', 'woocommerce') ?></h3>
+                            <div class="title_bundle">
+                                <h3><?= __('Select your bundle below:', 'woocommerce') ?></h3>
                             </div>
 
                             <div class="products_list">
@@ -117,21 +191,19 @@ if (!empty($package_product_ids)) {
                                         $total_prod_qty     = $prod['qty'] + $prod['qty_free'];
                                         $bundle_price       = ($prod_price * $prod['qty']) / $total_prod_qty;
                                         $bundle_price_total = $bundle_price * $total_prod_qty;
-                                        $bundle_coupon      = ((($prod_price * $total_prod_qty) - $bundle_price_total) / $bundle_price_total) * 100;
-                                        $discount           = ($total_prod_qty* $prod_price) - $bundle_price_total;
-
+                                        $bundle_coupon      = $prod['qty_free'] / $total_prod_qty * 100;
+                                        $discount           = ($total_prod_qty * $prod_price) - $bundle_price_total;
                                     } else if ($prod['type'] == 'off') {
 
                                         $bundle_title       = sprintf(__('Buy %s + Get %d&#37;', 'woocommerce'), $prod['qty'], $prod['coupon']);
                                         $total_prod_qty     = $prod['qty'];
                                         $i_total            = $prod_price * $prod['qty'];
                                         $bundle_coupon      = $prod['coupon'];
-                                        $bundle_price       = ($i_total - ($i_total * ($bundle_coupon/ 100))) / $prod['qty'];
+                                        $bundle_price       = ($i_total - ($i_total * ($bundle_coupon / 100))) / $prod['qty'];
                                         $bundle_price_total = $bundle_price * $prod['qty'];
                                         $discount           = $i_total - $bundle_price_total;
-
                                     } else {
-                                        
+
                                         $prod['type']       = 'Bundle';
                                         $bundle_price       = $prod['price'];
                                         $bundle_price_total = $prod['price'];
@@ -162,7 +234,10 @@ if (!empty($package_product_ids)) {
                                         }
                                         ?>
 
-                                        <input type="radio" class="radio_select" id="product_<?php echo ($opt_i) ?>" name="product" value="<?php echo ($opt_i) ?>">
+                                        <!-- radio -->
+                                        <div class="radio_select_cont">
+                                            <input type="radio" class="radio_select" id="product_<?php echo ($opt_i) ?>" name="product" value="<?php echo ($opt_i) ?>">
+                                        </div>
 
                                         <div class="product_name">
 
@@ -171,9 +246,9 @@ if (!empty($package_product_ids)) {
                                             <?php } ?>
 
                                             <?php if ($prod['type'] == 'bun') { ?>
-                                                <div class="opt_title"><?php echo ($option_title . " (" . wp_strip_all_tags(wc_price($bundle_price_total)) . ") - " . round($i_coupon, 0) . '% ') ?><span style="text-transform: uppercase;"><?= $prod['type'] ?></span></div>
+                                                <div class="opt_title"><?php echo ($option_title . " (" . wp_strip_all_tags(wc_price($bundle_price_total)) . ") - " . round($bundle_coupon, 0) . '% ') ?><span style="text-transform: uppercase;"><?= $prod['type'] ?></span></div>
                                             <?php } else { ?>
-                                                <div class="opt_title"><?php echo ($option_title . " (" . wp_strip_all_tags(wc_price($bundle_price)) . "/" . __('ea', 'woocommerce') . ") - " . round($i_coupon, 0) . '% ') ?><span style="text-transform: uppercase;"><?= $prod['type'] ?></span></div>
+                                                <div class="opt_title"><?php echo ($option_title . " (" . wp_strip_all_tags(wc_price($bundle_price)) . "/" . __('ea', 'woocommerce') . ") - " . round($bundle_coupon, 0) . '% ') ?><span style="text-transform: uppercase;"><?= $prod['type'] ?></span></div>
                                             <?php } ?>
                                         </div>
 
@@ -276,6 +351,61 @@ if (!empty($package_product_ids)) {
                             </div>
                         </div>
 
+                        <?php
+                        render_product_select_dds($package_product_ids);
+                        ?>
+
+                        <script id="mwc-style-d-DD-js">
+                            $ = jQuery.noConflict();
+
+                            $(document).ready(function() {
+
+                                console.log('mwc-style-d-DD-js loaded');
+
+                                // get selected bundle id
+                                let selected_bundle_id = $('.mwc_active_product').data('bundle_id');
+
+                                // console.log(selected_bundle_id);
+
+                                // show selected bundle variations
+                                $('.mwc_product_variations_' + selected_bundle_id).show();
+
+                                // on bundle click, hide all variations and show selected bundle variations
+                                $('.productRadioListItem').click(function() {
+
+                                    // get selected bundle id
+                                    let selected_bundle_id = $(this).data('bundle_id');
+
+                                    // hide all variations
+                                    $('.mwc_product_variations').hide();
+
+                                    // show selected bundle variations
+                                    $('.mwc_product_variations_' + selected_bundle_id).show();
+
+                                });
+
+                                // swatch on click change product image
+                                $('.wcvaswatchlabel').click(function(e) {
+                                    e.preventDefault();
+
+                                    let linked_id = $(this).data('linked_id');
+                                    let prd_img_src = $(this).attr('img-src');
+                                    let parent_container = $(this).closest('.c_prod_item');
+
+                                    // debug
+                                    // console.log(linked_id, prd_img_src, parent_container);
+
+                                    parent_container.find('.wcvaswatchlabel').removeClass('selected');
+
+                                    $(this).addClass('selected');
+
+                                    parent_container.find('.mwc_variation_img').attr('src', prd_img_src);
+
+                                });
+
+                            });
+                        </script>
+
                         <div data-r="" class="wysiwyg-content statistical">
                             <table>
                                 <thead>
@@ -291,7 +421,7 @@ if (!empty($package_product_ids)) {
                                     </tr>
                                     <tr>
                                         <td class="td-shipping-text"><?php pll_e('Shipping', 'woocommerce') ?>:</td>
-                                        <td class="td-shipping"></td>
+                                        <td class="td-shipping"><?php pll_e('FREE', 'woocommerce'); ?></td>
                                     </tr>
                                 </tbody>
                                 <tbody>
@@ -299,27 +429,36 @@ if (!empty($package_product_ids)) {
                                 </tbody>
                             </table>
 
-                            </p>
-                            <table style="border: 1px dashed #EA0013;">
-                                <tfoot>
-                                    <tr style="margin-top: 9px">
-                                        <td style="padding-bottom: 20px;"><img class="no-lazy" src="<?php echo (MWC_PLUGIN_URL . 'images/today-you-saved.png') ?>" width="200px">
-                                        </td>
-                                        <td style="padding-bottom: 20px;">
-                                            <p style="color: red; font-size: 18px; line-height: 22px; margin-right: 10px"><?php pll_e('Discount', 'woocommerce') ?>:
-                                                <span class="discount-total"></span>
-                                            <p style="font-size: 18px; line-height: 22px; margin-right: 10px"><?php pll_e('Grand Total', 'woocommerce') ?>:
-                                                <span class="grand-total"></span>
-                                            </p>
-                                        </td>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                            <!-- summary -->
+                            <div id="mwc_template_d_summary">
+
+                                <!-- summary image -->
+                                <div id="mwc_template_d_img">
+                                    <img class="no-lazy" src="<?php echo (MWC_PLUGIN_URL . 'images/today-you-saved.png') ?>" width="200px">
+                                </div>
+
+                                <!-- totals div -->
+                                <div id="mwc_template_d_totals">
+
+                                    <!-- discount -->
+                                    <div class="totals discount">
+                                        <span class="totals-title"><?php pll_e('Discount', 'woocommerce') ?>: </span>
+                                        <span class="totals-price discount-total"></span>
+                                    </div>
+
+                                    <!-- grand total -->
+                                    <div class="totals grand">
+                                        <span class="totals-title grand"><?php pll_e('Grand Total', 'woocommerce') ?>: </span>
+                                        <span class="totals-price grand-total"></span>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
                         </div>
                     </div>
                     <!--/span-->
-
-
                     <!-- form checkout woo -->
                     <div class="row row-collapse col large-5 op_c_checkout_form" style="display: none;">
                         <div>
@@ -333,11 +472,330 @@ if (!empty($package_product_ids)) {
 
                 </div>
                 <!--/row-->
+
             </div>
             <!--/container-->
         </section> <!-- /row-wrapper-->
 
     </div> <!-- /wrapper -->
-
 <?php
 }
+
+
+/**
+ * Render product select dds
+ *
+ * @param array $package_product_ids
+ * @return void
+ */
+function render_product_select_dds($package_product_ids)
+{
+
+    // get current currency
+    $current_curr = function_exists('alg_get_current_currency_code') ? alg_get_current_currency_code() : get_woocommerce_currency();
+
+?>
+    <div id="mwc-style-D" class="mwc-tab-content">
+        <?php
+
+        // Tab content (variation dropdowns)
+        foreach ($package_product_ids as $opt_i => $prod_data) :
+
+            /**
+             * Code which checks for presence of variable
+             */
+            $bundle_ptypes_string = '';
+
+            $bun_type = $prod_data['type'];
+
+            if ($bun_type === 'bun') :
+
+                $prods = $prod_data['prod'];
+
+                foreach ($prods as $index => $pdata) :
+                    $product = wc_get_product($pdata['id']);
+                    $bundle_ptypes_string .= $product->get_type();
+                endforeach;
+
+            else :
+
+                $product = wc_get_product($prod_data['id']);
+                $bundle_ptypes_string .= $product->get_type();
+
+            endif;
+
+            // only display variations dropdown if variable product present 
+            if (is_int(strpos($bundle_ptypes_string, 'variable'))) :
+        ?>
+
+                <!-- Product variations form ------------------------------>
+                <div hidden class="mwc_product_variations mwc_product_variations_<?php echo (trim($prod_data['bun_id'])) ?> info_products_checkout" data-bundle_id="<?php echo (trim($prod_data['bun_id'])) ?>">
+                    <h4 class="title_form"><?= __('Please choose:', 'woocommerce') ?> <h4>
+                            <table class="product_variations_table">
+                                <tbody>
+                                    <?php
+
+                                    //package selection variations free and off
+                                    if ($prod_data['type'] === 'free' || $prod_data['type'] === 'off') :
+
+                                        // retrieve product object
+                                        $prod_obj = wc_get_product($prod_data['id']);
+
+                                        // get variation images product
+                                        if (!isset($var_data[$prod_data['id']]) && $prod_obj->is_type('variable')) :
+
+                                            $var_arr = [];
+
+                                            foreach ($prod_obj->get_available_variations() as $key => $value) :
+
+                                                array_push($var_arr, [
+                                                    'id'         => $value['variation_id'],
+                                                    'price'      => isset($prod_data['custom_price'][$value['variation_id']]) ? $prod_data['custom_price'][$value['variation_id']][$current_curr] : '',
+                                                    'attributes' => $value['attributes'],
+                                                    'image'      => $value['image']['url']
+                                                ]);
+
+                                            endforeach;
+
+                                            $var_data[$prod_data['id']] = $var_arr;
+                                        endif;
+
+                                        // bundle/offer product loop start
+                                        for ($i = 0; $i < $prod_data['qty']; $i++) :
+
+                                            // check if has size chart
+                                            $has_size_chart = get_post_meta($prod_data['id'], 'sbarray_chart_data', true) ? 'true' : 'false';
+
+                                    ?>
+                                            <!-- c_prod_item -->
+                                            <tr class="c_prod_item" has-size-chart="<?php echo $has_size_chart; ?>" data-id="<?php echo ($prod_data['id']) ?>" <?= (!$prod_obj->is_type('variable')) ? 'hidden' : '' ?>>
+
+                                                <?php if ($prod_obj->is_type('variable')) : ?>
+
+                                                    <!-- variation index -->
+                                                    <td class="variation_index"><?= $i + 1 ?></td>
+
+                                                    <!-- variation image -->
+                                                    <td class="variation_img">
+                                                        <img class="mwc_variation_img" src="<?= wp_get_attachment_image_src($prod_obj->get_image_id())[0] ?>">
+                                                    </td>
+
+                                                    <!-- selectors -->
+                                                    <td class="variation_selectors">
+                                                        <?php
+
+                                                        // show variations linked by variations
+                                                        echo MWC::mwc_return_linked_variations_dropdown([
+                                                            'product_id'        => $prod_data['id'],
+                                                            'class'             => 'var_prod_attr checkou_prod_attr select-variation-' . $prod_data['type'],
+                                                        ], $var_data, $prod_data);
+
+                                                        $prod_variations = $prod_obj->get_variation_attributes();
+
+                                                        foreach ($prod_variations as $attribute_name => $options) :
+                                                            // $default_opt = $prod_obj->get_variation_default_attribute($attribute_name);
+                                                            $default_opt = '';
+                                                            try {
+                                                                $default_opt =  key_exists($attribute_name, $prod_obj->get_default_attributes()) ? $prod_obj->get_default_attributes()[$attribute_name] : '';
+                                                            } catch (Error $th) {
+                                                            }
+                                                        ?>
+
+                                                            <div class="variation_item">
+                                                                <p class="variation_name"><?= wc_attribute_label($attribute_name) ?>: </p>
+
+                                                                <!-- load dropdown variations -->
+                                                                <?php
+                                                                echo MWC::mwc_return_onepage_checkout_variation_dropdown([
+                                                                    'product_id'        => $prod_data['id'],
+                                                                    'options'             => $options,
+                                                                    'attribute_name'    => $attribute_name,
+                                                                    'default_option'    => $default_opt,
+                                                                    'var_data'            => $var_data[$p_id],
+                                                                    'class'             => 'var_prod_attr checkou_prod_attr select-variation-' . $prod_data['type'],
+                                                                ]);
+                                                                ?>
+
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </td>
+                                                <?php endif; ?>
+                                            </tr>
+                                            <?php
+                                        endfor;
+                                    else : //package selection bundle
+
+                                        $_index = 1;
+
+                                        foreach ($prod_data['prod'] as $i => $i_prod) :
+
+                                            $p_id       = $i_prod['id'];
+                                            $b_prod_obj = wc_get_product($p_id);
+
+                                            // has size chart
+                                            $has_size_chart = get_post_meta($p_id, 'sbarray_chart_data', true) ? 'true' : 'false';
+
+                                            // get variation images product
+                                            if (!isset($var_data[$p_id]) && $b_prod_obj->is_type('variable')) :
+
+                                                $var_arr = [];
+
+                                                foreach ($b_prod_obj->get_available_variations() as $key => $value) :
+
+                                                    array_push($var_arr, [
+                                                        'id'         => $value['variation_id'],
+                                                        'price'      => isset($prod_data['custom_price']) ? $prod_data['custom_price'][$value['variation_id']][$current_curr] : '',
+                                                        'attributes' => $value['attributes'],
+                                                        'image'      => $value['image']['url']
+                                                    ]);
+
+                                                endforeach;
+
+                                                $var_data[$p_id] = $var_arr;
+
+                                            endif;
+
+                                            for ($i = 1; $i <= $i_prod['qty']; $i++) : ?>
+                                                <tr class="c_prod_item" has-size-chart="<?php echo $has_size_chart; ?>" data-id="<?php echo ($p_id) ?>" <?= (!$b_prod_obj->is_type('variable')) ? 'hidden' : '' ?>>
+
+                                                    <?php
+
+                                                    // try {
+                                                    // 	do_action('mwc_size_chart', $p_id);
+                                                    // } catch (\Throwable $th) {
+                                                    // 	echo $th->getMessage();
+                                                    // }
+
+                                                    ?>
+
+                                                    <?php if ($b_prod_obj->is_type('variable')) : ?>
+
+                                                        <td class="variation_index"><?= $_index++ ?></td>
+                                                        <td class="variation_img">
+                                                            <img id="prod_image" class="mwc_variation_img" src="<?= wp_get_attachment_image_src($b_prod_obj->get_image_id())[0] ?>">
+                                                        </td>
+                                                        <td class="variation_selectors">
+                                                            <?php
+
+                                                            // show variations linked by variations
+                                                            echo MWC::mwc_return_linked_variations_dropdown([
+                                                                'product_id'        => $p_id,
+                                                                'class'             => 'var_prod_attr checkou_prod_attr select-variation-' . $prod_data['type'],
+                                                            ], $var_data, $prod_data);
+
+                                                            $prod_variations = $b_prod_obj->get_variation_attributes();
+
+                                                            foreach ($prod_variations as $attribute_name => $options) :
+                                                                $default_opt = '';
+                                                                try {
+                                                                    $default_opt =  key_exists($attribute_name, $b_prod_obj->get_default_attributes()) ? $b_prod_obj->get_default_attributes()[$attribute_name] : '';
+                                                                } catch (Error $th) {
+                                                                    $default_opt = '';
+                                                                }
+                                                            ?>
+                                                                <div class="variation_item">
+                                                                    <p class="variation_name"><?= wc_attribute_label($attribute_name) ?>: </p>
+
+                                                                    <!-- load dropdown variations -->
+                                                                    <?php
+                                                                    echo MWC::mwc_return_onepage_checkout_variation_dropdown([
+                                                                        'product_id'        => $p_id,
+                                                                        'options'             => $options,
+                                                                        'attribute_name'    => $attribute_name,
+                                                                        'default_option'    => $default_opt,
+                                                                        'var_data'            => $var_data[$p_id],
+                                                                        'class'             => 'var_prod_attr checkou_prod_attr select-variation-' . $prod_data['type'],
+                                                                    ]);
+                                                                    ?>
+
+                                                                </div>
+                                                                <?php
+                                                                // Size chart
+                                                                if (defined('SBHTML_VERSION')) :
+                                                                    do_action('mwc_size_chart', $p_id);
+                                                                endif;
+                                                                ?>
+                                                            <?php endforeach; ?>
+                                                        </td>
+                                                    <?php endif; ?>
+                                                </tr>
+                                    <?php endfor;
+                                        endforeach;
+                                    endif;
+                                    ?>
+                                </tbody>
+                            </table>
+
+                            <!-- ======================== -->
+                            <!-- variations free products -->
+                            <!-- ======================== -->
+                            <?php if ($prod_data['type'] == 'free' && isset($prod_data['qty_free']) && $prod_data['qty_free'] > 0) :    ?>
+
+                                <h5 class="title_form"><?= __('Select Free Product:', 'woocommerce') ?>:</h5>
+
+                                <table class="product_variations_table">
+                                    <tbody>
+
+                                        <?php for ($i = 0; $i < $prod_data['qty_free']; $i++) :    ?>
+                                            <tr class="c_prod_item free-item" data-id="<?php echo ($prod_data['id']) ?>" <?= (!$prod_obj->is_type('variable')) ? 'hidden' : '' ?>>
+                                                <?php if ($prod_obj->is_type('variable')) : ?>
+                                                    <td class="variation_index"><?= $i + 1 ?></td>
+                                                    <td class="variation_img">
+                                                        <img class="mwc_variation_img" src="<?= wp_get_attachment_image_src($prod_obj->get_image_id())[0] ?>">
+                                                    </td>
+                                                    <td class="variation_selectors">
+                                                        <?php
+
+                                                        // show variations linked by variations
+                                                        echo MWC::mwc_return_linked_variations_dropdown([
+                                                            'product_id'        => $prod_data['id'],
+                                                            'class'             => 'var_prod_attr checkou_prod_attr select-variation-' . $prod_data['type'],
+                                                        ], $var_data, $prod_data);
+
+                                                        $prod_variations = $prod_obj->get_variation_attributes();
+
+                                                        foreach ($prod_variations as $attribute_name => $options) :
+                                                            // $default_opt = $prod_obj->get_variation_default_attribute($attribute_name);
+                                                            $default_opt = '';
+                                                            try {
+                                                                $default_opt =  key_exists($attribute_name, $prod_obj->get_default_attributes()) ? $prod_obj->get_default_attributes()[$attribute_name] : '';
+                                                            } catch (Error $th) {
+                                                                $default_opt = '';
+                                                            }
+                                                        ?>
+                                                            <div class="variation_item">
+                                                                <p class="variation_name"><?= wc_attribute_label($attribute_name) ?>: </p>
+
+                                                                <!-- load dropdown variations -->
+                                                                <?php
+                                                                echo MWC::mwc_return_onepage_checkout_variation_dropdown([
+                                                                    'product_id'        => $prod_data['id'],
+                                                                    'options'             => $options,
+                                                                    'attribute_name'    => $attribute_name,
+                                                                    'default_option'    => $default_opt,
+                                                                    'var_data'            => $var_data[$prod_data['id']],
+                                                                    'class'             => 'var_prod_attr checkou_prod_attr select-variation-' . $prod_data['type'] . ' free-prod',
+                                                                ]);
+                                                                ?>
+
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </td>
+                                                <?php endif; ?>
+                                            </tr>
+                                        <?php endfor; ?>
+                                    </tbody>
+                                </table>
+
+                            <?php endif; ?>
+                </div>
+
+        <?php endif;
+            // Size chart
+            if (defined('SBHTML_VERSION')) :
+                do_action('mwc_size_chart', $prod_data['id']);
+            endif;
+        endforeach; ?>
+
+    </div><!-- .mwc-tab-content -->
+<?php }
