@@ -250,7 +250,7 @@ td.td-price {
   animation: rotateYAnimation 5s infinite;
 }
 
-@keyframes rotateYAnimation {
+ @keyframes rotateYAnimation {
   0% {
     transform: rotateY(0deg);
   }
@@ -282,7 +282,6 @@ img.no-lazy {
     transform: scale(1);
   }
 }
-
 
 .text_discount p {
   margin-bottom: 0;
