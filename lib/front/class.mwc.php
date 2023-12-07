@@ -82,6 +82,11 @@ if (!class_exists('MWC')) :
             add_action('wp_ajax_mwc_get_price_summary_table', array(__CLASS__, 'mwc_get_price_summary_table'));
             add_action('wp_ajax_nopriv_mwc_get_price_summary_table', array(__CLASS__, 'mwc_get_price_summary_table'));
 
+            // add to cart mwc template d products
+            add_action('wp_ajax_mwc_atc_template_d_products', array(__CLASS__, 'mwc_atc_template_d_products'));
+            add_action('wp_ajax_nopriv_mwc_atc_template_d_products', array(__CLASS__, 'mwc_atc_template_d_products'));
+
+
             // // action to set item prices to regular
             add_action('woocommerce_before_calculate_totals', array(__CLASS__, 'mwc_cart_apply_regular_prices'), PHP_INT_MAX, 1);
 

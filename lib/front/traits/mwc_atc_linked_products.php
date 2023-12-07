@@ -279,6 +279,10 @@ if (!trait_exists('AddToCartLinkedAjAction')) :
 
             wp_die();
         }
+
+        public function mwc_atc_template_d_products(){
+            wp_send_json($_POST);
+        }
     }
 
 endif;
