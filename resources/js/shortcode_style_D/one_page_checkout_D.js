@@ -1,6 +1,5 @@
 jQuery(document).ready( function( $ ) {
 
-
     $( window ).load(function() {
         // click default item
         $('.mwc_active_product').find('.radio_select').click();
@@ -14,7 +13,7 @@ jQuery(document).ready( function( $ ) {
 
         let bundle_title = div_parent.find('.opc_title').val();
         let bundle_price = div_parent.find('.opc_total_price').val();
-        let bundle_discount = div_parent.find('.opc_discount').val();
+        let bundle_discount = div_parent.find('.opc_total_discount').val();
 
         // debug
         // console.log(bundle_title);

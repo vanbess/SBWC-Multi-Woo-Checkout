@@ -100,7 +100,7 @@
 }
 
 .box_select .products_list .productRadioListItem {
-  min-height: 60px;
+  min-height: 90px;
   display: flex;
   position: relative;
   cursor: pointer;
@@ -140,6 +140,7 @@
   flex: 1;
   text-align: right;
   z-index: 1;
+  padding-right: 25px;
 }
 
 /* style product popular */
@@ -431,4 +432,12 @@ select.var_prod_attr.checkout_prod_attr {
 
 .mwc_product_variations {
   padding: 10px !important;
+}
+
+.woocommerce-form-coupon-toggle {
+  display: none;
+}
+
+span.price_old {
+  font-weight: 400;
 }

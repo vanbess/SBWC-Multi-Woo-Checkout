@@ -723,7 +723,7 @@ if (!class_exists('MWCShortCode')) {
     }
 
     // hook action shortcode class
-    // add_action('init', array('MWCShortCode', 'init'));
+    add_action('init', array('MWCShortCode', 'init'));
 }
 
 

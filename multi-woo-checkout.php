@@ -86,3 +86,49 @@ require_once MWC_PLUGIN_DIR . 'tracking/thank-you-page.php';
 
 // reset tracking data for addons and bundles
 require_once MWC_PLUGIN_DIR . 'tracking/reset-tracking.php';
+
+// debug cart
+// add_action('wp_footer', function () {
+
+//     echo 'thou art here';
+
+//     // debug entire wc session
+//     echo '<pre>';
+//     print_r(WC()->session);
+//     echo '</pre>';
+
+
+//     // get cart
+//     $cart = WC()->cart->get_cart();
+
+
+//     echo '<pre>';
+//     print_r($cart);
+//     echo '</pre>';
+// });
+
+// add cart fee
+add_action('woocommerce_cart_calculate_fees', function () {
+
+    if (!WC()->session->get('mwc_style_type')) :
+        return;
+    endif;
+
+    // get cart totals from session
+    $cart_totals = WC()->session->get('cart_totals');
+
+    // get sub total
+    $sub_total = $cart_totals['subtotal'];
+
+    // get cart discount text from session
+    $discount_text = WC()->session->get('mwc_discount_data')['discount_text'];
+
+    // get discount percentage from session
+    $discount_perc = WC()->session->get('mwc_discount_data')['discount_perc'];
+
+    // calculate discount amount
+    $discount_amount = $sub_total * ($discount_perc / 100);
+
+    // add discount fee
+    WC()->cart->add_fee($discount_text, -$discount_amount, false);
+});
