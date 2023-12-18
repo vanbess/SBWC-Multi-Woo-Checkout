@@ -106,6 +106,8 @@ add_action('wp_footer', function () {
     // echo '<pre>';
     // print_r($cart);
     // echo '</pre>';
+
+
 });
 
 /**

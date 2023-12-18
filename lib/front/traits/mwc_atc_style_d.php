@@ -24,6 +24,9 @@ trait MWC_ATC_Style_D
             wp_send_json_error('Nonce verification failed', 403);
         }
 
+        // clear WC() session
+        WC()->session->destroy_session();
+
         // debug
         // wp_send_json($_POST);
 

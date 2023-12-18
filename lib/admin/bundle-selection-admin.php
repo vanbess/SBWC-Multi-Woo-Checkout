@@ -12,11 +12,13 @@ if (!class_exists('MWCBundleSectionAdmin')) :
     /*
     * MWCBundleSectionAdmin Class
     */
-    class MWCBundleSectionAdmin {
+    class MWCBundleSectionAdmin
+    {
         /**
          * Constructor
          */
-        public function __construct() {
+        public function __construct()
+        {
 
             // custom post type
             add_action('init', array(__CLASS__, 'create_post_type_bundle_selection'));
@@ -48,7 +50,8 @@ if (!class_exists('MWCBundleSectionAdmin')) :
          *
          * @return void
          */
-        public static function create_post_type_bundle_selection() {
+        public static function create_post_type_bundle_selection()
+        {
             $args = array(
                 'labels' => array(
                     'name'               => 'Multi woo checkout',
@@ -84,7 +87,8 @@ if (!class_exists('MWCBundleSectionAdmin')) :
          * @param array $defaults
          * @return array
          */
-        public static function columns_head_only_bundle_selection($defaults) {
+        public static function columns_head_only_bundle_selection($defaults)
+        {
 
             $defaults['tracking_id']     = __('Tracking ID', 'woocommerce');
             $defaults['product_id']      = __('Product ID(s)', 'woocommerce');
@@ -106,7 +110,8 @@ if (!class_exists('MWCBundleSectionAdmin')) :
          * @param int $post_ID
          * @return void
          */
-        public static function columns_content_bundle_selection($column_name, $post_id) {
+        public static function columns_content_bundle_selection($column_name, $post_id)
+        {
 
             switch ($column_name) {
 
@@ -206,7 +211,8 @@ if (!class_exists('MWCBundleSectionAdmin')) :
          *
          * @return void
          */
-        public static function add_style_script() {
+        public static function add_style_script()
+        {
 
             // load tinymce and select2 only on bundle_selection edit screen
             $screen_data = get_current_screen();
@@ -246,7 +252,8 @@ if (!class_exists('MWCBundleSectionAdmin')) :
          *
          * @return json
          */
-        public static function mwc_bundle_get_product() {
+        public static function mwc_bundle_get_product()
+        {
 
             check_ajax_referer('mcb retrieve product');
 
@@ -267,7 +274,8 @@ if (!class_exists('MWCBundleSectionAdmin')) :
          *
          * @return json
          */
-        public static function ajax_get_html_custom_product_price() {
+        public static function ajax_get_html_custom_product_price()
+        {
 
             if (isset($_GET['action']) && isset($_GET['product_id']) && $_GET['action'] == 'mwc_get_html_custom_product_price') :
 
@@ -294,7 +302,8 @@ if (!class_exists('MWCBundleSectionAdmin')) :
          * @param array $data_custom_price
          * @return html
          */
-        public static function get_custom_price_html($product_id, $data_custom_price = []) {
+        public static function get_custom_price_html($product_id, $data_custom_price = [])
+        {
 
             $product = wc_get_product($product_id);
 
@@ -457,7 +466,8 @@ if (!class_exists('MWCBundleSectionAdmin')) :
          *
          * @return void
          */
-        public static function add_form_meta_boxes() {
+        public static function add_form_meta_boxes()
+        {
 
             add_meta_box(
                 "mwc_bundle_selection_meta",
@@ -474,7 +484,8 @@ if (!class_exists('MWCBundleSectionAdmin')) :
          *
          * @return void
          */
-        public static function add_bundle_selection_meta_box() {
+        public static function add_bundle_selection_meta_box()
+        {
 
             global $post;
 
@@ -609,7 +620,8 @@ if (!class_exists('MWCBundleSectionAdmin')) :
          * @param int $post_id
          * @return void
          */
-        public static function save_bundle_selection_fields($post_id) {
+        public static function save_bundle_selection_fields($post_id)
+        {
 
             global $post;
 
@@ -821,7 +833,8 @@ if (!class_exists('MWCBundleSectionAdmin')) :
          * @param boolean $active
          * @return html
          */
-        private static function render_buy_x_get_x_free($data = null, $active = false) { ?>
+        private static function render_buy_x_get_x_free($data = null, $active = false)
+        { ?>
 
             <!-- option buy x get x free -->
             <div class='product product_free <?= $active ? 'activetype' : '' ?>'>
@@ -920,22 +933,22 @@ if (!class_exists('MWCBundleSectionAdmin')) :
                         </tr>
 
                         <!-- custom price -->
-                        <tr valign="top">
+                        <!-- <tr valign="top">
                             <th scope="row" class="titledesc">
                                 <label>Custom price:</label>
                             </th>
                             <td class="forminp forminp-text">
                                 <div class="custom_prod_price">
                                     <?php
-                                    if (is_array($data) && isset($data['free']['id'])) :
-                                        echo self::get_custom_price_html($data['free']['id'], $data['custom_price']);
-                                    else :
-                                        _e('<b><i>Not defined yet</b></i>', 'default');
-                                    endif;
+                                    // if (is_array($data) && isset($data['free']['id'])) :
+                                    //     echo self::get_custom_price_html($data['free']['id'], $data['custom_price']);
+                                    // else :
+                                    //     _e('<b><i>Not defined yet</b></i>', 'default');
+                                    // endif;
                                     ?>
                                 </div>
                             </td>
-                        </tr>
+                        </tr> -->
 
                         <!-- discount label -->
                         <tr valign="top">
@@ -1129,7 +1142,8 @@ if (!class_exists('MWCBundleSectionAdmin')) :
          * @param boolean $active
          * @return html
          */
-        private static function render_buy_x_get_x_off($data = null, $active = false) {
+        private static function render_buy_x_get_x_off($data = null, $active = false)
+        {
 
         ?>
             <!-- buy x get y% -->
@@ -1218,22 +1232,22 @@ if (!class_exists('MWCBundleSectionAdmin')) :
                         </tr>
 
                         <!-- custom price -->
-                        <tr valign="top">
+                        <!-- <tr valign="top">
                             <th scope="row" class="titledesc">
                                 <label>Custom price:</label>
                             </th>
                             <td class="forminp forminp-text">
                                 <div class="custom_prod_price">
                                     <?php
-                                    if (is_array($data) && isset($data['off']['id'])) :
-                                        echo self::get_custom_price_html($data['off']['id'], $data['custom_price']);
-                                    else :
-                                        _e('<b><i>Not defined yet</b></i>', 'default');
-                                    endif;
+                                    // if (is_array($data) && isset($data['off']['id'])) :
+                                    //     echo self::get_custom_price_html($data['off']['id'], $data['custom_price']);
+                                    // else :
+                                    //     _e('<b><i>Not defined yet</b></i>', 'default');
+                                    // endif;
                                     ?>
                                 </div>
                             </td>
-                        </tr>
+                        </tr> -->
 
                         <!-- coupon -->
                         <tr valign="top">
@@ -1448,7 +1462,8 @@ if (!class_exists('MWCBundleSectionAdmin')) :
 
 
         // fun render option bun products
-        private static function render_bundle_prods_section($data = null, $active = false) {
+        private static function render_bundle_prods_section($data = null, $active = false)
+        {
         ?>
             <!-- buy bundle prod -->
             <div class="product product_bun <?= $active ? 'activetype' : '' ?>">
@@ -1815,7 +1830,8 @@ if (!class_exists('MWCBundleSectionAdmin')) :
          *
          * @return string currency
          */
-        private static function mwc_getCurrency() {
+        private static function mwc_getCurrency()
+        {
 
             $additional_currencies = [];
             $total_number          = min(get_option('alg_currency_switcher_total_number', 2), apply_filters('alg_wc_currency_switcher_plugin_option', 2));

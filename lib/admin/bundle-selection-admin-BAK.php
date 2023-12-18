@@ -666,20 +666,20 @@ if (!class_exists('MWCBundleSectionAdmin')) {
                             </td>
                         </tr>
 
-                        <tr valign="top">
+                        <!-- <tr valign="top">
                             <th scope="row" class="titledesc">
                                 <label>Custom price</label>
                             </th>
                             <td class="forminp forminp-text">
                                 <div class="custom_prod_price">
                                     <?php
-                                    if (isset($data['free']['id'])) {
-                                        echo $this->get_custom_price_html($data['free']['id'], $data['custom_price']);
-                                    }
+                                    // if (isset($data['free']['id'])) {
+                                    //     echo $this->get_custom_price_html($data['free']['id'], $data['custom_price']);
+                                    // }
                                     ?>
                                 </div>
                             </td>
-                        </tr>
+                        </tr> -->
 
                         <tr valign="top">
                             <th scope="row" class="titledesc">
@@ -871,20 +871,20 @@ if (!class_exists('MWCBundleSectionAdmin')) {
                             </td>
                         </tr>
 
-                        <tr valign="top">
+                        <!-- <tr valign="top">
                             <th scope="row" class="titledesc">
                                 <label>Custom price</label>
                             </th>
                             <td class="forminp forminp-text">
                                 <div class="custom_prod_price">
                                     <?php
-                                    if (isset($data['off']['id'])) {
-                                        echo $this->get_custom_price_html($data['off']['id'], $data['custom_price']);
-                                    }
+                                    // if (isset($data['off']['id'])) {
+                                    //     echo $this->get_custom_price_html($data['off']['id'], $data['custom_price']);
+                                    // }
                                     ?>
                                 </div>
                             </td>
-                        </tr>
+                        </tr> -->
 
                         <tr valign="top">
                             <th scope="row" class="titledesc">
