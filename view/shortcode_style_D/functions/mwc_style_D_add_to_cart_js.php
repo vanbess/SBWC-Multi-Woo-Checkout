@@ -20,36 +20,42 @@ function mwc_style_D_add_to_cart_js()
 
             if (product_data.length > 0) {
 
-                // ajax request
-                $.ajax({
-                    type: 'POST',
-                    url: '<?php echo admin_url('admin-ajax.php'); ?>',
-                    data: {
-                        'action': 'mwc_atc_template_d_products',
-                        'nonce': '<?php echo wp_create_nonce('mwc_atc_template_d_products'); ?>',
-                        'product_data': product_data,
-                        'bundle_id': bundle_id
-                    },
+                setTimeout(() => {
+                    // ajax request
+                    $.ajax({
+                        type: 'POST',
+                        url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                        data: {
+                            'action': 'mwc_atc_template_d_products',
+                            'nonce': '<?php echo wp_create_nonce('mwc_atc_template_d_products'); ?>',
+                            'product_data': product_data,
+                            'bundle_id': bundle_id,
+                            'discount_text': $('.mwc_active_product').find('.opc_title').val(),
+                            'discount_percentage': $('.mwc_active_product').find('.opc_discounted_perc').val(),
+                            'discount_amount': $('.mwc_active_product').find('.opc_total_discount').val().replace(/[^0-9.,]/g, ''),
+                            'total_cost': $('.mwc_active_product').find('.opc_total_price').val().replace(/[^0-9.,]/g, ''),
+                        },
 
-                    success: function(response) {
+                        success: function(response) {
 
-                        // debug
-                        console.log('response', response);
+                            // debug
+                            console.log('response', response);
 
-                        // trigger fragment refresh
-                        $(document.body).trigger('wc_fragment_refresh');
+                            // trigger fragment refresh
+                            $(document.body).trigger('wc_fragment_refresh');
 
-                    },
-                    error: function(error) {
+                        },
+                        error: function(error) {
 
-                        // debug
-                        console.error('error', error);
+                            // debug
+                            console.error('error', error);
 
-                    }
-                });
+                        }
+                    });
 
-                // stop execution > 1
-                return false;
+                    // stop execution > 1
+                    return false;
+                }, 500);
 
             }
         }
@@ -97,7 +103,7 @@ function mwc_style_D_add_to_cart_js()
                 prod_data.push({
                     'prod_id': prod_id,
                     'prod_type': prod_type,
-                    'selected_size': selected_size,
+                    'selected_size': selected_size.replace(/-/g, '.'),
                     'selected_color': selected_color,
                     'variation_id': variation_id,
                     'qty': 1
@@ -139,7 +145,7 @@ function mwc_style_D_add_to_cart_js()
                 $('.mwc_product_variations_' + bundle_id).show();
 
                 // debug
-                console.log('mousedown bundle_id', bundle_id);
+                // console.log('mousedown bundle_id', bundle_id);
                 // console.log('clicked');
 
                 product_data = mwc_style_d_return_product_data(bundle_id);

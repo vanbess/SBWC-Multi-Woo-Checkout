@@ -36,6 +36,16 @@ trait MWC_ATC_Style_D
         // set mwc style type
         WC()->session->set('mwc_style_type', 'D');
 
+        // set discount text
+        WC()->session->set('mwc_discount_text', $_POST['discount_text']);
+
+        // set discount fee
+        WC()->session->set('mwc_discount_fee', $_POST['discount_amount']);
+
+        // set discount percentage
+        WC()->session->set('mwc_discount_perc', $_POST['discount_percentage']);
+
+
         // empty cart
         WC()->cart->empty_cart();
 
@@ -45,37 +55,31 @@ trait MWC_ATC_Style_D
         // debug
         // wp_send_json($product_data);
 
-        // get discount text and % discount
-        $discount_data = self::generate_discount_text($product_data);
-
-        // add discount date to session
-        WC()->session->set('mwc_discount_data', $discount_data);
-
-        // debug
-        // wp_send_json($discount_data);
-
         // holds cart keys
         $cart_keys = [];
 
         // debug
-        // $test_var_ids = [];
+        $test_var_ids = [];
 
         // loop to add to cart
         foreach ($product_data as $item) :
 
-            $var_sku = isset($item['selected_color']) ? get_post_meta($item['prod_id'], '_sku', true) . '-' . $item['selected_size'] . '-' . $item['selected_color'] : get_post_meta($item['prod_id'], '_sku', true) . '-' . $item['selected_size'];
-
             // get variation id based on sku
-            $item['variation_id'] = wc_get_product_id_by_sku($var_sku);
+            $item['variation_id'] = self::mwc_get_correct_variation_id($item);
 
-            // $test_var_ids[] = $item['variation_id'];
+            // wp_send_json($item);
+
+            // add product type to session
+            WC()->session->set('mwc_prod_type', $item['prod_type']);
+
+            $test_var_ids[] = $item['variation_id'];
 
             $cart_keys[] = WC()->cart->add_to_cart(
                 $item['prod_id'],
                 $item['qty'],
                 $item['variation_id'] ? $item['variation_id'] : 0,
                 [],
-                ['mwc_bun_free_prod' => $discount_data['discount_perc']]
+                [$item['prod_type'] => $_POST['discount_percentage']]
 
             );
 
@@ -90,90 +94,8 @@ trait MWC_ATC_Style_D
         } else {
             wp_send_json_success([
                 'cart_keys'     => $cart_keys,
-                'discount_data' => $discount_data
             ]);
         }
-    }
-
-    /**
-     * Generate discount text + calc discount %
-     *
-     * @param array $prod_data
-     * @return void
-     */
-    private static function generate_discount_text($prod_data)
-    {
-
-        // ======
-        // BOGOF
-        // ======
-
-        // bogof paid items
-        $bogof_paid = array_filter($prod_data, function ($item) {
-            return $item['prod_type'] == 'mwc_bun_paid_prod' || false;
-        });
-
-        // bogof free items
-        $bogof_free = array_filter($prod_data, function ($item) {
-            return $item['prod_type'] == 'mwc_bun_free_prod' || false;
-        });
-
-        if (!empty($bogof_paid) && !empty($bogof_free)) :
-
-            // get counts
-            $bogof_paid_count = count($bogof_paid);
-            $bogof_free_count = count($bogof_free);
-
-            // calc % discount
-            $discount_perc = ($bogof_free_count / ($bogof_paid_count + $bogof_free_count)) * 100;
-
-            // format discount % to zero decimal places
-            $discount_perc = number_format($discount_perc, 0);
-
-            // setup discount fee text (buy x get y free) with discount %
-            $discount_text = sprintf(
-                __('Buy %s get %s free (%s%% discount)', 'mwc'),
-                $bogof_paid_count,
-                $bogof_free_count,
-                $discount_perc
-            );
-
-            return [
-                'discount_text' => $discount_text,
-                'paid_count'    => $bogof_paid_count,
-                'free_count'    => $bogof_free_count,
-                'discount_perc' => $discount_perc,
-            ];
-
-        endif;
-
-
-        // ==================
-        // % DISCOUNT BUNDLE
-        // ==================
-
-        // discount bundle type
-        $discount_bundle_type = array_filter($prod_data, function ($item) {
-            return $item['prod_type'] == 'mwc_bun_discount' || false;
-        });
-
-
-        // ===============
-        // PRODUCT BUNDLE
-        // ===============
-
-        // product bundle type
-        $product_bundle_type = array_filter($prod_data, function ($item) {
-            return $item['prod_type'] == 'mwc_off_discount' || false;
-        });
-
-        // debug
-        // return ([
-        //     'bogof_paid'           => $bogof_paid,
-        //     'bogof_free'           => $bogof_free,
-        //     'discount_bundle_type' => $discount_bundle_type,
-        //     'product_bundle_type'  => $product_bundle_type,
-        // ]);
     }
 
     /**
@@ -187,52 +109,35 @@ trait MWC_ATC_Style_D
     {
 
         // setup vars
-        $prod_id = $item['prod_id'];
-        $selected_size = isset($item['selected_size']) ? $item['selected_size'] : false;
-        $selected_color = isset($item['selected_color']) ? $item['selected_color'] : false;
+        $prod_id        = $item['prod_id'];
+        $selected_size  = $item['selected_size'];
+        $selected_color = $item['selected_color'];
 
-        // if both size and color are selected
-        if($selected_size && $selected_color) :
-
-            // get variation id based on sku
-            $var_sku = get_post_meta($prod_id, '_sku', true) . '-' . $selected_size . '-' . $selected_color;
-            $variation_id = wc_get_product_id_by_sku($var_sku);
-
-            return $variation_id;
-        
-        endif;
-
-        // if only size is selected
-        if($selected_size && !$selected_color) :
-
-            // get variation id based on sku
-            $var_sku = get_post_meta($prod_id, '_sku', true) . '-' . $selected_size;
-            $variation_id = wc_get_product_id_by_sku($var_sku);
-
-            return $variation_id;
-
-        endif;
-
-        // if only color is selected
-        if(!$selected_size && $selected_color) :
-
-            // get variation id based on sku
-            $var_sku = get_post_meta($prod_id, '_sku', true) . '-' . $selected_color;
-            $variation_id = wc_get_product_id_by_sku($var_sku);
-
-            return $variation_id;
-
-        endif;
-
-        // if neither size or color are selected
-        if(!$selected_size && !$selected_color) :
-
-            return 0;
-
-        endif;
+        // get sku
+        $sku = get_post_meta($prod_id, '_sku', true);
 
         // debug
-        // wp_send_json($var_skus);
-    }
+        // return $sku . '-' . $selected_size . '-' . $selected_color;
 
+        $var_sku = $sku . '-' . $selected_size . '-' . $selected_color;
+
+        // debug
+        // return $var_sku;
+
+        // Remove trailing dashes from $var_sku
+        if (substr($var_sku, -1) === '-') {
+            $var_sku = substr($var_sku, 0, -1); // Remove the last character
+        }
+
+        // Replace double dashes with single dashes
+        $var_sku = strpos($var_sku, '--') ? str_replace('--', '-', $var_sku) : $var_sku;
+
+        // debug
+        // return strtoupper($var_sku);
+
+        // get variation id based on sku
+        $variation_id = wc_get_product_id_by_sku($var_sku);
+
+        return $variation_id;
+    }
 }

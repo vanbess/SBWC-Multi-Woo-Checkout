@@ -96,6 +96,10 @@ if (!class_exists('MWC')) :
              *****************************/
             add_action('woocommerce_cart_calculate_fees', function () {
 
+                if (WC()->session->get('mwc_style_type')) :
+                    return;
+                endif;
+
                 // is mwc
                 $is_mwc = false;
 
