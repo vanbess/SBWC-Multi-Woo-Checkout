@@ -3,7 +3,7 @@
 /**
  * @package mwc
  * 
- * Plugin Name: Multi Woo Checkout [Van's Fixes] w. ALG pricing
+ * Plugin Name: Multi Woo Checkout [Van's Fixes] w. ALG pricing - Added Style D Support
  * Plugin URI:
  * Description: Multi Woo Checkout
  * Author: Webmaster0313 w/ lots of bugfixes and tweaks by WC Bessinger
@@ -18,8 +18,6 @@ use Elementor\Core\Logger\Items\PHP;
 define('MWCVersion', '2.4.8');
 define('MWC_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('MWC_PLUGIN_DIR', plugin_dir_path(__FILE__));
-
-
 
 try {
     // if WooCommerce is active, require the main class
@@ -98,9 +96,9 @@ add_action('wp_footer', function () {
     // WC()->session->destroy_session();
 
     // debug entire wc session
-    echo '<pre>';
-    print_r(WC()->session);
-    echo '</pre>';
+    // echo '<pre>';
+    // print_r(WC()->session);
+    // echo '</pre>';
 
     // get cart
     // $cart = WC()->cart->get_cart();
