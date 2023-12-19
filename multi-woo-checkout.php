@@ -159,3 +159,12 @@ add_action('woocommerce_cart_calculate_fees', function () {
     // add discount fee
     WC()->cart->add_fee($discount_text, -$discount_fee, false);
 }, PHP_INT_MAX);
+
+/**
+ * Destroy session on thank you page post checkout
+ */
+add_action('woocommerce_thankyou', function () {
+    if (WC()->session->get('mwc_style_type')) :
+        WC()->session->destroy_session();
+    endif;
+});
