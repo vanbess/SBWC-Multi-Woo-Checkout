@@ -73,6 +73,8 @@
   text-align: center;
   position: absolute;
   top: 33%;
+  max-width: 120px;
+  left: 8%;
 }
 
 .box_select .banner_discount .text_discount {

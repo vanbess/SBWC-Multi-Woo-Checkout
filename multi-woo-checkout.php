@@ -45,7 +45,6 @@ add_action('admin_menu', function () {
     );
 });
 
-
 // Require template and template functions
 require_once(MWC_PLUGIN_DIR . 'lib/front/class-add-template.php');
 require_once(MWC_PLUGIN_DIR . 'functions.php');
