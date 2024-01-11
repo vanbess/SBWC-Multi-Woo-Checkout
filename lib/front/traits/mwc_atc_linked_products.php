@@ -279,6 +279,7 @@ if (!trait_exists('AddToCartLinkedAjAction')) :
 
             wp_die();
         }
+
     }
 
 endif;

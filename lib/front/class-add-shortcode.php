@@ -40,7 +40,6 @@ if (!class_exists('MWCShortCode')) {
             if (!self::$initiated) {
                 self::init_hooks();
             }
-
         }
 
         /**
@@ -60,8 +59,8 @@ if (!class_exists('MWCShortCode')) {
             add_filter('woocommerce_is_checkout', array(__CLASS__, 'is_checkout_filter'));
 
             // Display order review template even when cart is empty in WC < 2.3
-            add_action('wp_ajax_woocommerce_update_order_review', array(__CLASS__, 'short_circuit_ajax_update_order_review'), 1);
-            add_action('wp_ajax_nopriv_woocommerce_update_order_review', array(__CLASS__, 'short_circuit_ajax_update_order_review'), 1);
+            // add_action('wp_ajax_woocommerce_update_order_review', array(__CLASS__, 'short_circuit_ajax_update_order_review'), 1);
+            // add_action('wp_ajax_nopriv_woocommerce_update_order_review', array(__CLASS__, 'short_circuit_ajax_update_order_review'), 1);
 
             // Display order review template even when cart is empty in WC 2.3+
             add_action('woocommerce_update_order_review_fragments', array(__CLASS__, 'mwc_update_order_review_fragments'));
@@ -73,8 +72,8 @@ if (!class_exists('MWCShortCode')) {
             add_action('template_redirect', array(__CLASS__, 'maybe_set_session'), 1);
 
             // Payment gateways
-            add_action('wp_ajax_mwc_fetch_pmt_gateways', [__CLASS__ , 'mwc_fetch_pmt_gateways']);
-            add_action('wp_ajax_nopriv_mwc_fetch_pmt_gateways',  [__CLASS__ , 'mwc_fetch_pmt_gateways']);
+            // add_action('wp_ajax_mwc_fetch_pmt_gateways', [__CLASS__, 'mwc_fetch_pmt_gateways']);
+            // add_action('wp_ajax_nopriv_mwc_fetch_pmt_gateways',  [__CLASS__, 'mwc_fetch_pmt_gateways']);
 
             // if any item in the cart has a price of 0.00, remove said item
             add_action('woocommerce_before_calculate_totals', array(__CLASS__, 'remove_free_products_from_cart'), 10, 1);
@@ -86,7 +85,8 @@ if (!class_exists('MWCShortCode')) {
          * @param  object $cart_object
          * @return void
          */
-        public static function remove_free_products_from_cart($cart_object){
+        public static function remove_free_products_from_cart($cart_object)
+        {
 
             if (is_admin() && !defined('DOING_AJAX')) {
                 return;
@@ -611,13 +611,13 @@ if (!class_exists('MWCShortCode')) {
         // function shortcode one page checkout style D
         public static function one_page_checkout_shortcode_style_D()
         {
-            $suffix      = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
+            // $suffix      = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
             $assets_path = str_replace(array('http:', 'https:'), '', WC()->plugin_url()) . '/assets/';
 
-            wp_enqueue_script('wc-checkout', $assets_path . 'js/frontend/checkout' . $suffix . '.js', array('jquery', 'woocommerce', 'wc-country-select', 'wc-address-i18n'), time(), true);
+            wp_enqueue_script('wc-checkout', $assets_path . 'js/frontend/checkout.js', array('jquery', 'woocommerce', 'wc-country-select', 'wc-address-i18n'), time(), true);
             wp_enqueue_style('mwc_front_style_D', MWC_PLUGIN_URL . 'resources/style/shortcode_style_D/front_style_D.css', array(), time(), 'all');
             wp_enqueue_script('mwc_package_order_checkout_D', MWC_PLUGIN_URL . 'resources/js/shortcode_style_D/one_page_checkout_D.js', array(), time(), true);
-            wp_enqueue_script('mwc_one_page_checkout_js', MWC_PLUGIN_URL . 'resources/js/one_page_checkout_js.js', array(), time(), true);
+            // wp_enqueue_script('mwc_one_page_checkout_js', MWC_PLUGIN_URL . 'resources/js/one_page_checkout_js.js', array(), time(), true);
 
             ob_start();
             require_once MWC_PLUGIN_DIR . 'view/shortcode_style_D/mwc_one_page_checkout_view_D.php';
@@ -725,3 +725,8 @@ if (!class_exists('MWCShortCode')) {
     // hook action shortcode class
     add_action('init', array('MWCShortCode', 'init'));
 }
+
+
+$lekker_man = new MWCShortCode();
+
+$lekker_man->init();

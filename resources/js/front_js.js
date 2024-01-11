@@ -1,7 +1,7 @@
 jQuery(document).ready(function ($) {
 
     // bail if template D
-    if ($('.opc_style_d_container').length) {
+    if ($('#opc_style_d_container').length) {
         return;
     }
 

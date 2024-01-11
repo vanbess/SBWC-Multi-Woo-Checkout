@@ -20,6 +20,7 @@ if (!class_exists('MWC')) :
     require_once __DIR__ . '/traits/mwc_return_linked_variations_dropdown.php';
     require_once __DIR__ . '/traits/mwc_return_onepage_checkout_variation_dropdown.php';
     require_once __DIR__ . '/traits/mwc_update_minicart_prices.php';
+    require_once __DIR__ . '/traits/mwc_atc_style_d.php';
 
     class MWC
     {
@@ -38,7 +39,8 @@ if (!class_exists('MWC')) :
             ReturnOnePageCoVarDD,
             MWC_Remove_Other_Coupons,
             MWC_PLL_Register_Strings,
-            MWC_Update_MiniCart;
+            MWC_Update_MiniCart,
+            MWC_ATC_Style_D;
 
         // vars
         private static $initiated = false;
@@ -55,8 +57,8 @@ if (!class_exists('MWC')) :
         // public static function init()
         // {
         //     if (!self::$initiated) :
-        //         self::init_hooks();
-        //     endif;
+                //         self::init_hooks();
+            //     endif;
         // }
 
         /**
@@ -82,13 +84,21 @@ if (!class_exists('MWC')) :
             add_action('wp_ajax_mwc_get_price_summary_table', array(__CLASS__, 'mwc_get_price_summary_table'));
             add_action('wp_ajax_nopriv_mwc_get_price_summary_table', array(__CLASS__, 'mwc_get_price_summary_table'));
 
-            // // action to set item prices to regular
+            // add to cart mwc template d products
+            add_action('wp_ajax_mwc_atc_template_d_products', array(__CLASS__, 'mwc_atc_template_d_products'));
+            add_action('wp_ajax_nopriv_mwc_atc_template_d_products', array(__CLASS__, 'mwc_atc_template_d_products'));
+
+            // action to set item prices to regular
             add_action('woocommerce_before_calculate_totals', array(__CLASS__, 'mwc_cart_apply_regular_prices'), PHP_INT_MAX, 1);
 
             /*****************************
              * Add bundle discount as fee
              *****************************/
             add_action('woocommerce_cart_calculate_fees', function () {
+
+                if (WC()->session->get('mwc_style_type')) :
+                    return;
+                endif;
 
                 // is mwc
                 $is_mwc = false;
@@ -219,7 +229,7 @@ if (!class_exists('MWC')) :
 
                 // if not mwc, return
                 if (!$is_mwc) :
-                    return;
+                return;
                 endif;
 
                 // file put contents paid and free product count
@@ -280,6 +290,8 @@ if (!class_exists('MWC')) :
 
             // register PLL strings
             self::mwc_pll_register_strings();
+
+            
         }
 
 

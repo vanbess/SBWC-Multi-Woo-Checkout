@@ -3,21 +3,21 @@
 /**
  * @package mwc
  * 
- * Plugin Name: Multi Woo Checkout [Van's Fixes] w. ALG pricing
+ * Plugin Name: Multi Woo Checkout [Van's Fixes] w. ALG pricing - Added Style D Support
  * Plugin URI:
  * Description: Multi Woo Checkout
  * Author: Webmaster0313 w/ lots of bugfixes and tweaks by WC Bessinger
- * Version: 2.4.7
+ * Version: 2.4.8
  * Author URI:
  * Text Domain: mwc
  * Domain Path: /languages
  */
 
-define('MWCVersion', '2.4.7');
+use Elementor\Core\Logger\Items\PHP;
+
+define('MWCVersion', '2.4.8');
 define('MWC_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('MWC_PLUGIN_DIR', plugin_dir_path(__FILE__));
-
-
 
 try {
     // if WooCommerce is active, require the main class
@@ -45,7 +45,6 @@ add_action('admin_menu', function () {
     );
 });
 
-
 // Require template and template functions
 require_once(MWC_PLUGIN_DIR . 'lib/front/class-add-template.php');
 require_once(MWC_PLUGIN_DIR . 'functions.php');
@@ -59,88 +58,13 @@ if (is_admin()) {
     require_once(MWC_PLUGIN_DIR . 'lib/front/class-add-shortcode.php');
 }
 
-return;
 // Require addon product class
-require_once(MWC_PLUGIN_DIR . 'lib/front/class-addon-product.php');
+// require_once(MWC_PLUGIN_DIR . 'lib/front/class-addon-product.php');
 
 // Define the locale for this plugin for internationalization
 add_action('plugins_loaded', function () {
     $plugin_rel_path = basename(dirname(__FILE__)) . '/languages';
     load_plugin_textdomain('mwc', false, $plugin_rel_path);
-});
-
-// ************************************************
-// FORCE FETCH WC PAYMENT GATEWAYS FOR OFFER PAGES
-// ************************************************
-
-add_action('wp_footer', function () {
-
-    global $post;
-
-    if (is_object($post) && has_shortcode($post->post_content, 'mwc_one_page_checkout')) : ?>
-        <script>
-            $ = jQuery.noConflict();
-
-            var data = {
-                'action': 'mwc_fetch_gateways',
-                '_ajax_nonce': '<?php echo wp_create_nonce('mwc fetch payment gateways'); ?>',
-            }
-
-            $.post('<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) {
-                console.log(response);
-                setTimeout(() => {
-                    $('#payment').prepend(response);
-                }, 6000);
-            }, function(error) {
-                console.log(error);
-            });
-        </script>
-    <?php endif;
-});
-
-add_action('wp_ajax_nopriv_mwc_fetch_gateways', function () {
-
-    check_ajax_referer('mwc fetch payment gateways');
-
-    // start woocommerce session
-    if (!session_id()) {
-        session_start();
-    }
-
-    // debug
-    // wp_send_json($_POST);
-
-    // get available payment gateways
-    $available_gateways = WC()->payment_gateways->get_available_payment_gateways();
-
-    // debug
-    // wp_send_json($available_gateways);
-
-    // html output start 
-    ?>
-    <ul class="wc_payment_methods payment_methods methods">
-
-        <?php
-        // available payment gateway html
-        foreach ($available_gateways as $gateway) : ?>
-            <li class="wc_payment_method payment_method_<?php echo esc_attr($gateway->id); ?>">
-                <input id="payment_method_<?php echo esc_attr($gateway->id); ?>" type="radio" class="input-radio" name="payment_method" value="<?php echo esc_attr($gateway->id); ?>" <?php checked($gateway->chosen, true); ?> data-order_button_text="<?php echo esc_attr($gateway->order_button_text); ?>" />
-
-                <label for="payment_method_<?php echo esc_attr($gateway->id); ?>">
-                    <?php echo $gateway->get_title(); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?> <?php echo $gateway->get_icon(); /* phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped */ ?>
-                </label>
-                <?php if ($gateway->has_fields() || $gateway->get_description()) : ?>
-                    <div class="payment_box payment_method_<?php echo esc_attr($gateway->id); ?>" <?php if (!$gateway->chosen) : /* phpcs:ignore Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace */ ?>style="display:none;" <?php endif; /* phpcs:ignore Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace */ ?>>
-                        <?php $gateway->payment_fields(); ?>
-                    </div>
-                <?php endif; ?>
-            </li>
-        <?php endforeach;
-
-        ?>
-    </ul>
-<?php
-    wp_die();
 });
 
 // *********
@@ -161,3 +85,85 @@ require_once MWC_PLUGIN_DIR . 'tracking/thank-you-page.php';
 
 // reset tracking data for addons and bundles
 require_once MWC_PLUGIN_DIR . 'tracking/reset-tracking.php';
+
+// debug cart
+add_action('wp_footer', function () {
+
+    // echo 'thou art here';
+
+    // destroy session
+    // WC()->session->destroy_session();
+
+    // debug entire wc session
+    // echo '<pre>';
+    // print_r(WC()->session);
+    // echo '</pre>';
+
+    // get cart
+    // $cart = WC()->cart->get_cart();
+
+    // echo '<pre>';
+    // print_r($cart);
+    // echo '</pre>';
+
+
+});
+
+/**
+ * Add discount fee to cart
+ * IMPORTANT NOTE: Because ALG assumes and pricing in WC() session is USD and converts it again to current currency, we need to revert this conversion before adding it to the cart, else the
+ * discount fee will be converted twice and the discount will be wrong, i.e. waaaaay too high.      
+ */
+add_action('woocommerce_cart_calculate_fees', function () {
+
+    if (!WC()->session->get('mwc_style_type')) :
+        return;
+    endif;
+
+    if (is_admin() && !defined('DOING_AJAX')) {
+        return;
+    }
+
+    // don't run this more than once
+    if (did_action('woocommerce_cart_calculate_fees') >= 2) {
+        return;
+    }
+
+    // get current currency
+    $currency = alg_get_current_currency_code() ? alg_get_current_currency_code() : get_woocommerce_currency();
+
+    // setup exchange rate
+    $exchange_rate = alg_wc_cs_get_exchange_rate($currency, 'USD');
+
+    // getting product type
+    $product_type = WC()->session->get('mwc_prod_type');
+
+    // if is type product bundle, use discount amount instead of discount percentage
+    if ($product_type == 'mwc_bun_discount') :
+
+        // get discount fee
+        $discount_fee = WC()->session->get('mwc_discount_fee');
+
+    else :
+        // get discount percentage
+        $discount_perc = WC()->session->get('mwc_discount_perc');
+
+        // calculate discount fee
+        $discount_fee = (WC()->cart->subtotal * $discount_perc) / 100;
+    endif;
+
+    // get discount text
+    $discount_text = WC()->session->get('mwc_discount_text');
+
+    // add discount fee
+    WC()->cart->add_fee($discount_text, -$discount_fee, false);
+}, PHP_INT_MAX);
+
+/**
+ * Destroy session on thank you page post checkout
+ */
+add_action('woocommerce_thankyou', function () {
+    if (WC()->session->get('mwc_style_type')) :
+        WC()->session->destroy_session();
+    endif;
+});
